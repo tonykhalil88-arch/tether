@@ -7,7 +7,8 @@ runnable from the command line. Presentation comes later.
 Two players duel with a 50-card deck plus a single Vanguard. Card types are
 **Vanguard**, **Banner** (creature), **Technique** (one-shot) and **Stage**
 (persistent field). The engine runs the real **WM01 "The First Stampede"** set
-— 88 cards across five tribes (Redgale, Runner, Pact, Consortium, Bulwark).
+— 100 cards across five tribes (Redgale, Runner, Pact, Consortium, Bulwark),
+at patch 1.1 (Strict Purity).
 
 **Phase 3 adds a playable human-vs-AI 3D client** on top of this frozen engine
 (`client/`, main scene `client/main.tscn`). The client is a pure consumer: it
@@ -52,7 +53,7 @@ wildmigration/
 │       ├── effect_engine.gd      # data-driven effect resolver (WM01 schema)
 │       └── hooks.gd              # GDScript hook escape hatch for bespoke effects
 ├── data/cards/
-│   └── wildmigration_set1.json   # WM01 — 88 cards
+│   └── wildmigration_set1.json   # WM01 — 100 cards (patch 1.1)
 ├── tools/importer.gd             # JSON <-> CardData importer (lossless)
 ├── sim/
 │   ├── ai_policy.gd              # two AI policies (aggro / guard), Rush + Freeze aware
@@ -80,14 +81,14 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (155 tests: 139 engine + 16 client).
+All suites report **All tests passed!** (157 tests: 141 engine + 16 client).
 The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
 Phase 3 presentation layer and the Brief 10 readability pass (card-text
 synthesis, inspector data binding, deterministic placeholder art). Coverage:
 
 | Suite | Covers |
 |-------|--------|
-| `test_importer.gd` | round-trip over all 88 cards, validation, power ceiling |
+| `test_importer.gd` | round-trip over all 100 cards, validation, power ceiling |
 | `test_setup.gd` | opening hand, 5-mono / 4-dual Life, free mulligan |
 | `test_turn_flow.gd` | phase order, Refresh, turn/battle buff expiry, no hand cap |
 | `test_first_player.gd` | first-player skip-draw + 1-Aura asymmetries |
@@ -104,7 +105,7 @@ synthesis, inspector data binding, deterministic placeholder art). Coverage:
 | `test_watch.gd` | balance watch-list counters increment on resolution |
 | `test_ai_behavior.gd` | AI understands Rush and Freeze |
 | `test_policies.gd` | each archetype's signature line (incl. Stampede loops) |
-| `test_deck_validator.gd` | 50-card / max-4-copies / colour-legality rules |
+| `test_deck_validator.gd` | 50-card / max-4-copies / **Strict Purity** subset rule |
 | `test_ablations.gd` | ablation flags (A1–A5) + defence-economy metrics |
 | `test_patch02.gd` | Patch 0.2 values + the Stampede `refreshed` rider |
 | `test_patch03.gd` | Patch 0.3 values + the `defender_has_rested_banner` line |
@@ -167,6 +168,14 @@ game, the **defence economy** (connect rate, counters per Life lost, avg
 attacker vs defender power), the exact decklists, and **REVIEW** flags for any
 matchup outside 35–65% or Vanguard outside 45–55%. Results reflect both card
 balance *and* pilot skill — first-pass evidence, not a verdict.
+
+`sim/revalidation.gd` runs the matrix **and** the C0 shared-generic-pilot control
+together (matched seeds) and writes `revalidation_report.md` — this is what
+produced the current **v1.1 Strict-Purity baseline**:
+
+```bash
+godot --headless -s sim/revalidation.gd -- --games=50 --seed=1
+```
 
 ### Isolation pass (ablations + control)
 
