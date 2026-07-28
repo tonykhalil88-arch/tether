@@ -99,17 +99,23 @@ func _banner_row(img: Image, ps: PlayerState, y: int) -> void:
 func _unit_thumb(img: Image, inst: CardInstance, x: int, y: int) -> void:
 	if inst == null:
 		return
-	var frame: Image = CardFrame.render(inst.data)
-	frame.resize(TW, TH, Image.INTERPOLATE_NEAREST)
+	# Deterministic per-id placeholder art (the new distinct identity), so the
+	# schematic reflects that every card now reads differently.
+	var frame: Image = PlaceholderArt.card_art(inst.data, TW * 2, TH * 2)
+	frame.resize(TW, TH, Image.INTERPOLATE_LANCZOS)
 	img.blit_rect(frame, Rect2i(0, 0, TW, TH), Vector2i(x, y))
-	# Status tag under the card.
-	var tag := ""
+	# Name + power under the card (clipped to the thumb width).
+	var name := inst.data.name
+	if PixelFont.measure(name, 1) > TW:
+		name = name.substr(0, 11)
+	_text(img, name, x, y + TH + 2, Color(0.92, 0.92, 0.85), 1)
+	var stat := "L%d" % inst.data.vanguard_life() if inst.data.type == "vanguard" else "P%d" % inst.data.power
+	var tag := stat
 	if inst.frozen:
-		tag = "FROZEN"
+		tag += "  FROZEN"
 	elif inst.exhausted:
-		tag = "RESTED"
-	if tag != "":
-		_text(img, tag, x, y + TH + 2, Color(0.6, 0.8, 1.0), 1)
+		tag += "  RESTED"
+	_text(img, tag, x, y + TH + 12, Color(0.7, 0.85, 1.0), 1)
 
 
 func _zone_counts(img: Image, ps: PlayerState, x: int, y: int) -> void:

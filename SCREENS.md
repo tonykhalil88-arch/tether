@@ -13,20 +13,28 @@ presentation beats. No rules live in `client/`.
 
 > **Why a schematic and not a framebuffer grab?** This repo runs under
 > `godot --headless`, whose dummy video driver cannot render a 3D framebuffer to
-> disk. The capture above is therefore generated *from the same Image tools the
-> live client renders with* (`CardFrame` + `PixelFont`) by playing a real
-> scripted game to a mid-game state and drawing the resulting **public** board.
-> On a machine with a GPU the identical state is drawn in 3D — Sprite3D creature
-> billboards on an angled table, the same zones, the same counts. Regenerate it
-> any time with:
+> disk. The capture above is generated *from the same Image tools the live client
+> renders with* — now using `PlaceholderArt` (the new deterministic per-id card
+> identity) — by playing a real scripted game to a mid-game state and drawing the
+> resulting **public** board. On a machine with a GPU the identical state is drawn
+> in 3D: creature billboards on an angled, lit table, real-font card frames, the
+> aura rack, zone plaques. Regenerate it any time with:
 >
 > ```bash
 > godot --headless -s tools/gen_screens.gd     # -> docs/screens/board_schematic.png
 > ```
 
-The capture shows both seats: each Vanguard, the Banner row, the Stage slot, and
-the Life / Aura / Hand / Deck / Trash counts, plus the human hand fanned along
-the bottom. `RESTED` / `FROZEN` tags sit under any exhausted or frozen unit.
+The capture shows both seats: each Vanguard, the Banner row, the Stage slot, the
+Life / Aura / Hand / Deck / Trash counts, and the human hand. Note that **every
+card now has a distinct colour + sigil + initial** (Redgale red, Bulwark/Pact
+gold, Runner green…), with its name and power/life printed — no two cards look
+alike. The two example cards (Stormfoal, Cull-Beast) keep their real art.
+
+> **Headless caveat for reviewers.** The schematic is a faithful 2D projection of
+> public state, but it is **not** the 3D scene. The camera framing, lighting,
+> shadows, glow/vignette, table material, Label3D card text, and the hover
+> **Card Inspector** only exist on a real GPU. That is exactly why the acceptance
+> gate for this pass is the **Human Checklist** below, run on Tony's machine.
 
 ---
 
@@ -46,6 +54,7 @@ godot                      # main scene is client/main.tscn
 
 | Action | Input |
 | --- | --- |
+| **Read any card** | **Hover ~0.3s → Card Inspector (right side); click a card to pin it; Esc to close** |
 | Play a card | Click a lit hand card (auto-slots; dimmed = unaffordable/no slot) |
 | Pick an attacker | Click one of your units (a green ring appears) |
 | Attack | Click a highlighted (red-ring) enemy unit / Vanguard |
@@ -53,6 +62,13 @@ godot                      # main scene is client/main.tscn
 | Activate an ability | `Activate VG` / `Activate Stage` |
 | Speed / skip animations | `Speed 1x↔2x`, `Skip` |
 | End your turn | `End Turn` |
+
+The **Card Inspector** shows the full card: name, cost, colours, tribe,
+keywords, complete effect text (synthesised from the structured data by
+`CardText`), and flavour. It works **during prompts too**, so you can hover the
+attacking creature while deciding whether to spend counters. Whenever an action
+is illegal, the reason (e.g. *"can't attack: exhausted"*) floats **at the card**,
+not only in the corner status banner.
 
 **Prompts** appear as center panels when it's your decision:
 - **Mulligan** — keep your opening hand or redraw once.
@@ -106,5 +122,43 @@ They verify, headless:
 - the full client stack (BoardView + Hud) plays **turn 1** — mulligan, play,
   attack, pass — driven through the board's own click handlers, with no errors.
 
+**Brief 10 readability smoke** (`test_readability_smoke.gd`) additionally checks:
+- `CardText` synthesises correct effect text (e.g. *"On Play (2 Aura): KO an
+  enemy Banner with 5000 power or less"*) and spells out keywords;
+- the **Card Inspector** binds a pinned card's data and live-swaps on hover;
+- **placeholder art is deterministic** — same id → identical bytes, different ids
+  → different art — and the creature-sprite fallback is the per-id sigil, **not**
+  the shared magenta diamond, while the two real-art cards keep their art.
+
 **Engine untouched:** all pre-existing engine tests still pass — the full suite
-is **146/146 green** (139 engine + 7 client).
+is **155/155 green** (139 engine + 16 client).
+
+---
+
+## Human Checklist — for Tony (the Definition of Done for Brief 10)
+
+A human has eyes now, so the acceptance gate is you, on your machine (RTX 3050 /
+1080p target). Launch with `godot` (main scene `client/main.tscn`), start a match,
+and report **pass/fail per item**. Suggested opponent: **Neza (lockdown)** or
+**Bram (refresh_tempo)** for a busy board.
+
+| # | Check | Pass? |
+|---|-------|:-----:|
+| 1 | From your hand, hover **Ragnir, Thunder-Maned** and read its full effect text in the inspector without squinting ("On Play (2 Aura): KO an enemy Banner with 5000 power or less"). | ☐ |
+| 2 | Read a **long card name** in full on the frame (it wraps / shrinks — nothing is cut off with "…"). | ☐ |
+| 3 | **Identify every creature on the board without clicking** — colour + sigil + name make each one distinct (no field of identical diamonds). | ☐ |
+| 4 | **Find both players' Aura totals in under a second** — the two racks (bright = refreshed, dim = exhausted, ice-blue = frozen) each show `AURA n/total`. | ☐ |
+| 5 | Hover an enemy Banner **during a defence prompt** and read it while the prompt is still open (deciding counters). | ☐ |
+| 6 | **Click a card to pin** the inspector, move the mouse away, confirm it stays; press **Esc** to close. | ☐ |
+| 7 | Try to attack with a **rested/summoning-sick** unit and see the reason (*"can't attack: exhausted / summoning sick"*) float **at that unit**. | ☐ |
+| 8 | Confirm the **turn banner** is large and colour-coded (green on your turn, red on the AI's). | ☐ |
+| 9 | Confirm the board **reads as a lit place**: warm/cool lighting, soft shadows under creatures, carved slot inlays, dark-wood table, gentle vignette — legible first, moody second. | ☐ |
+| 10 | Confirm each **creature billboard sits centred ABOVE its slot** (not offset to the side), and that **Stormfoal Hatchling / Cull-Beast 01 show their real art** while everything else shows its placeholder sigil. | ☐ |
+
+Bonus perf check: with a full board + several animations, does it stay smooth at
+1080p on the 3050? Note any hitches (card-frame build, glow, shadows) so they can
+be tuned.
+
+> Reminder: items 1–2 and 5–9 are **only observable on a real GPU** — the headless
+> CI can prove the data and wiring are correct (155/155 tests) but not that the
+> pixels look right. That's this checklist's job.

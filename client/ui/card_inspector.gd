@@ -97,8 +97,8 @@ func hover_show(card: CardData) -> void:
 		return
 	_pending = card
 	_hide_timer.stop()
-	if _panel.visible and not _pinned:
-		# Already open (transient) — switch immediately, no re-delay.
+	if _panel.visible:
+		# Already open — swap to the hovered card immediately (pinned or not).
 		_populate(card)
 	else:
 		_show_timer.start()
@@ -130,6 +130,15 @@ func is_open() -> bool:
 
 func current_card() -> CardData:
 	return _current
+
+
+## The rendered body text (for tests / data-binding checks).
+func inspected_text() -> String:
+	return _body.text if _body != null else ""
+
+
+func meta_text() -> String:
+	return _meta.text if _meta != null else ""
 
 
 func _unhandled_input(event: InputEvent) -> void:

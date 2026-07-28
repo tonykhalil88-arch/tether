@@ -80,7 +80,10 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (139 tests). Coverage:
+All suites report **All tests passed!** (155 tests: 139 engine + 16 client).
+The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
+Phase 3 presentation layer and the Brief 10 readability pass (card-text
+synthesis, inspector data binding, deterministic placeholder art). Coverage:
 
 | Suite | Covers |
 |-------|--------|
