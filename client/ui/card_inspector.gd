@@ -12,6 +12,7 @@ const SHOW_DELAY := 0.3
 const HIDE_DELAY := 0.15
 
 var _panel: PanelContainer
+var _band: TextureRect
 var _art: TextureRect
 var _title: Label
 var _meta: Label
@@ -56,6 +57,14 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	_panel.add_child(box)
+
+	# Colour-identity header band: a 50/50 vertical split for dual cards (left =
+	# colour A, right = colour B), solid for mono. Never a blended colour.
+	_band = TextureRect.new()
+	_band.custom_minimum_size = Vector2(324, 10)
+	_band.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_band.stretch_mode = TextureRect.STRETCH_SCALE
+	box.add_child(_band)
 
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 24)
@@ -165,11 +174,22 @@ func _populate(card: CardData) -> void:
 	_current = card
 	_title.text = card.name
 	_meta.text = _meta_line(card)
+	_band.texture = _identity_band(card)
 	_art.texture = ImageTexture.create_from_image(
 		PlaceholderArt.card_art(card, 336, 480))
 	_body.text = _body_bbcode(card)
 	_pin_hint.text = "click a card to pin · Esc to close" if not _pinned else "pinned · Esc to close"
 	_panel.visible = true
+
+
+## A 2px-wide identity texture: left column = colour A, right = colour B. Stretched
+## across the header band it reads as a 50/50 vertical split (solid for mono).
+func _identity_band(card: CardData) -> Texture2D:
+	var cols: Array = PlaceholderArt.identity_colors(card.colors)
+	var img := Image.create(2, 1, false, Image.FORMAT_RGBA8)
+	img.set_pixel(0, 0, cols[0])
+	img.set_pixel(1, 0, cols[1])
+	return ImageTexture.create_from_image(img)
 
 
 func _meta_line(card: CardData) -> String:

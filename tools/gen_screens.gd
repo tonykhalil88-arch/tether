@@ -22,7 +22,7 @@ func _init() -> void:
 	mc = MatchController.new()
 	get_root().add_child(mc)
 	mc.auto_prompts = true
-	mc.begin_match("wm01-001", "wm01-034", 5, HUMAN)
+	mc.begin_match("wm01-012", "wm01-078", 5, HUMAN)
 
 	# Play until both sides have a developed board (or turn 5), then snapshot.
 	var guard := 0
@@ -59,7 +59,7 @@ func _compose() -> Image:
 	var turn := mc.engine.state.turn_number
 	_text(img, "WILDMIGRATION  -  BOARD SCHEMATIC  -  TURN %d" % turn, 24, 18,
 		Color(0.95, 0.95, 0.98), 3)
-	_text(img, "human (rush)  vs  ai (lockdown)          generated headless - the live client renders this in 3D",
+	_text(img, "human (rest_punish, red/green dual)  vs  ai (threshold_ramp, purple)   -   generated headless - live client renders in 3D",
 		24, 52, Color(0.6, 0.7, 0.55), 1)
 
 	# Opponent band.

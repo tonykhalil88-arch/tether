@@ -6,7 +6,9 @@ extends RefCounted
 ## produces the same art, so two Stormfoals look identical and no two different
 ## cards collide by accident.
 ##
-##   * palette   — from colour identity (red/blue/green/purple, blended if dual)
+##   * palette   — from colour identity. Mono = one colour; DUAL = a 50/50
+##                 vertical SPLIT (left = colour A, right = colour B, order as
+##                 listed in colors[]) — NEVER a blended/averaged colour.
 ##   * pattern   — family chosen by tribe (stripes/scatter/chevron/grid/bricks)
 ##   * sigil     — a bold symmetric silhouette seeded by the id hash
 ##   * initial   — the name's first letter worked in as a watermark
@@ -38,59 +40,88 @@ static var _sprite_cache: Dictionary = {}
 # Public
 # =========================================================================
 
-static func palette(colors: Array) -> Dictionary:
-	var base := NEUTRAL
-	if not colors.is_empty():
-		base = COLORS.get(str(colors[0]), NEUTRAL)
-		if colors.size() >= 2:
-			base = base.lerp(COLORS.get(str(colors[1]), NEUTRAL), 0.5)
+## Palette for a single colour (never blended).
+static func _one(color: Color) -> Dictionary:
 	return {
-		"base": base,
-		"dark": base.darkened(0.55),
-		"accent": base.lightened(0.35),
+		"base": color,
+		"dark": color.darkened(0.55),
+		"accent": color.lightened(0.35),
 		"ink": Color(0.96, 0.95, 0.92),
 	}
 
 
-## Background art Image for a card frame at (w,h). Includes dark title/stat bands
-## so overlaid light text stays legible.
-static func card_art(card: CardData, w: int, h: int) -> Image:
-	var pal := palette(card.colors)
-	var seed := _hash(card.id)
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	img.fill(pal["dark"])
+## The two identity palettes [A, B]. Mono cards return the same palette twice, so
+## every draw path can treat the card as a 50/50 split uniformly (a mono split of
+## one colour is indistinguishable from a solid fill).
+static func palettes(colors: Array) -> Array:
+	var a := NEUTRAL
+	var b := NEUTRAL
+	if not colors.is_empty():
+		a = COLORS.get(str(colors[0]), NEUTRAL)
+		b = COLORS.get(str(colors[1]), a) if colors.size() >= 2 else a
+	return [_one(a), _one(b)]
 
-	# Art field.
+
+## Primary identity palette (colour A). Back-compat convenience; NOT blended.
+static func palette(colors: Array) -> Dictionary:
+	return palettes(colors)[0]
+
+
+## The card's identity colours [A, B] (base tones), for chips/bands elsewhere.
+## Mono returns the same colour twice.
+static func identity_colors(colors: Array) -> Array:
+	var p := palettes(colors)
+	return [p[0]["base"], p[1]["base"]]
+
+
+## Background art Image for a card frame at (w,h). Dual cards split left/right;
+## mono cards look solid. Dark title/stat bands keep overlaid light text legible.
+static func card_art(card: CardData, w: int, h: int) -> Image:
+	var ps := palettes(card.colors)
+	var A: Dictionary = ps[0]
+	var B: Dictionary = ps[1]
+	var seed := _hash(card.id)
+	var mid := int(w * 0.5)
+	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	# Split background.
+	_fill(img, 0, 0, mid, h, A["dark"])
+	_fill(img, mid, 0, w - mid, h, B["dark"])
+
+	# Split art field, patterned per half.
 	var fx := int(w * 0.06)
 	var fy := int(h * 0.14)
 	var fw := w - fx * 2
 	var fh := int(h * 0.52)
-	_fill(img, fx, fy, fw, fh, pal["base"])
-	_pattern(img, fx, fy, fw, fh, _pattern_for(card.tribe), pal, seed)
-	_sigil(img, fx + fw / 2, fy + fh / 2, int(min(fw, fh) * 0.34), pal, seed)
-	_initial(img, card.name, fx + 4, fy + 2, pal)
+	_fill(img, fx, fy, mid - fx, fh, A["base"])
+	_fill(img, mid, fy, fx + fw - mid, fh, B["base"])
+	_pattern(img, fx, fy, mid - fx, fh, _pattern_for(card.tribe), A, seed)
+	_pattern(img, mid, fy, fx + fw - mid, fh, _pattern_for(card.tribe), B, seed)
+	# Sigil centred on the split line, coloured per half.
+	_sigil(img, mid, fy + fh / 2, int(min(fw, fh) * 0.34), A, B, seed)
+	_initial(img, card.name, fx + 4, fy + 2, A)
 
-	# Colour-identity border.
-	_border(img, 0, 0, w, h, 3, pal["accent"])
-	# Title band (top) + stat band (bottom) for legible overlaid text.
-	_fill(img, 0, 0, w, int(h * 0.12), pal["dark"].darkened(0.1))
-	_fill(img, 0, int(h * 0.80), w, int(h * 0.20), pal["dark"].darkened(0.1))
+	# Split colour-identity border.
+	_border_lr(img, 0, 0, w, h, 3, A["accent"], B["accent"])
+	# Title band (top) + stat band (bottom), each split so identity still reads.
+	_band(img, 0, int(h * 0.12), A, B, mid, w, 0, 0)
+	_band(img, int(h * 0.80), int(h * 0.20), A, B, mid, w, 0, 0)
 	return img
 
 
-## Creature billboard texture for a card (cached by id). Transparent PNG-style
-## sigil silhouette in the card's palette, ~size x size.
+## Creature billboard texture for a card (cached by id). Dual cards use a split
+## body + split sigil; mono cards look solid.
 static func sprite_for(card: CardData, size: int = 96) -> Texture2D:
 	if _sprite_cache.has(card.id):
 		return _sprite_cache[card.id]
-	var pal := palette(card.colors)
+	var ps := palettes(card.colors)
+	var A: Dictionary = ps[0]
+	var B: Dictionary = ps[1]
 	var seed := _hash(card.id)
 	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
-	# Soft body blob so the sigil sits on a readable silhouette.
-	_blob(img, size / 2, int(size * 0.56), int(size * 0.40), int(size * 0.34), pal["base"])
-	_sigil(img, size / 2, int(size * 0.50), int(size * 0.30), pal, seed)
-	_initial(img, card.name, int(size * 0.06), int(size * 0.04), pal)
+	_blob(img, size / 2, int(size * 0.56), int(size * 0.40), int(size * 0.34), A, B)
+	_sigil(img, size / 2, int(size * 0.50), int(size * 0.30), A, B, seed)
+	_initial(img, card.name, int(size * 0.06), int(size * 0.04), A)
 	var tex := ImageTexture.create_from_image(img)
 	_sprite_cache[card.id] = tex
 	return tex
@@ -158,12 +189,11 @@ static func _pattern(img: Image, x: int, y: int, w: int, h: int, kind: String,
 					_fill(img, x + col, y + row, 1, min(10, h - row), line)
 
 
-static func _sigil(img: Image, cx: int, cy: int, r: int, pal: Dictionary, seed: int) -> void:
+static func _sigil(img: Image, cx: int, cy: int, r: int, A: Dictionary, B: Dictionary, seed: int) -> void:
 	# A symmetric star/gear seeded by the hash: number of points 5..9, drawn as a
-	# filled radial polygon mirrored across the vertical axis for symmetry.
+	# filled radial polygon mirrored across the vertical axis for symmetry. The
+	# left half uses palette A, the right half palette B (split down the centre).
 	var points := 5 + (seed % 5)
-	var accent: Color = pal["accent"]
-	var ink: Color = pal["ink"]
 	for y in range(cy - r, cy + r + 1):
 		if y < 0 or y >= img.get_height():
 			continue
@@ -178,7 +208,8 @@ static func _sigil(img: Image, cx: int, cy: int, r: int, pal: Dictionary, seed: 
 			var ang := atan2(dy, absf(dx))          # mirror across vertical axis
 			var lobe := 0.62 + 0.38 * cos(ang * points)
 			if dist <= r * lobe:
-				img.set_pixel(x, y, accent if dist > r * lobe * 0.55 else ink)
+				var pal: Dictionary = A if x < cx else B
+				img.set_pixel(x, y, pal["accent"] if dist > r * lobe * 0.55 else pal["ink"])
 
 
 static func _initial(img: Image, name: String, x: int, y: int, pal: Dictionary) -> void:
@@ -208,6 +239,25 @@ static func _border(img: Image, x: int, y: int, w: int, h: int, t: int, c: Color
 	_fill(img, x + w - t, y, t, h, c)
 
 
+## Split border: top/bottom edges split at the centre, left edge = A, right = B.
+static func _border_lr(img: Image, x: int, y: int, w: int, h: int, t: int,
+		cA: Color, cB: Color) -> void:
+	var mid := int(img.get_width() * 0.5)
+	_fill(img, x, y, mid - x, t, cA)
+	_fill(img, mid, y, x + w - mid, t, cB)
+	_fill(img, x, y + h - t, mid - x, t, cA)
+	_fill(img, mid, y + h - t, x + w - mid, t, cB)
+	_fill(img, x, y, t, h, cA)
+	_fill(img, x + w - t, y, t, h, cB)
+
+
+## A darkened title/stat band, split left/right so identity reads inside it too.
+static func _band(img: Image, y: int, h: int, A: Dictionary, B: Dictionary,
+		mid: int, w: int, _a: int, _b: int) -> void:
+	_fill(img, 0, y, mid, h, A["dark"].darkened(0.1))
+	_fill(img, mid, y, w - mid, h, B["dark"].darkened(0.1))
+
+
 static func _disc(img: Image, cx: int, cy: int, r: int, c: Color) -> void:
 	for y in range(cy - r, cy + r + 1):
 		if y < 0 or y >= img.get_height():
@@ -219,7 +269,7 @@ static func _disc(img: Image, cx: int, cy: int, r: int, c: Color) -> void:
 				img.set_pixel(x, y, c)
 
 
-static func _blob(img: Image, cx: int, cy: int, rx: int, ry: int, c: Color) -> void:
+static func _blob(img: Image, cx: int, cy: int, rx: int, ry: int, A: Dictionary, B: Dictionary) -> void:
 	for y in range(cy - ry, cy + ry + 1):
 		if y < 0 or y >= img.get_height():
 			continue
@@ -229,4 +279,4 @@ static func _blob(img: Image, cx: int, cy: int, rx: int, ry: int, c: Color) -> v
 			var nx := float(x - cx) / float(rx)
 			var ny := float(y - cy) / float(ry)
 			if nx * nx + ny * ny <= 1.0:
-				img.set_pixel(x, y, c)
+				img.set_pixel(x, y, (A if x < cx else B)["base"])

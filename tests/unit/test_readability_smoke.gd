@@ -72,6 +72,46 @@ func test_placeholder_art_differs_between_ids():
 	assert_ne(a.get_data(), b.get_data(), "different ids -> different art")
 
 
+func test_dual_colour_card_renders_a_5050_vertical_split_not_a_blend():
+	# Verdigris is red/green. The art field left half must be the RED tone and the
+	# right half the GREEN tone — and NEITHER may be the averaged/blended colour.
+	var verdigris := DeckFactory.card("wm01-013")   # colors = [red, green]
+	var img := PlaceholderArt.card_art(verdigris, 168, 240)
+	var left := img.get_pixel(20, 90)
+	var right := img.get_pixel(148, 90)
+	var ids: Array = PlaceholderArt.identity_colors(verdigris.colors)
+	assert_ne(left, right, "dual card has a left/right split, not one colour")
+	assert_true(_col_close(left, ids[0]), "left half is colour A (red)")
+	assert_true(_col_close(right, ids[1]), "right half is colour B (green)")
+	var blended: Color = ids[0].lerp(ids[1], 0.5)
+	assert_false(_col_close(left, blended), "left half is never the blended colour")
+	assert_false(_col_close(right, blended), "right half is never the blended colour")
+	# Determinism: same id -> same split.
+	var img2 := PlaceholderArt.card_art(verdigris, 168, 240)
+	assert_eq(img.get_data(), img2.get_data(), "same id -> identical split art")
+
+
+## Colours compared with an 8-bit tolerance (RGBA8 quantises float channels).
+func _col_close(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) < 0.02 and absf(a.g - b.g) < 0.02 and absf(a.b - b.b) < 0.02
+
+
+func test_mono_colour_card_is_solid_not_split():
+	var ragnir := DeckFactory.card("wm01-002")   # mono red
+	var img := PlaceholderArt.card_art(ragnir, 168, 240)
+	assert_eq(img.get_pixel(20, 90), img.get_pixel(148, 90),
+		"mono card art field is one colour on both halves")
+
+
+func test_dual_sprite_splits_too():
+	PlaceholderArt.clear_cache()
+	var idris := DeckFactory.card("wm01-058")   # blue/purple banner
+	var img := PlaceholderArt.sprite_for(idris, 96).get_image()
+	# Opaque body pixels either side of the vertical centre differ by colour.
+	assert_ne(img.get_pixel(30, 54), img.get_pixel(66, 54),
+		"dual creature sprite is split, not one colour")
+
+
 func test_creature_sprite_fallback_is_per_id_not_the_shared_diamond():
 	AssetManifest.clear_cache()
 	PlaceholderArt.clear_cache()

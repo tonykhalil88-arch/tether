@@ -110,13 +110,13 @@ static func _as_dict(card) -> Dictionary:
 	return {}
 
 
+## NOTE: this v1 pixel-font frame is superseded by CardVisual (Card Frame v2),
+## which shows dual-colour identity as a 50/50 vertical split (see PlaceholderArt).
+## v1 survives only as a headless dimension check; it uses the PRIMARY colour and
+## never a blended/averaged colour (per the Strict-split rule).
 static func _accent(colors) -> Color:
 	if typeof(colors) == TYPE_ARRAY and not colors.is_empty():
-		var a: Color = COLORS.get(str(colors[0]), NEUTRAL)
-		if colors.size() >= 2:
-			var b: Color = COLORS.get(str(colors[1]), NEUTRAL)
-			return a.lerp(b, 0.5)
-		return a
+		return COLORS.get(str(colors[0]), NEUTRAL)
 	return NEUTRAL
 
 

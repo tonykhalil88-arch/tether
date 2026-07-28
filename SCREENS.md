@@ -24,11 +24,14 @@ presentation beats. No rules live in `client/`.
 > godot --headless -s tools/gen_screens.gd     # -> docs/screens/board_schematic.png
 > ```
 
-The capture shows both seats: each Vanguard, the Banner row, the Stage slot, the
-Life / Aura / Hand / Deck / Trash counts, and the human hand. Note that **every
-card now has a distinct colour + sigil + initial** (Redgale red, Bulwark/Pact
-gold, Runner green…), with its name and power/life printed — no two cards look
-alike. The two example cards (Stormfoal, Cull-Beast) keep their real art.
+The capture (human = **Kaya, red/green dual**) shows both seats: each Vanguard,
+the Banner row, the Stage slot, the Life / Aura / Hand / Deck / Trash counts, and
+the human hand. Note that **every card has a distinct colour + sigil + initial**,
+with its name and power/life printed — no two cards look alike. **Dual-colour
+cards render a 50/50 vertical split** (Kaya's red/green cards are red on the left,
+green on the right — never a blended colour), while mono cards (the purple
+opponent) stay solid. The two example cards (Stormfoal, Cull-Beast) keep their
+real art.
 
 > **Headless caveat for reviewers.** The schematic is a faithful 2D projection of
 > public state, but it is **not** the 3D scene. The camera framing, lighting,
@@ -128,10 +131,13 @@ They verify, headless:
 - the **Card Inspector** binds a pinned card's data and live-swaps on hover;
 - **placeholder art is deterministic** — same id → identical bytes, different ids
   → different art — and the creature-sprite fallback is the per-id sigil, **not**
-  the shared magenta diamond, while the two real-art cards keep their art.
+  the shared magenta diamond, while the two real-art cards keep their art;
+- **dual-colour cards render a 50/50 vertical split** (left = colour A, right =
+  colour B, never a blend); mono cards stay solid; the split is deterministic and
+  applies to the frame, the creature sprite, and the inspector band.
 
 **Engine untouched:** all pre-existing engine tests still pass — the full suite
-is **155/155 green** (139 engine + 16 client).
+is **160/160 green** (141 engine + 19 client).
 
 ---
 
@@ -154,11 +160,13 @@ and report **pass/fail per item**. Suggested opponent: **Neza (lockdown)** or
 | 8 | Confirm the **turn banner** is large and colour-coded (green on your turn, red on the AI's). | ☐ |
 | 9 | Confirm the board **reads as a lit place**: warm/cool lighting, soft shadows under creatures, carved slot inlays, dark-wood table, gentle vignette — legible first, moody second. | ☐ |
 | 10 | Confirm each **creature billboard sits centred ABOVE its slot** (not offset to the side), and that **Stormfoal Hatchling / Cull-Beast 01 show their real art** while everything else shows its placeholder sigil. | ☐ |
+| 11 | **Identify a dual-colour card's BOTH colours at hand scale without the inspector** — dual cards render a **50/50 vertical split** (left = colour A, right = colour B, never a blend); a mono card stays solid. Try a red/green Kaya/Bram card next to a mono card. | ☐ |
 
 Bonus perf check: with a full board + several animations, does it stay smooth at
 1080p on the 3050? Note any hitches (card-frame build, glow, shadows) so they can
 be tuned.
 
-> Reminder: items 1–2 and 5–9 are **only observable on a real GPU** — the headless
-> CI can prove the data and wiring are correct (155/155 tests) but not that the
-> pixels look right. That's this checklist's job.
+> Reminder: items 1–2 and 5–9 (and the split in 11) are **only fully judged on a
+> real GPU** — the headless CI proves the data and wiring are correct (160/160
+> tests, incl. the dual-split determinism) but not that the pixels look right.
+> That's this checklist's job.
