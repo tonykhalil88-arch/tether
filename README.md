@@ -197,6 +197,13 @@ against a fixed baseline (Brief 4's A0) on matched seed blocks. The campaign and
 method are written up in [`docs/balance-campaign.md`](docs/balance-campaign.md);
 per-patch measurements are in `patch0{2..5}_report.md`.
 
+**Baseline commit:** the alpha freeze is commit `54cbe82` (the "Apply Patch 0.5
+and freeze Set 1 balance at alpha" commit), which is intended to carry the
+`alpha-balance-baseline` tag. If the tag is absent on the remote, check that
+SHA out directly — the tag push was blocked by this environment's git proxy
+(feature-branch pushes only), so the tag may need to be created on `54cbe82`
+from an environment with tag-push permission.
+
 **Campaign summary** (each patch measured on the same seeds; Δ = archetype-pilot
 overall win-rate move it produced):
 
