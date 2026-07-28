@@ -27,7 +27,7 @@ func _init() -> void:
 
 	for i in range(results.size()):
 		var r: Dictionary = results[i]
-		var winner_txt := ("draw" if r["winner"] < 0 else "P%d (%s)" % [r["winner"], r["styles"][r["winner"]]])
+		var winner_txt := ("draw" if r["winner"] < 0 else "P%d (%s)" % [r["winner"], r["archetypes"][r["winner"]]])
 		if not quiet:
 			print("Game %3d | seed %d | %s vs %s | first=P%d | winner=%s | turns=%d | life=%s" % [
 				i, r["seed"], r["vanguards"][0], r["vanguards"][1],
@@ -37,7 +37,6 @@ func _init() -> void:
 
 	print("-------------------------------------------------------------")
 	print("Wins by seat : %s" % JSON.stringify(report["wins_by_seat"]))
-	print("Wins by style: %s" % JSON.stringify(report["wins_by_style"]))
 	print("Watch-list   : %s" % JSON.stringify(report["watch_totals"]))
 	var capped := 0
 	for r in results:

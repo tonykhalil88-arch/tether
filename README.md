@@ -63,7 +63,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (94 tests). Coverage:
+All suites report **All tests passed!** (106 tests). Coverage:
 
 | Suite | Covers |
 |-------|--------|
@@ -83,6 +83,7 @@ All suites report **All tests passed!** (94 tests). Coverage:
 | `test_effects.gd` | event bus, WM01 actions, hook escape hatch |
 | `test_watch.gd` | balance watch-list counters increment on resolution |
 | `test_ai_behavior.gd` | AI understands Rush and Freeze |
+| `test_policies.gd` | each archetype's signature line (incl. Stampede loops) |
 | `test_sim.gd` | simulator determinism + batch integrity |
 
 ---
@@ -104,13 +105,42 @@ godot --headless -s sim/run.gd -- --games=10 --seed=1 --quiet
 Flags (after `--`): `--games=N` (default 10), `--seed=S` (default 1; game `i`
 uses `S+i`), `--out=DIR`, `--quiet`.
 
-The two policies (`sim/ai_policy.gd`) both play on curve and both understand
-**Rush** (a fresh Banner with Rush can attack) and **Freeze** (a frozen enemy
-Banner stays rested, so it is a target rather than a blocker):
+### Archetype-aware pilots
 
-- **aggro** — attacks the enemy Vanguard, never defends.
-- **guard** — clears rested/frozen enemy Banners first, and blocks / pitches
-  counter cards to protect its Vanguard when Life is low.
+Each Vanguard is piloted toward its own gameplan — `AIPolicy.for_vanguard(id)`
+maps the Vanguard to one of eight deterministic policies (`sim/ai_policy.gd`):
+
+| Vanguard | Archetype | Plan |
+|----------|-----------|------|
+| Sora (001) | `rush` | convert the Vanguard buff into Rush damage, swing wide |
+| Kaya (012) | `rest_punish` | rest a target, then attack rested Banners |
+| Bram (023) | `refresh_tempo` | go wide, loop Stampede / Bram / Korgan refreshes |
+| Neza (034) | `lockdown` | rest + freeze the biggest threat, hold Blockers |
+| Averil (045) | `filter_control` | filter every turn, hold counters, bounce, win late |
+| Vale (056) | `discount_deploy` | Canyon + discount, then the biggest Bulwark |
+| Rue (067) | `drain` | maximise Aura frozen per turn, trade evenly |
+| Dreyse (078) | `threshold_ramp` | ramp to 8+ Aura, leverage the threshold, drop Walkbreaker |
+
+Every policy understands **Rush** and **Freeze**.
+
+### Balance matrix
+
+`sim/balance.gd` runs the full 8×8 Vanguard matchup matrix (64 ordered
+matchups × 50 games, first player split 25/25 = 3200 games) and writes
+`balance_report.json` + `balance_report.md`:
+
+```bash
+godot --headless -s sim/balance.gd -- --games=50 --seed=1
+```
+
+Flags: `--games=N` per matchup (default 50), `--seed=S` (default 1), `--out=DIR`
+(default: project root). The report contains the 8×8 win-rate matrix (row =
+Player A's Vanguard), per-Vanguard overall win rate and average game length, the
+first-player win rate (overall and per matchup), the watch-list normalised per
+game, the exact decklists, and **REVIEW** flags for any matchup outside 35–65%
+or Vanguard outside 45–55%. Results reflect both card balance *and* pilot
+skill — the harness is the first-pass evidence for the Set 1 review, not a
+verdict.
 
 ### Balance watch-list
 

@@ -1,0 +1,1138 @@
+{
+  "config": {
+    "games_per_matchup": 50,
+    "matchup_tolerance": [
+      0.35,
+      0.65
+    ],
+    "seed": 1,
+    "total_games": 3200,
+    "vanguard_tolerance": [
+      0.45,
+      0.55
+    ]
+  },
+  "decklists": {
+    "wm01-001": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-002",
+        "wm01-003",
+        "wm01-004",
+        "wm01-005",
+        "wm01-006",
+        "wm01-007",
+        "wm01-008",
+        "wm01-009",
+        "wm01-010",
+        "wm01-011"
+      ],
+      "vanguard": "Sora Akaza, Redgale Captain"
+    },
+    "wm01-012": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-013",
+        "wm01-014",
+        "wm01-015",
+        "wm01-016",
+        "wm01-017",
+        "wm01-018",
+        "wm01-019",
+        "wm01-020",
+        "wm01-021",
+        "wm01-022"
+      ],
+      "vanguard": "Kaya Morrow, Twilight Courier"
+    },
+    "wm01-023": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-024",
+        "wm01-025",
+        "wm01-026",
+        "wm01-027",
+        "wm01-028",
+        "wm01-029",
+        "wm01-030",
+        "wm01-031",
+        "wm01-032",
+        "wm01-033"
+      ],
+      "vanguard": "Bram Oxhart, Warband Chief"
+    },
+    "wm01-034": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-035",
+        "wm01-036",
+        "wm01-037",
+        "wm01-038",
+        "wm01-039",
+        "wm01-040",
+        "wm01-041",
+        "wm01-042",
+        "wm01-043",
+        "wm01-044"
+      ],
+      "vanguard": "Elder Neza, Route-Keeper"
+    },
+    "wm01-045": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-046",
+        "wm01-047",
+        "wm01-048",
+        "wm01-049",
+        "wm01-050",
+        "wm01-051",
+        "wm01-052",
+        "wm01-053",
+        "wm01-054",
+        "wm01-055"
+      ],
+      "vanguard": "Director Averil Cros, the Kind Face"
+    },
+    "wm01-056": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-057",
+        "wm01-058",
+        "wm01-059",
+        "wm01-060",
+        "wm01-061",
+        "wm01-062",
+        "wm01-063",
+        "wm01-064",
+        "wm01-065",
+        "wm01-066"
+      ],
+      "vanguard": "Commander Idris Vale, the Liaison"
+    },
+    "wm01-067": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-068",
+        "wm01-069",
+        "wm01-070",
+        "wm01-071",
+        "wm01-072",
+        "wm01-073",
+        "wm01-074",
+        "wm01-075",
+        "wm01-076",
+        "wm01-077"
+      ],
+      "vanguard": "Dr. Halcyon Rue, Chief Harvester"
+    },
+    "wm01-078": {
+      "copies_each": 5,
+      "deck_size": 50,
+      "kit_cards": [
+        "wm01-079",
+        "wm01-080",
+        "wm01-081",
+        "wm01-082",
+        "wm01-083",
+        "wm01-084",
+        "wm01-085",
+        "wm01-086",
+        "wm01-087",
+        "wm01-088"
+      ],
+      "vanguard": "Marshal Goran Dreyse, the Siegebreaker"
+    }
+  },
+  "first_player": {
+    "overall_win_rate": 0.553125,
+    "per_matchup": {
+      "wm01-001_vs_wm01-001": 0.6,
+      "wm01-001_vs_wm01-012": 0.52,
+      "wm01-001_vs_wm01-023": 0.5,
+      "wm01-001_vs_wm01-034": 0.5,
+      "wm01-001_vs_wm01-045": 0.44,
+      "wm01-001_vs_wm01-056": 0.5,
+      "wm01-001_vs_wm01-067": 0.5,
+      "wm01-001_vs_wm01-078": 0.7,
+      "wm01-012_vs_wm01-001": 0.5,
+      "wm01-012_vs_wm01-012": 0.66,
+      "wm01-012_vs_wm01-023": 0.68,
+      "wm01-012_vs_wm01-034": 0.54,
+      "wm01-012_vs_wm01-045": 0.52,
+      "wm01-012_vs_wm01-056": 0.52,
+      "wm01-012_vs_wm01-067": 0.76,
+      "wm01-012_vs_wm01-078": 0.5,
+      "wm01-023_vs_wm01-001": 0.5,
+      "wm01-023_vs_wm01-012": 0.8,
+      "wm01-023_vs_wm01-023": 0.54,
+      "wm01-023_vs_wm01-034": 0.56,
+      "wm01-023_vs_wm01-045": 0.56,
+      "wm01-023_vs_wm01-056": 0.5,
+      "wm01-023_vs_wm01-067": 0.56,
+      "wm01-023_vs_wm01-078": 0.5,
+      "wm01-034_vs_wm01-001": 0.5,
+      "wm01-034_vs_wm01-012": 0.52,
+      "wm01-034_vs_wm01-023": 0.56,
+      "wm01-034_vs_wm01-034": 0.6,
+      "wm01-034_vs_wm01-045": 0.58,
+      "wm01-034_vs_wm01-056": 0.6,
+      "wm01-034_vs_wm01-067": 0.58,
+      "wm01-034_vs_wm01-078": 0.5,
+      "wm01-045_vs_wm01-001": 0.46,
+      "wm01-045_vs_wm01-012": 0.56,
+      "wm01-045_vs_wm01-023": 0.56,
+      "wm01-045_vs_wm01-034": 0.52,
+      "wm01-045_vs_wm01-045": 0.52,
+      "wm01-045_vs_wm01-056": 0.68,
+      "wm01-045_vs_wm01-067": 0.54,
+      "wm01-045_vs_wm01-078": 0.44,
+      "wm01-056_vs_wm01-001": 0.56,
+      "wm01-056_vs_wm01-012": 0.52,
+      "wm01-056_vs_wm01-023": 0.52,
+      "wm01-056_vs_wm01-034": 0.56,
+      "wm01-056_vs_wm01-045": 0.6,
+      "wm01-056_vs_wm01-056": 0.48,
+      "wm01-056_vs_wm01-067": 0.54,
+      "wm01-056_vs_wm01-078": 0.54,
+      "wm01-067_vs_wm01-001": 0.5,
+      "wm01-067_vs_wm01-012": 0.62,
+      "wm01-067_vs_wm01-023": 0.6,
+      "wm01-067_vs_wm01-034": 0.56,
+      "wm01-067_vs_wm01-045": 0.56,
+      "wm01-067_vs_wm01-056": 0.52,
+      "wm01-067_vs_wm01-067": 0.72,
+      "wm01-067_vs_wm01-078": 0.48,
+      "wm01-078_vs_wm01-001": 0.68,
+      "wm01-078_vs_wm01-012": 0.48,
+      "wm01-078_vs_wm01-023": 0.52,
+      "wm01-078_vs_wm01-034": 0.5,
+      "wm01-078_vs_wm01-045": 0.44,
+      "wm01-078_vs_wm01-056": 0.58,
+      "wm01-078_vs_wm01-067": 0.48,
+      "wm01-078_vs_wm01-078": 0.66
+    }
+  },
+  "matrix": {
+    "wm01-001": {
+      "wm01-001": 0.42,
+      "wm01-012": 0.98,
+      "wm01-023": 1.0,
+      "wm01-034": 0.88,
+      "wm01-045": 0.9,
+      "wm01-056": 0.72,
+      "wm01-067": 1.0,
+      "wm01-078": 0.64
+    },
+    "wm01-012": {
+      "wm01-001": 0.0,
+      "wm01-012": 0.44,
+      "wm01-023": 0.58,
+      "wm01-034": 0.08,
+      "wm01-045": 0.1,
+      "wm01-056": 0.02,
+      "wm01-067": 0.42,
+      "wm01-078": 0.0
+    },
+    "wm01-023": {
+      "wm01-001": 0.0,
+      "wm01-012": 0.38,
+      "wm01-023": 0.48,
+      "wm01-034": 0.06,
+      "wm01-045": 0.1,
+      "wm01-056": 0.0,
+      "wm01-067": 0.18,
+      "wm01-078": 0.0
+    },
+    "wm01-034": {
+      "wm01-001": 0.04,
+      "wm01-012": 0.9,
+      "wm01-023": 0.94,
+      "wm01-034": 0.58,
+      "wm01-045": 0.44,
+      "wm01-056": 0.1,
+      "wm01-067": 0.84,
+      "wm01-078": 0.04
+    },
+    "wm01-045": {
+      "wm01-001": 0.12,
+      "wm01-012": 0.9,
+      "wm01-023": 0.94,
+      "wm01-034": 0.58,
+      "wm01-045": 0.5,
+      "wm01-056": 0.22,
+      "wm01-067": 0.88,
+      "wm01-078": 0.26
+    },
+    "wm01-056": {
+      "wm01-001": 0.26,
+      "wm01-012": 0.98,
+      "wm01-023": 0.98,
+      "wm01-034": 0.94,
+      "wm01-045": 0.86,
+      "wm01-056": 0.42,
+      "wm01-067": 0.96,
+      "wm01-078": 0.4
+    },
+    "wm01-067": {
+      "wm01-001": 0.0,
+      "wm01-012": 0.6,
+      "wm01-023": 0.78,
+      "wm01-034": 0.14,
+      "wm01-045": 0.18,
+      "wm01-056": 0.1,
+      "wm01-067": 0.5,
+      "wm01-078": 0.02
+    },
+    "wm01-078": {
+      "wm01-001": 0.38,
+      "wm01-012": 0.94,
+      "wm01-023": 0.98,
+      "wm01-034": 0.92,
+      "wm01-045": 0.82,
+      "wm01-056": 0.4,
+      "wm01-067": 0.94,
+      "wm01-078": 0.52
+    }
+  },
+  "per_vanguard": {
+    "wm01-001": {
+      "archetype": "rush",
+      "avg_game_length": 7.0625,
+      "games": 800,
+      "win_rate": 0.8325
+    },
+    "wm01-012": {
+      "archetype": "rest_punish",
+      "avg_game_length": 8.1225,
+      "games": 800,
+      "win_rate": 0.22
+    },
+    "wm01-023": {
+      "archetype": "refresh_tempo",
+      "avg_game_length": 7.9875,
+      "games": 800,
+      "win_rate": 0.1575
+    },
+    "wm01-034": {
+      "archetype": "lockdown",
+      "avg_game_length": 12.48375,
+      "games": 800,
+      "win_rate": 0.48125
+    },
+    "wm01-045": {
+      "archetype": "filter_control",
+      "avg_game_length": 9.03625,
+      "games": 800,
+      "win_rate": 0.53125
+    },
+    "wm01-056": {
+      "archetype": "discount_deploy",
+      "avg_game_length": 7.10375,
+      "games": 800,
+      "win_rate": 0.73875
+    },
+    "wm01-067": {
+      "archetype": "drain",
+      "avg_game_length": 8.5,
+      "games": 800,
+      "win_rate": 0.2875
+    },
+    "wm01-078": {
+      "archetype": "threshold_ramp",
+      "avg_game_length": 7.32625,
+      "games": 800,
+      "win_rate": 0.75125
+    }
+  },
+  "review": {
+    "matchups": [
+      {
+        "a": "wm01-001",
+        "a_win_rate": 0.98,
+        "b": "wm01-012"
+      },
+      {
+        "a": "wm01-001",
+        "a_win_rate": 1.0,
+        "b": "wm01-023"
+      },
+      {
+        "a": "wm01-001",
+        "a_win_rate": 0.88,
+        "b": "wm01-034"
+      },
+      {
+        "a": "wm01-001",
+        "a_win_rate": 0.9,
+        "b": "wm01-045"
+      },
+      {
+        "a": "wm01-001",
+        "a_win_rate": 0.72,
+        "b": "wm01-056"
+      },
+      {
+        "a": "wm01-001",
+        "a_win_rate": 1.0,
+        "b": "wm01-067"
+      },
+      {
+        "a": "wm01-012",
+        "a_win_rate": 0.0,
+        "b": "wm01-001"
+      },
+      {
+        "a": "wm01-012",
+        "a_win_rate": 0.08,
+        "b": "wm01-034"
+      },
+      {
+        "a": "wm01-012",
+        "a_win_rate": 0.1,
+        "b": "wm01-045"
+      },
+      {
+        "a": "wm01-012",
+        "a_win_rate": 0.02,
+        "b": "wm01-056"
+      },
+      {
+        "a": "wm01-012",
+        "a_win_rate": 0.0,
+        "b": "wm01-078"
+      },
+      {
+        "a": "wm01-023",
+        "a_win_rate": 0.0,
+        "b": "wm01-001"
+      },
+      {
+        "a": "wm01-023",
+        "a_win_rate": 0.06,
+        "b": "wm01-034"
+      },
+      {
+        "a": "wm01-023",
+        "a_win_rate": 0.1,
+        "b": "wm01-045"
+      },
+      {
+        "a": "wm01-023",
+        "a_win_rate": 0.0,
+        "b": "wm01-056"
+      },
+      {
+        "a": "wm01-023",
+        "a_win_rate": 0.18,
+        "b": "wm01-067"
+      },
+      {
+        "a": "wm01-023",
+        "a_win_rate": 0.0,
+        "b": "wm01-078"
+      },
+      {
+        "a": "wm01-034",
+        "a_win_rate": 0.04,
+        "b": "wm01-001"
+      },
+      {
+        "a": "wm01-034",
+        "a_win_rate": 0.9,
+        "b": "wm01-012"
+      },
+      {
+        "a": "wm01-034",
+        "a_win_rate": 0.94,
+        "b": "wm01-023"
+      },
+      {
+        "a": "wm01-034",
+        "a_win_rate": 0.1,
+        "b": "wm01-056"
+      },
+      {
+        "a": "wm01-034",
+        "a_win_rate": 0.84,
+        "b": "wm01-067"
+      },
+      {
+        "a": "wm01-034",
+        "a_win_rate": 0.04,
+        "b": "wm01-078"
+      },
+      {
+        "a": "wm01-045",
+        "a_win_rate": 0.12,
+        "b": "wm01-001"
+      },
+      {
+        "a": "wm01-045",
+        "a_win_rate": 0.9,
+        "b": "wm01-012"
+      },
+      {
+        "a": "wm01-045",
+        "a_win_rate": 0.94,
+        "b": "wm01-023"
+      },
+      {
+        "a": "wm01-045",
+        "a_win_rate": 0.22,
+        "b": "wm01-056"
+      },
+      {
+        "a": "wm01-045",
+        "a_win_rate": 0.88,
+        "b": "wm01-067"
+      },
+      {
+        "a": "wm01-045",
+        "a_win_rate": 0.26,
+        "b": "wm01-078"
+      },
+      {
+        "a": "wm01-056",
+        "a_win_rate": 0.26,
+        "b": "wm01-001"
+      },
+      {
+        "a": "wm01-056",
+        "a_win_rate": 0.98,
+        "b": "wm01-012"
+      },
+      {
+        "a": "wm01-056",
+        "a_win_rate": 0.98,
+        "b": "wm01-023"
+      },
+      {
+        "a": "wm01-056",
+        "a_win_rate": 0.94,
+        "b": "wm01-034"
+      },
+      {
+        "a": "wm01-056",
+        "a_win_rate": 0.86,
+        "b": "wm01-045"
+      },
+      {
+        "a": "wm01-056",
+        "a_win_rate": 0.96,
+        "b": "wm01-067"
+      },
+      {
+        "a": "wm01-067",
+        "a_win_rate": 0.0,
+        "b": "wm01-001"
+      },
+      {
+        "a": "wm01-067",
+        "a_win_rate": 0.78,
+        "b": "wm01-023"
+      },
+      {
+        "a": "wm01-067",
+        "a_win_rate": 0.14,
+        "b": "wm01-034"
+      },
+      {
+        "a": "wm01-067",
+        "a_win_rate": 0.18,
+        "b": "wm01-045"
+      },
+      {
+        "a": "wm01-067",
+        "a_win_rate": 0.1,
+        "b": "wm01-056"
+      },
+      {
+        "a": "wm01-067",
+        "a_win_rate": 0.02,
+        "b": "wm01-078"
+      },
+      {
+        "a": "wm01-078",
+        "a_win_rate": 0.94,
+        "b": "wm01-012"
+      },
+      {
+        "a": "wm01-078",
+        "a_win_rate": 0.98,
+        "b": "wm01-023"
+      },
+      {
+        "a": "wm01-078",
+        "a_win_rate": 0.92,
+        "b": "wm01-034"
+      },
+      {
+        "a": "wm01-078",
+        "a_win_rate": 0.82,
+        "b": "wm01-045"
+      },
+      {
+        "a": "wm01-078",
+        "a_win_rate": 0.94,
+        "b": "wm01-067"
+      }
+    ],
+    "vanguards": [
+      {
+        "vanguard": "wm01-001",
+        "win_rate": 0.8325
+      },
+      {
+        "vanguard": "wm01-012",
+        "win_rate": 0.22
+      },
+      {
+        "vanguard": "wm01-023",
+        "win_rate": 0.1575
+      },
+      {
+        "vanguard": "wm01-056",
+        "win_rate": 0.73875
+      },
+      {
+        "vanguard": "wm01-067",
+        "win_rate": 0.2875
+      },
+      {
+        "vanguard": "wm01-078",
+        "win_rate": 0.75125
+      }
+    ]
+  },
+  "vanguards": [
+    "wm01-001",
+    "wm01-012",
+    "wm01-023",
+    "wm01-034",
+    "wm01-045",
+    "wm01-056",
+    "wm01-067",
+    "wm01-078"
+  ],
+  "watch_per_game_by_matchup": {
+    "wm01-001_vs_wm01-001": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.34,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-001_vs_wm01-012": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.34,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.08
+    },
+    "wm01-001_vs_wm01-023": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.36,
+      "stampede_multi_refresh": 0.04,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-001_vs_wm01-034": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.42,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-001_vs_wm01-045": {
+      "averil_cards_seen": 3.06,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.32,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-001_vs_wm01-056": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.32,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-001_vs_wm01-067": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.36,
+      "sora_rush_grants": 0.34,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-001_vs_wm01-078": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.4,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-012_vs_wm01-001": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.36,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.22
+    },
+    "wm01-012_vs_wm01-012": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.6
+    },
+    "wm01-012_vs_wm01-023": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.14,
+      "verdigris_double_rest": 0.6
+    },
+    "wm01-012_vs_wm01-034": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.42
+    },
+    "wm01-012_vs_wm01-045": {
+      "averil_cards_seen": 4.24,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.78
+    },
+    "wm01-012_vs_wm01-056": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.1
+    },
+    "wm01-012_vs_wm01-067": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.6,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.26
+    },
+    "wm01-012_vs_wm01-078": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.34
+    },
+    "wm01-023_vs_wm01-001": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.18,
+      "stampede_multi_refresh": 0.06,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-023_vs_wm01-012": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.12,
+      "verdigris_double_rest": 0.68
+    },
+    "wm01-023_vs_wm01-023": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.44,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-023_vs_wm01-034": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.32,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-023_vs_wm01-045": {
+      "averil_cards_seen": 3.96,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.18,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-023_vs_wm01-056": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.1,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-023_vs_wm01-067": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.82,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.08,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-023_vs_wm01-078": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.08,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-034_vs_wm01-001": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.38,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-034_vs_wm01-012": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.5
+    },
+    "wm01-034_vs_wm01-023": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.32,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-034_vs_wm01-034": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-034_vs_wm01-045": {
+      "averil_cards_seen": 5.36,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-034_vs_wm01-056": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-034_vs_wm01-067": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.82,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-034_vs_wm01-078": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-045_vs_wm01-001": {
+      "averil_cards_seen": 3.08,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.24,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-045_vs_wm01-012": {
+      "averil_cards_seen": 4.16,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.66
+    },
+    "wm01-045_vs_wm01-023": {
+      "averil_cards_seen": 4.08,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.36,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-045_vs_wm01-034": {
+      "averil_cards_seen": 5.02,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-045_vs_wm01-045": {
+      "averil_cards_seen": 9.74,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-045_vs_wm01-056": {
+      "averil_cards_seen": 3.36,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-045_vs_wm01-067": {
+      "averil_cards_seen": 4.18,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.82,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-045_vs_wm01-078": {
+      "averil_cards_seen": 3.32,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-056_vs_wm01-001": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.16,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-056_vs_wm01-012": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.24
+    },
+    "wm01-056_vs_wm01-023": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.1,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-056_vs_wm01-034": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-056_vs_wm01-045": {
+      "averil_cards_seen": 3.16,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-056_vs_wm01-056": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-056_vs_wm01-067": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.48,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-056_vs_wm01-078": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-067_vs_wm01-001": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.54,
+      "sora_rush_grants": 0.34,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-067_vs_wm01-012": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.8,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.22
+    },
+    "wm01-067_vs_wm01-023": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 1.08,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.02,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-067_vs_wm01-034": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 1.16,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-067_vs_wm01-045": {
+      "averil_cards_seen": 4.2,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.76,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-067_vs_wm01-056": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.34,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-067_vs_wm01-067": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 1.14,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-067_vs_wm01-078": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.6,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-078_vs_wm01-001": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.32,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-078_vs_wm01-012": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.28
+    },
+    "wm01-078_vs_wm01-023": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.16,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-078_vs_wm01-034": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-078_vs_wm01-045": {
+      "averil_cards_seen": 3.38,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-078_vs_wm01-056": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-078_vs_wm01-067": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.52,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    },
+    "wm01-078_vs_wm01-078": {
+      "averil_cards_seen": 0.0,
+      "korgan_repeat_attacks": 0.0,
+      "rue_aura_frozen": 0.0,
+      "sora_rush_grants": 0.0,
+      "stampede_multi_refresh": 0.0,
+      "verdigris_double_rest": 0.0
+    }
+  }
+}

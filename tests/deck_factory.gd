@@ -33,21 +33,28 @@ static func vanguard() -> CardData:
 	return load_kit()["wm01-001"]
 
 
-## Build a ~tribe-coherent 50-card deck for a Vanguard: cycle that tribe's
-## non-Vanguard cards (broadened to the faction if too few) up to `size`.
+## The ten non-Vanguard card ids of a Vanguard's own kit (the contiguous
+## wm01 block that follows it). This keeps decks PURE — Bram and Elder Neza
+## are both tribe "Pact" but draw from separate kits.
+static func kit_ids(vg: CardData) -> Array:
+	var kit := load_kit()
+	var n := int(vg.id.split("-")[1])
+	var out: Array = []
+	for i in range(n + 1, n + 11):
+		var id := "wm01-%03d" % i
+		if kit.has(id) and kit[id].type != CardEnums.TYPE_VANGUARD:
+			out.append(id)
+	return out
+
+
+## A pure-kit 50-card deck: the kit's ten non-Vanguard cards, cycled to `size`
+## (10 -> 50 = 5 copies of each). See the balance report for the decklist
+## rationale (4x core + 1x same-kit filler; hybrids are out of scope).
 static func deck_for(vg: CardData, size: int = 50) -> Array:
 	var kit := load_kit()
 	var pool: Array = []
-	for c in kit.values():
-		if c.type == CardEnums.TYPE_VANGUARD:
-			continue
-		if c.tribe == vg.tribe:
-			pool.append(c)
-	if pool.size() < 8:
-		for c in kit.values():
-			if c.type != CardEnums.TYPE_VANGUARD and c.faction == vg.faction and not pool.has(c):
-				pool.append(c)
-	pool.sort_custom(func(a, b): return a.cost < b.cost)
+	for id in kit_ids(vg):
+		pool.append(kit[id])
 	return _cycle(pool, size)
 
 
