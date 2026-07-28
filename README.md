@@ -210,56 +210,85 @@ godot --headless -s sim/patch_report.gd -- --phase=consolidate
 
 ---
 
-## Balance status: FROZEN at Patch 0.5 (alpha)
+## Balance status: FROZEN at v1.1 (Strict Purity baseline)
 
-Set 1 balance is **CLOSED** at Patch 0.5. Five patches were applied and measured
-against a fixed baseline (Brief 4's A0) on matched seed blocks. The campaign and
-method are written up in [`docs/balance-campaign.md`](docs/balance-campaign.md);
-per-patch measurements are in `patch0{2..5}_report.md`.
+Set 1 balance is **re-frozen at patch 1.1**. The **Strict Purity** rule change
+(§ *Deckbuilding*: a deck card's colour set must be a **subset** of the
+Vanguard's) together with the **Purity Twelve** (wm01-089..100, three mono
+Banners per colour) changed both deck legality *and* the card pool. That resets
+the measurement: the old Patch 0.5 alpha baseline is **VOID** — measured under
+the previous *share-a-colour* legality and a smaller pool, so it is not
+comparable, only historical. A fresh full 8×8 matrix + C0 control was re-run on
+the same seed protocol → [`revalidation_report.md`](revalidation_report.md).
 
-**Baseline commit:** the alpha freeze is commit `54cbe82` (the "Apply Patch 0.5
-and freeze Set 1 balance at alpha" commit), which is intended to carry the
-`alpha-balance-baseline` tag. If the tag is absent on the remote, check that
-SHA out directly — the tag push was blocked by this environment's git proxy
-(feature-branch pushes only), so the tag may need to be created on `54cbe82`
-from an environment with tag-push permission.
+**Baseline commit:** the v1.1 Strict-Purity baseline is commit `__BASELINE_SHA__`
+(the "re-freeze at v1.1" commit that records this section). Check it
+out directly to reproduce; the environment's git proxy blocks tag pushes
+(feature-branch pushes only), so a `v1.1-strict-purity-baseline` tag may need to
+be created on that SHA from an environment with tag-push permission — same
+practice as the 0.5 baseline (`54cbe82`).
 
-**Campaign summary** (each patch measured on the same seeds; Δ = archetype-pilot
-overall win-rate move it produced):
+**New per-Vanguard standings** (patch 1.1, archetype pilots, 50 games × 64
+matchups; C0 = shared generic pilot; ~~struck~~ = old 0.5, **VOID**):
 
-| Patch | Theme | Changes | Measured result |
-|-------|-------|---------|-----------------|
-| A0 | isolation baseline | — | under-decks identified: refresh_tempo 15%, rest_punish 23%, drain 34% |
-| 0.2 | economy | 6 cheaper/bigger abilities | **drain 34→44%** (real, pilot-independent); Kaya/Bram flat |
-| 0.3 | conversion | 4 (Bo & Lantern widened) | **Kaya 23→27%** (converts board to face); Bram flat |
-| 0.4 | structural (refresh) | 3 (uncap Bram/Stampede) | **Bram 14→29%** — biggest move; no overshoot |
-| 0.5 | structural (rest) | 3 (uncap Verdigris/Toll/Twilight) | Kaya 24→25% (marginal — reach wasn't the bottleneck) |
+| Vanguard | Archetype | 1.1 win rate | 1.1 C0 | ~~0.5 (VOID)~~ | Status |
+|----------|-----------|--------------|--------|----------------|--------|
+| Sora (001) | rush | 81% | 68% | ~~77%~~ | over — for playtesting |
+| Threshold (078) | threshold_ramp | 70% | 52% | ~~70%~~ | over — mostly pilot (C0 −18) |
+| Discount (056) | discount_deploy | 63% | 56% | ~~67%~~ | over — for playtesting |
+| Filter (045) | filter_control | 46% | 69% | ~~45%~~ | in tolerance (strong under C0) |
+| Drain (067) | drain | 45% | 54% | ~~42%~~ | in tolerance |
+| Lockdown (034) | lockdown | 40% | 54% | ~~46%~~ | under — pilot-driven dip |
+| Rest-punish (012) | rest_punish | 28% | 25% | ~~25%~~ | under — card-weak, persists in C0 |
+| Refresh-tempo (023) | refresh_tempo | 28% | 22% | ~~28%~~ | under — card-weak, persists in C0 |
 
-**Final per-Vanguard standings** (Patch 0.5, archetype pilots, 50 games × 64
-matchups):
+**Reading:** under Strict Purity the mono decks lose their off-colour splashes
+and the dual decks gain a wider legal pool, which is exactly where the numbers
+moved. rush stays dominant and pilot-independent; **threshold's 70% is now
+mostly pilot** (C0 collapses it to 52%); the two persistent under-decks
+(rest_punish, refresh_tempo) stay weak under *both* pilots, so their weakness is
+**cards, not piloting**. 6/8 Vanguards and 45/64 matchups sit outside tolerance
+— a first-set spread, handed to **human playtesting in the client**, not tuned
+here. This brief only **re-measured** the new rules; it applied no card patches.
 
-| Vanguard | Archetype | Win rate | Status |
-|----------|-----------|----------|--------|
-| Sora (001) | rush | 77% | over — for playtesting |
-| Threshold (078) | threshold_ramp | 70% | over — for playtesting |
-| Discount (056) | discount_deploy | 67% | over — for playtesting |
-| Lockdown (034) | lockdown | 46% | in tolerance |
-| Filter (045) | filter_control | 45% | in tolerance |
-| Bram (023) | refresh_tempo | 28% | under — recovered from 15% |
-| Kaya (012) | rest_punish | 25% | under — resistant to buffs |
-| Rue (067) | drain | 42% | under — recovered from 34% |
-
-The balance passes closed the three engine-fixable gaps we could confidently
-attribute to cards (Bram, drain, partially Kaya) and left the high-end trio
-(rush / threshold / discount) and Kaya's residual weakness where simulation
-can't safely arbitrate them. **Those remaining gaps are handed to human
-playtesting in the playable client (Phase 3)** — pilot AIs can only approximate
-real play, and the strong decks' edge may be a pilot artifact, a matchup-web
-effect, or genuine. **Balance work resumes there, not here.**
+The prior five-patch alpha campaign (Patches 0.2–0.5) remains documented in
+[`docs/balance-campaign.md`](docs/balance-campaign.md) and `patch0{2..5}_report.md`
+as history — its numbers are **VOID** under Strict Purity but its *method* is the
+template this revalidation followed.
 
 ---
 
 ## Changelog
+
+### Patch 1.1 — Strict Purity + the Purity Twelve (baseline reset)
+
+A **rule change** and a **12-card addition**, no card patches. This resets the
+balance baseline (see *Balance status* above); the 0.5 campaign numbers are VOID
+under the new legality.
+
+**Rule change — Strict Purity.** Deck legality was *share-a-colour* (a deck card
+had to share ≥1 colour with the Vanguard). It is now **subset**: a deck card is
+legal iff its colour set is a subset of the Vanguard's. A mono-red Vanguard
+admits only mono-red cards; a red/green Vanguard admits mono-red, mono-green and
+red/green — but never a card carrying a colour the Vanguard lacks. Deck size
+(50 + Vanguard) and the 4-copy cap are unchanged.
+
+**The Purity Twelve** — twelve new mono-colour Banners, three per colour, all
+using existing effect types (data-only), so no engine or pilot logic changed:
+
+| Colour | New Banners |
+|--------|-------------|
+| red | wm01-089 Redgale Duelist Hana · 090 Ashvane Skirmishers (Rush) · 091 Ragnir's Brood (KO ≤3000) |
+| green | wm01-092 Pact Shieldwall (Blocker) · 093 Waystone Sentry (rest ≤3) · 094 Elder Grovetusk (8000) |
+| blue | wm01-095 Junior Actuary (Life: draw) · 096 Consortium Archivist (draw-then-bottom) · 097 Repossession Officer (bounce ≤3) |
+| purple | wm01-098 Supply Column (gain Aura) · 099 Garrison Drillmaster (threshold self-buff) · 100 Rampart Colossus (8000) |
+
+**Deck construction under Strict Purity.** Mono Vanguards now have exactly 13
+subset-legal uniques (kit 10 + the 3 mono staples): 13×4 = 52, trimmed to 50 by
+dropping one copy each off the two lowest archetype-ranked cards (documented per
+deck in `revalidation_report.md`). Dual Vanguards keep kit ×4 (40) + 10 filler
+drawn from their now-larger subset-legal pool (both mono pools + both dual kits),
+ranked by the existing archetype heuristic. Set size 88 → **100**.
 
 ### Patch 0.5 — "the last structural uncap" (evidence: Patch 0.4 measurement)
 

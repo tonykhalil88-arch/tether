@@ -179,3 +179,42 @@ godot --headless -s sim/patch_report.gd -- --phase=consolidate5   # or 3 / 4
 For Set 2: add the new archetype pilots, extend the ablation scenario list to
 the new suspect cards, and keep the same discipline — **isolate, patch one lever,
 measure on matched seeds, run the C0 control, report as-is.**
+
+---
+
+## Addendum — v1.1 baseline reset (Strict Purity)
+
+*Added for patch 1.1. Everything above documents the 0.5 alpha campaign; this
+note explains why those numbers are now VOID and what replaced them.*
+
+**Why the baseline was reset.** Patch 1.1 made two changes that invalidate the
+0.5 measurement rather than continue it:
+
+1. **A legality rule change — Strict Purity.** Deck legality went from
+   *share-a-colour* to **subset** (a deck card's colours must be a subset of the
+   Vanguard's). This is not a card tweak; it changes *which decks exist*. Mono
+   Vanguards lose every off-colour splash they previously ran, and dual
+   Vanguards' legal pool shifts. The decks the pilots fly are materially
+   different, so a win rate measured before the rule cannot be compared to one
+   after it.
+2. **A larger card pool — the Purity Twelve** (wm01-089..100). New staples enter
+   the legal pools (e.g. Elder Grovetusk into red/green filler, Drillmaster into
+   Dreyse's mono pool), again changing deck composition.
+
+A balance number is only meaningful relative to a fixed set of decks and rules.
+Change the decks or the rules and the old number measures a game that no longer
+exists. So rather than diff against 0.5, we **struck 0.5 VOID** and re-measured
+from scratch, on the *same seed protocol*, producing
+[`revalidation_report.md`](../revalidation_report.md).
+
+**What we did NOT do.** No card was patched and no pilot logic changed — the new
+cards use only existing effect types, and the pilots pick them up through the
+same archetype heuristics. This brief **re-measured**; it did not tune. Any
+imbalance the 1.1 baseline shows (rush still high; rest_punish / refresh_tempo
+still card-weak under both pilots) is reported as-is for human playtesting, in
+keeping with rule 6 above (*report, don't tune*).
+
+**Method unchanged.** The revalidation is the same discipline this document
+prescribes for Set 2: full 8×8 matrix, C0 shared-pilot control, matched seeds,
+defence-economy and watch-list instrumentation, REVIEW tolerances — just re-run
+because the ground under the old baseline moved.
