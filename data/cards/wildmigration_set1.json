@@ -4,13 +4,14 @@
     "name": "The First Stampede",
     "game": "WILDMIGRATION",
     "world": "Vantara",
-    "patch": "0.5"
+    "patch": "1.1"
   },
   "rules_addenda": {
     "keyword_freeze": "A frozen card does not refresh during its owner's next Refresh Phase.",
     "banner_freeze_cap": "Each player may freeze at most 1 Banner per turn (engine-enforced).",
     "aura_freeze_cap": "None \u2014 Aura freezing is uncapped (Tony ruling).",
-    "power_ceiling": 9000
+    "power_ceiling": 9000,
+    "deck_legality": "STRICT PURITY: every deck card's colour set must be a SUBSET of the Vanguard's colours. Deck = 50 cards + Vanguard, max 4 copies per id."
   },
   "cards": [
     {
@@ -2269,6 +2270,271 @@
           }
         }
       ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-089",
+      "name": "Redgale Duelist Hana",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 2,
+      "power": 4000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-090",
+      "name": "Ashvane Skirmishers",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 3,
+      "power": 4000,
+      "counter": 1000,
+      "keywords": [
+        "rush"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-091",
+      "name": "Ragnir's Brood",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 6,
+      "power": 7000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "ko",
+            "target": "enemy_banner",
+            "max_power": 3000
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-092",
+      "name": "Pact Shieldwall",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-093",
+      "name": "Waystone Sentry",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 4,
+      "power": 5000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 3,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-094",
+      "name": "Elder Grovetusk",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 6,
+      "power": 8000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-095",
+      "name": "Junior Actuary",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "draw",
+            "count": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-096",
+      "name": "Consortium Archivist",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "draw_then_bottom",
+            "draw": 1,
+            "bottom": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-097",
+      "name": "Repossession Officer",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 5,
+      "power": 6000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "bounce",
+            "target": "enemy_banner",
+            "max_cost": 3,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-098",
+      "name": "Supply Column",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 3,
+      "power": 4000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "gain_aura",
+            "amount": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-099",
+      "name": "Garrison Drillmaster",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 4,
+      "power": 5000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "passive",
+          "phase": "your_turn",
+          "condition": {
+            "min_aura_total": 8
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 1000,
+            "target": "self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-100",
+      "name": "Rampart Colossus",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 6,
+      "power": 8000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
       "flavor": ""
     }
   ]

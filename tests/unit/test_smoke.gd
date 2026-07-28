@@ -4,7 +4,7 @@ extends GutTest
 
 func test_kit_imports():
 	var kit: Dictionary = DeckFactory.load_kit()
-	assert_eq(kit.size(), 88, "WM01 contains 88 cards")
+	assert_eq(kit.size(), 100, "WM01 contains 100 cards (patch 1.1)")
 	assert_true(kit.has("wm01-001"), "Sora Vanguard present")
 
 func test_engine_setup_places_life():

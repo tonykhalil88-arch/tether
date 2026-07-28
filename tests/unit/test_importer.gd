@@ -1,16 +1,16 @@
 extends GutTest
 
 ## JSON <-> CardData importer: lossless round-trip, validation, dir import,
-## power ceiling — over the real 88-card WM01 set.
+## power ceiling — over the real 100-card WM01 set (patch 1.1).
 
 func test_set_composition():
 	var cards: Array = CardImporter.import_file(DeckFactory.KIT_PATH)
-	assert_eq(cards.size(), 88, "88 cards in the set")
+	assert_eq(cards.size(), 100, "100 cards in the set (patch 1.1)")
 	var counts := { "vanguard": 0, "banner": 0, "technique": 0, "stage": 0 }
 	for c in cards:
 		counts[c.type] += 1
 	assert_eq(counts["vanguard"], 8, "8 Vanguards")
-	assert_eq(counts["banner"], 56, "56 Banners")
+	assert_eq(counts["banner"], 68, "68 Banners (56 + the Purity Twelve)")
 	assert_eq(counts["technique"], 16, "16 Techniques")
 	assert_eq(counts["stage"], 8, "8 Stages")
 
@@ -48,7 +48,7 @@ func test_invalid_type_is_rejected():
 
 func test_clean_set_reports_no_issues_and_respects_ceiling():
 	var cards: Array = CardImporter.import_file(DeckFactory.KIT_PATH)
-	assert_eq(cards.size(), 88)
+	assert_eq(cards.size(), 100)
 	assert_eq(CardImporter.last_issues.size(), 0, "no issues on the real set")
 	for c in cards:
 		assert_true(c.power <= CardEnums.POWER_CEILING, "%s within power ceiling" % c.id)

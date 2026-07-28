@@ -2,9 +2,11 @@ extends GutTest
 
 ## Patch 0.5 — the Kaya rest-package uncap (Verdigris / Toll / Twilight Road).
 
-func test_set_is_patch_05():
+func test_set_is_patch_11_carrying_the_05_tuning():
+	# The set is now patch 1.1 (Strict Purity baseline); it carries the full
+	# 0.2–0.5 card tuning unchanged (verified by the value checks below).
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(DeckFactory.KIT_PATH))
-	assert_eq(str(parsed["set"]["patch"]), "0.5")
+	assert_eq(str(parsed["set"]["patch"]), "1.1")
 
 func test_changelog_05_values():
 	var kit: Dictionary = DeckFactory.load_kit()

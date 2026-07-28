@@ -4,8 +4,10 @@ extends RefCounted
 ## Enforces the WILDMIGRATION deckbuilding rules:
 ##   1. A deck is exactly 50 cards, plus 1 Vanguard.
 ##   2. At most 4 copies of any card id.
-##   3. Colour legality: every deck card shares at least one colour with the
-##      Vanguard.
+##   3. STRICT PURITY (patch 1.1): every deck card's colour set must be a
+##      SUBSET of the Vanguard's colours. A mono-red Vanguard admits only
+##      mono-red cards; a red/green Vanguard admits mono-red, mono-green, and
+##      red/green cards — but never a card carrying a colour the Vanguard lacks.
 ##
 ## Used by DeckFactory (build valid decks), the tests, and the engine
 ## (GameEngine.setup can enforce it). An illegal deck is a hard failure with a
@@ -35,19 +37,26 @@ static func validate(deck: Array, vanguard: CardData) -> Dictionary:
 				id, counts[id], MAX_COPIES])
 
 	for c in deck:
-		if not shares_colour(c, vanguard):
-			return _fail("card '%s' colours %s share no colour with Vanguard '%s' colours %s" % [
+		if not is_colour_legal(c, vanguard):
+			return _fail("card '%s' colours %s are not a subset of Vanguard '%s' colours %s (Strict Purity)" % [
 				c.id, str(c.colors), vanguard.id, str(vanguard.colors)])
 
 	return { "ok": true, "reason": "" }
 
 
-## True if `card` shares at least one colour with `vanguard`.
-static func shares_colour(card: CardData, vanguard: CardData) -> bool:
+## STRICT PURITY: true iff `card`'s colour set is a SUBSET of `vanguard`'s. A
+## colourless card (empty set) is legal under any Vanguard.
+static func is_colour_legal(card: CardData, vanguard: CardData) -> bool:
 	for col in card.colors:
-		if vanguard.colors.has(col):
-			return true
-	return false
+		if not vanguard.colors.has(col):
+			return false
+	return true
+
+
+## Back-compat alias. Under Strict Purity, legality is subset — NOT sharing a
+## colour. Kept so existing callers read clearly; delegates to is_colour_legal.
+static func shares_colour(card: CardData, vanguard: CardData) -> bool:
+	return is_colour_legal(card, vanguard)
 
 
 ## Validate and push a hard engine error on failure. Returns ok.
