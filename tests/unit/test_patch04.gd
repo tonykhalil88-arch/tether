@@ -2,10 +2,6 @@ extends GutTest
 
 ## Patch 0.4 — the refresh-package redesign (uncapped) + Kaya rest nudge.
 
-func test_set_is_patch_04():
-	var parsed = JSON.parse_string(FileAccess.get_file_as_string(DeckFactory.KIT_PATH))
-	assert_eq(str(parsed["set"]["patch"]), "0.4")
-
 func test_changelog_04_values():
 	var kit: Dictionary = DeckFactory.load_kit()
 	# 1. Bram refresh max_cost removed

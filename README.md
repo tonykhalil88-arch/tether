@@ -63,7 +63,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (134 tests). Coverage:
+All suites report **All tests passed!** (139 tests). Coverage:
 
 | Suite | Covers |
 |-------|--------|
@@ -89,6 +89,7 @@ All suites report **All tests passed!** (134 tests). Coverage:
 | `test_patch02.gd` | Patch 0.2 values + the Stampede `refreshed` rider |
 | `test_patch03.gd` | Patch 0.3 values + the `defender_has_rested_banner` line |
 | `test_patch04.gd` | Patch 0.4 uncapped refresh (Bram/Stampede) + Kaya rest-5 |
+| `test_patch05.gd` | Patch 0.5 uncapped rest package + biggest-threat targeting |
 | `test_sim.gd` | simulator determinism + batch integrity |
 
 ---
@@ -189,7 +190,72 @@ godot --headless -s sim/patch_report.gd -- --phase=consolidate
 
 ---
 
+## Balance status: FROZEN at Patch 0.5 (alpha)
+
+Set 1 balance is **CLOSED** at Patch 0.5. Five patches were applied and measured
+against a fixed baseline (Brief 4's A0) on matched seed blocks. The campaign and
+method are written up in [`docs/balance-campaign.md`](docs/balance-campaign.md);
+per-patch measurements are in `patch0{2..5}_report.md`.
+
+**Campaign summary** (each patch measured on the same seeds; Δ = archetype-pilot
+overall win-rate move it produced):
+
+| Patch | Theme | Changes | Measured result |
+|-------|-------|---------|-----------------|
+| A0 | isolation baseline | — | under-decks identified: refresh_tempo 15%, rest_punish 23%, drain 34% |
+| 0.2 | economy | 6 cheaper/bigger abilities | **drain 34→44%** (real, pilot-independent); Kaya/Bram flat |
+| 0.3 | conversion | 4 (Bo & Lantern widened) | **Kaya 23→27%** (converts board to face); Bram flat |
+| 0.4 | structural (refresh) | 3 (uncap Bram/Stampede) | **Bram 14→29%** — biggest move; no overshoot |
+| 0.5 | structural (rest) | 3 (uncap Verdigris/Toll/Twilight) | Kaya 24→25% (marginal — reach wasn't the bottleneck) |
+
+**Final per-Vanguard standings** (Patch 0.5, archetype pilots, 50 games × 64
+matchups):
+
+| Vanguard | Archetype | Win rate | Status |
+|----------|-----------|----------|--------|
+| Sora (001) | rush | 77% | over — for playtesting |
+| Threshold (078) | threshold_ramp | 70% | over — for playtesting |
+| Discount (056) | discount_deploy | 67% | over — for playtesting |
+| Lockdown (034) | lockdown | 46% | in tolerance |
+| Filter (045) | filter_control | 45% | in tolerance |
+| Bram (023) | refresh_tempo | 28% | under — recovered from 15% |
+| Kaya (012) | rest_punish | 25% | under — resistant to buffs |
+| Rue (067) | drain | 42% | under — recovered from 34% |
+
+The balance passes closed the three engine-fixable gaps we could confidently
+attribute to cards (Bram, drain, partially Kaya) and left the high-end trio
+(rush / threshold / discount) and Kaya's residual weakness where simulation
+can't safely arbitrate them. **Those remaining gaps are handed to human
+playtesting in the playable client (Phase 3)** — pilot AIs can only approximate
+real play, and the strong decks' edge may be a pilot artifact, a matchup-web
+effect, or genuine. **Balance work resumes there, not here.**
+
+---
+
 ## Changelog
+
+### Patch 0.5 — "the last structural uncap" (evidence: Patch 0.4 measurement)
+
+Patch 0.4's uncap fixed Bram; Patch 0.5 applies the same structural lens to
+Kaya's rest package, whose reach was capped so it could only rest chaff. Three
+changes, buffs only, everyone else untouched:
+
+| # | Card | Change | Rationale |
+|---|------|--------|-----------|
+| 1 | Verdigris (wm01-013) | double-rest `max_cost` removed | rest any two enemy Banners (Walkbreaker-class included) |
+| 2 | Toll of the Quiet Road (wm01-020) | both modes `max_cost` 4 → 6 | reach the big attackers |
+| 3 | The Twilight Road (wm01-022) | `max_cost` 3 → 4 | reach Greatox-class bodies |
+
+No engine or pilot change was needed: rest effects already auto-target the
+**highest-power** eligible Banner (verified by test), so the widened reach flows
+straight into "rest the biggest legal threat."
+
+**Measured outcome** (`patch05_report.md`): **Kaya/rest_punish 24 → 25%** — the
+rest uncap barely moved it (connect rate ticked 83→84%). The finding is that
+Kaya's weakness is **not** rest reach — she resets bodies fine but her 4-Life,
+small-body clock loses the race. That is exactly the kind of structural question
+handed to playtesting. Rue and Bram held (stable, untouched controls); no new
+Vanguard overshoots from this patch.
 
 ### Patch 0.4 — "refresh tools could only touch the worst cards" (evidence: Patch 0.3 measurement)
 

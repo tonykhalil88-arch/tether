@@ -39,9 +39,137 @@ func _init() -> void:
 			_consolidate3(out_dir, games)
 		"consolidate4":
 			_consolidate4(out_dir, games)
+		"consolidate5":
+			_consolidate5(out_dir, games)
 		_:
 			push_error("patch_report: unknown phase '%s'" % phase)
 	quit(0)
+
+
+func _consolidate5(out_dir: String, games: int) -> void:
+	var names := ["isolation_report", "patch02_arch", "patch02_c0", "patch03_arch",
+		"patch03_c0", "patch04_arch", "patch04_c0", "patch_after_arch", "patch_after_c0"]
+	var d := {}
+	for n in names:
+		d[n] = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join(n + ".json")))
+		if d[n] == null:
+			push_error("patch_report: missing %s.json for consolidate5" % n)
+			return
+	# archetype snapshots A0..0.5 and C0 snapshots A0..0.5
+	var arch := {
+		"A0": d["isolation_report"]["scenarios"]["A0"]["per_vanguard"],
+		"0.2": d["patch02_arch"], "0.3": d["patch03_arch"],
+		"0.4": d["patch04_arch"], "0.5": d["patch_after_arch"],
+	}
+	var c0 := {
+		"A0": d["isolation_report"]["scenarios"]["C0"]["per_vanguard"],
+		"0.2": d["patch02_c0"], "0.3": d["patch03_c0"],
+		"0.4": d["patch04_c0"], "0.5": d["patch_after_c0"],
+	}
+	_write(out_dir.path_join("patch05_report.md"), _render5(arch, c0, games))
+	print("Wrote %s" % out_dir.path_join("patch05_report.md"))
+
+
+# win rate for a snapshot that is either isolation-format (has win_rate) or
+# matrix-format (has per_vanguard{wins,games}).
+func _snap_wr(snap: Dictionary, v: String) -> float:
+	var e: Dictionary = snap["per_vanguard"][v] if snap.has("per_vanguard") else snap[v]
+	if e.has("win_rate"):
+		return float(e["win_rate"])
+	return _rate(e["wins"], e["games"])
+
+
+func _snap_metric(snap: Dictionary, v: String, key: String) -> float:
+	# Only matrix-format snapshots carry raw metrics; isolation carries derived.
+	if snap.has("per_vanguard"):
+		var m: Dictionary = snap["per_vanguard"][v]["metrics"]
+		if key == "connect":
+			return _rate(m["connects"], m["attacks"])
+	# isolation-format derived
+	if key == "connect":
+		return float(snap[v].get("connect_rate", 0.0))
+	return 0.0
+
+
+func _render5(arch: Dictionary, c0: Dictionary, games: int) -> String:
+	var order := ["A0", "0.2", "0.3", "0.4", "0.5"]
+	var vgs: Array = arch["0.5"]["vanguards"]
+	var s := "# WILDMIGRATION — Patch 0.5 + Final Balance Measurement\n\n"
+	s += "Closes the balance chapter. Kaya's rest package uncapped (Verdigris rests "
+	s += "any two Banners; Toll max_cost 4→6; Twilight Road 3→4). Full 8×8 archetype "
+	s += "+ C0 matrices, %d games/matchup, on the A0 seed blocks.\n\n" % games
+
+	# Campaign table — archetype pilots.
+	s += "## Full campaign — per-Vanguard win rate (archetype pilots)\n\n"
+	s += "| Vanguard | A0 | 0.2 | 0.3 | 0.4 | 0.5 | Δ 0.5 vs A0 |\n|---|---|---|---|---|---|---|\n"
+	for v in vgs:
+		var row := "| %s |" % _short(v)
+		for k in order:
+			row += " %s |" % _pct(_snap_wr(arch[k], v))
+		row += " %s |\n" % _d(_snap_wr(arch["A0"], v), _snap_wr(arch["0.5"], v))
+		s += row
+	s += "\n"
+
+	# Campaign table — C0.
+	s += "## Full campaign — per-Vanguard win rate (C0 shared generic pilot)\n\n"
+	s += "| Vanguard | A0 | 0.2 | 0.3 | 0.4 | 0.5 | Δ 0.5 vs A0 |\n|---|---|---|---|---|---|---|\n"
+	for v in vgs:
+		var row2 := "| %s |" % _short(v)
+		for k in order:
+			row2 += " %s |" % _pct(_snap_wr(c0[k], v))
+		row2 += " %s |\n" % _d(_snap_wr(c0["A0"], v), _snap_wr(c0["0.5"], v))
+		s += row2
+	s += "\n"
+
+	# Kaya connect rate.
+	s += "## Kaya (rest_punish) — connect rate across the campaign\n\n"
+	s += "| A0 | 0.2 | 0.3 | 0.4 | 0.5 |\n|---|---|---|---|---|\n| "
+	var cells: Array = []
+	for k in order:
+		cells.append(_pct(_snap_metric(arch[k], "wm01-012", "connect")))
+	s += " | ".join(cells) + " |\n\n"
+
+	# Stability of untouched decks (Rue, Bram — untouched since 0.4/0.2).
+	s += "## Stability — untouched decks (0.4 → 0.5)\n\n"
+	for v in ["wm01-067", "wm01-023"]:
+		var a: float = _snap_wr(arch["0.4"], v)
+		var b: float = _snap_wr(arch["0.5"], v)
+		s += "- **%s**: 0.4 %s → 0.5 %s (%s) — %s\n" % [
+			_short(v), _pct(a), _pct(b), _d(a, b),
+			("stable" if abs(b - a) <= 0.03 else "drifted")]
+	s += "\n"
+
+	# Overshoot check (Kaya is the buffed deck this patch).
+	s += "## ⚠ OVERSHOOT check\n\n"
+	var p05: Dictionary = arch["0.5"]
+	var flagged: Array = []
+	for v in vgs:
+		if _snap_wr(p05, v) > VG_HI + 0.001:
+			flagged.append("%s (%s)" % [_short(v), _pct(_snap_wr(p05, v))])
+	var hot := 0
+	for a in vgs:
+		for b in vgs:
+			if float(p05["matrix"][a][b]) > MATCHUP_HI:
+				hot += 1
+	s += "Vanguards over 55%%: %s. Matchups over 65%%: **%d / %d**.\n\n" % [
+		("none" if flagged.is_empty() else ", ".join(flagged)), hot, vgs.size() * vgs.size()]
+
+	# Final REVIEW flags.
+	s += "## Final REVIEW flags (Patch 0.5)\n\n"
+	var rev: Array = []
+	for v in vgs:
+		var wr: float = _snap_wr(p05, v)
+		if wr < VG_LO or wr > VG_HI:
+			rev.append("%s (%s)" % [_short(v), _pct(wr)])
+	var rmu := 0
+	for a in vgs:
+		for b in vgs:
+			var c: float = float(p05["matrix"][a][b])
+			if c < MATCHUP_LO or c > MATCHUP_HI:
+				rmu += 1
+	s += "Vanguards outside 45–55%%: %s\n\n" % ("none" if rev.is_empty() else ", ".join(rev))
+	s += "Matchups outside 35–65%%: **%d / %d** cells.\n" % [rmu, vgs.size() * vgs.size()]
+	return s
 
 
 func _consolidate4(out_dir: String, games: int) -> void:
