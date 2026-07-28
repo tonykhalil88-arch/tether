@@ -36,7 +36,7 @@ func test_bo_and_lantern_line_buffs_into_rested_target():
 	var bo: CardInstance = Scenario.spawn_banner(g, 0, "wm01-015")   # Bo & Lantern, 3000
 	var rested: CardInstance = Scenario.spawn_banner(g, 1, "wm01-036", true)
 	var r := g.declare_attack(bo, rested)
-	assert_eq(r["attacker_power"], 5000, "3000 + 2000 vs a rested target")
+	assert_eq(r["attacker_power"], 6000, "Patch 0.2: 3000 + 3000 vs a rested target")
 
 # --- refresh_tempo: Stampede double-refresh when lethal-relevant -----------
 func test_refresh_tempo_finds_lethal_stampede_double_refresh():

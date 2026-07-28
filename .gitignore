@@ -34,3 +34,6 @@ Thumbs.db
 
 # Isolation-pass intermediate partials (consolidated into isolation_report.*)
 iso_*.json
+
+# Patch-report intermediate matrices (consolidated into patch02_report.md)
+patch_after_*.json

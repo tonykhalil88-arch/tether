@@ -3,7 +3,8 @@
     "code": "WM01",
     "name": "The First Stampede",
     "game": "WILDMIGRATION",
-    "world": "Vantara"
+    "world": "Vantara",
+    "patch": "0.2"
   },
   "rules_addenda": {
     "keyword_freeze": "A frozen card does not refresh during its owner's next Refresh Phase.",
@@ -314,7 +315,7 @@
           "trigger": "when_attacking",
           "once_per_turn": true,
           "cost": {
-            "aura": 2
+            "aura": 1
           },
           "action": {
             "type": "rest",
@@ -401,7 +402,7 @@
           },
           "action": {
             "type": "power_buff",
-            "amount": 2000,
+            "amount": 3000,
             "target": "self",
             "duration": "battle"
           }
@@ -611,7 +612,7 @@
           "trigger": "activate_main",
           "once_per_turn": true,
           "cost": {
-            "aura": 2
+            "aura": 1
           },
           "action": {
             "type": "refresh",
@@ -843,7 +844,13 @@
             "target": "own_banner",
             "filter_tribe": "Pact",
             "max_cost": 3,
-            "up_to": 2
+            "up_to": 2,
+            "rider": {
+              "type": "power_buff",
+              "amount": 1000,
+              "duration": "turn",
+              "applies_to": "refreshed"
+            }
           }
         }
       ],
@@ -1744,9 +1751,6 @@
         {
           "trigger": "when_attacking",
           "once_per_turn": true,
-          "cost": {
-            "aura": 1
-          },
           "action": {
             "type": "freeze",
             "target": "enemy_aura",
@@ -1792,7 +1796,7 @@
       "faction": "The Harvest Consortium",
       "tribe": "Consortium",
       "cost": 2,
-      "power": 3000,
+      "power": 4000,
       "counter": 1000,
       "keywords": [],
       "effects": [

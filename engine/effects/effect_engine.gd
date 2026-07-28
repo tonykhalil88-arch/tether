@@ -185,8 +185,27 @@ static func _act_refresh(game, source: CardInstance, action: Dictionary, ctx: Di
 	var targets: Array = game.select_own_banners(source.owner, filter, up_to)
 	for b in targets:
 		game.refresh_unit(b)
+	# Rider that applies_to the Banners this refresh touched (Patch 0.2:
+	# Stampede Doctrine buffs each refreshed Banner +1000 until end of turn).
+	_apply_refresh_rider(action.get("rider", {}), targets)
 	if source.data.id == "wm01-032" and targets.size() >= 2:
 		game.note_watch("stampede_multi_refresh")
+
+
+static func _apply_refresh_rider(rider: Dictionary, refreshed: Array) -> void:
+	if rider.is_empty() or str(rider.get("applies_to", "")) != "refreshed":
+		return
+	if str(rider.get("type", "")) != CardEnums.ACT_POWER_BUFF:
+		return
+	var amount := int(rider.get("amount", 0))
+	var battle := str(rider.get("duration", "turn")) == "battle"
+	for b in refreshed:
+		if b == null:
+			continue
+		if battle:
+			b.battle_power_bonus += amount
+		else:
+			b.turn_power_bonus += amount
 
 
 static func _act_rest_and_freeze(game, source: CardInstance, action: Dictionary) -> void:

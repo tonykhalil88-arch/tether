@@ -63,7 +63,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (119 tests). Coverage:
+All suites report **All tests passed!** (124 tests). Coverage:
 
 | Suite | Covers |
 |-------|--------|
@@ -86,6 +86,7 @@ All suites report **All tests passed!** (119 tests). Coverage:
 | `test_policies.gd` | each archetype's signature line (incl. Stampede loops) |
 | `test_deck_validator.gd` | 50-card / max-4-copies / colour-legality rules |
 | `test_ablations.gd` | ablation flags (A1–A5) + defence-economy metrics |
+| `test_patch02.gd` | Patch 0.2 values + the Stampede `refreshed` rider |
 | `test_sim.gd` | simulator determinism + batch integrity |
 
 ---
@@ -169,6 +170,51 @@ Ablations are pure runtime config (`GameState.ablations`) — **no card data is
 changed**. A suspect card is `REAL` if its owning Vanguard shifts >5 points,
 `acquit` if <2. C0 shows which win rates are cards (persist under one pilot) vs
 pilot skill (collapse toward 50%).
+
+### Patch measurement
+
+`sim/patch_report.gd` reruns the archetype matrix and the C0 matrix under the
+current card data on the baseline seed blocks, then compares against the
+isolation A0/C0 baselines, writing `patch02_report.md` (per-Vanguard before/
+after for both pilots, connect-rate deltas for the buffed decks, remaining
+REVIEW flags):
+
+```bash
+godot --headless -s sim/patch_report.gd -- --phase=archetype --games=50 --seed=1
+godot --headless -s sim/patch_report.gd -- --phase=c0 --games=50 --seed=1
+godot --headless -s sim/patch_report.gd -- --phase=consolidate
+```
+
+---
+
+## Changelog
+
+### Patch 0.2 — "buffs to the under-decks" (evidence: Brief 4 isolation pass)
+
+The isolation pass flagged three decks well under tolerance at the A0 baseline —
+Bram/refresh_tempo (15%), Kaya/rest_punish (23%), Rue/drain (34%) — and its
+defence-economy table showed the under-decks' small bodies bouncing off
+5000-power Vanguards (refresh_tempo connected 63% at 3920 avg attacker power vs
+5047 defender). Patch 0.2 is six **buffs only** aimed at those three kits:
+
+| # | Card | Change | Rationale |
+|---|------|--------|-----------|
+| 1 | Kaya Morrow (wm01-012) | rest Aura cost 2 → 1 | fire the rest line more often |
+| 2 | Bo & Lantern (wm01-015) | rested-target bonus 2000 → 3000 | help the punish body connect |
+| 3 | Bram Oxhart (wm01-023) | refresh Aura cost 2 → 1 | more extra-attack tempo |
+| 4 | Stampede Doctrine (wm01-032) | new rider: each refreshed Banner +1000 until end of turn | let refreshed small bodies connect |
+| 5 | Rue (wm01-067) | freeze-on-attack Aura cost removed (still 1×/turn) | free the drain engine |
+| 6 | Field Vivisector (wm01-069) | power 3000 → 4000 | a Rue body that trades up |
+
+The `rider.applies_to: "refreshed"` mechanic is implemented in `EffectEngine`:
+after a refresh resolves, the rider's `power_buff` is applied to exactly the
+Banners it refreshed.
+
+**Measured outcome** (`patch02_report.md`, matched seeds): **Rue/drain moved
+meaningfully, +10 pts (34→44%)** — and the C0 control shows the same +12
+independent of pilot, so it's a genuine card swing. **Kaya and Bram stayed
+flat** (within ±2 pts under both pilots): their buffs did not, on this evidence,
+move those decks — a finding for the next patch pass, reported not tuned.
 
 ### Balance watch-list
 
