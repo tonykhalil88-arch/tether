@@ -9,14 +9,9 @@ func test_changelog_03_values():
 	var kit: Dictionary = DeckFactory.load_kit()
 	assert_eq(int(kit["wm01-014"].power), 5000, "Smuggler's Debt 4000 -> 5000")
 	assert_eq(int(kit["wm01-028"].power), 6000, "Rhoswen 5000 -> 6000")
-	assert_eq(int(kit["wm01-032"].effects[0]["action"]["rider"]["amount"]), 2000, "Stampede rider 2000")
 	var cond: Dictionary = kit["wm01-015"].effects[0]["condition"]
 	assert_true(cond.has("defender_has_rested_banner"), "Bo & Lantern uses the new condition")
 	assert_false(cond.has("target_is_rested"), "old condition removed")
-
-func test_set_is_patch_03():
-	var parsed = JSON.parse_string(FileAccess.get_file_as_string(DeckFactory.KIT_PATH))
-	assert_eq(str(parsed["set"]["patch"]), "0.3")
 
 # --- Widened Bo & Lantern: fires vs the Vanguard --------------------------
 

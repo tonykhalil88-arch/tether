@@ -39,3 +39,5 @@ iso_*.json
 patch_after_*.json
 patch02_arch.json
 patch02_c0.json
+patch03_arch.json
+patch03_c0.json

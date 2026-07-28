@@ -133,11 +133,11 @@ func _deploy_banners(game: GameEngine, me: int) -> void:
 			progressed = true
 
 
-## refresh_tempo keeps a small Aura reserve during deployment so it can still
-## afford Stampede Doctrine / Bram's refresh for extra attacks after combat.
+## Patch 0.4: refresh_tempo now commits full Aura to fielding the biggest Pact
+## bodies (Korgan/Greatox/Tortallon) — the uncapped refresh loop runs on later
+## turns with refreshed Aura, so it no longer needs a same-turn reserve.
 func _deploy_budget(ps: PlayerState) -> int:
-	var reserve := 2 if archetype == "refresh_tempo" else 0
-	return max(0, ps.aura_available() - reserve)
+	return ps.aura_available()
 
 
 func _play_priority_techniques(game: GameEngine, me: int) -> void:
@@ -301,11 +301,10 @@ func _manufacture_attacks(game: GameEngine, me: int) -> bool:
 
 
 func _count_stampede_targets(ps: PlayerState) -> int:
-	# Stampede Doctrine refreshes rested Pact Banners of cost <= 3.
+	# Patch 0.4: Stampede Doctrine refreshes rested Pact Banners of ANY cost.
 	var n := 0
 	for b in ps.battle_area:
-		if b.exhausted and b.type() == CardEnums.TYPE_BANNER \
-				and b.data.tribe == "Pact" and b.data.cost <= 3:
+		if b.exhausted and b.type() == CardEnums.TYPE_BANNER and b.data.tribe == "Pact":
 			n += 1
 	return n
 
@@ -316,19 +315,20 @@ func _count_stampede_targets(ps: PlayerState) -> int:
 
 func _best_affordable_banner(game: GameEngine, ps: PlayerState, me: int, budget: int = -1) -> CardInstance:
 	var avail: int = ps.aura_available() if budget < 0 else budget
-	# refresh_tempo goes wide with cost<=3 Pact bodies (the Stampede engine),
-	# preferring the highest-power ones (Warband Outriders connect at 5000).
+	# Patch 0.4: refresh_tempo now fields the BIGGEST Pact bodies (Korgan,
+	# Greatox, Tortallon) and refreshes them uncapped, instead of going wide
+	# with cost<=3 chaff — so prefer the highest-power affordable body.
 	if archetype == "refresh_tempo":
-		var wide: CardInstance = null
+		var big: CardInstance = null
 		for inst in ps.hand:
-			if inst.type() != CardEnums.TYPE_BANNER or inst.data.tribe != "Pact" or inst.data.cost > 3:
+			if inst.type() != CardEnums.TYPE_BANNER:
 				continue
 			if game._effective_play_cost(me, inst) > avail:
 				continue
-			if wide == null or inst.data.power > wide.data.power:
-				wide = inst
-		if wide != null:
-			return wide
+			if big == null or inst.data.power > big.data.power:
+				big = inst
+		if big != null:
+			return big
 	var best: CardInstance = null
 	var best_cost := -1
 	for inst in ps.hand:

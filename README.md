@@ -63,7 +63,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (130 tests). Coverage:
+All suites report **All tests passed!** (134 tests). Coverage:
 
 | Suite | Covers |
 |-------|--------|
@@ -88,6 +88,7 @@ All suites report **All tests passed!** (130 tests). Coverage:
 | `test_ablations.gd` | ablation flags (A1–A5) + defence-economy metrics |
 | `test_patch02.gd` | Patch 0.2 values + the Stampede `refreshed` rider |
 | `test_patch03.gd` | Patch 0.3 values + the `defender_has_rested_banner` line |
+| `test_patch04.gd` | Patch 0.4 uncapped refresh (Bram/Stampede) + Kaya rest-5 |
 | `test_sim.gd` | simulator determinism + batch integrity |
 
 ---
@@ -118,7 +119,7 @@ maps the Vanguard to one of eight deterministic policies (`sim/ai_policy.gd`):
 |----------|-----------|------|
 | Sora (001) | `rush` | convert the Vanguard buff into Rush damage, swing wide |
 | Kaya (012) | `rest_punish` | rest a target, then attack rested Banners |
-| Bram (023) | `refresh_tempo` | go wide, loop Stampede / Bram / Korgan refreshes |
+| Bram (023) | `refresh_tempo` | field the biggest Pact bodies, loop them via Korgan / Bram / Stampede refreshes |
 | Neza (034) | `lockdown` | rest + freeze the biggest threat, hold Blockers |
 | Averil (045) | `filter_control` | filter every turn, hold counters, bounce, win late |
 | Vale (056) | `discount_deploy` | Canyon + discount, then the biggest Bulwark |
@@ -189,6 +190,35 @@ godot --headless -s sim/patch_report.gd -- --phase=consolidate
 ---
 
 ## Changelog
+
+### Patch 0.4 — "refresh tools could only touch the worst cards" (evidence: Patch 0.3 measurement)
+
+Patches 0.2–0.3 showed Bram/refresh_tempo stuck at ~14% despite cheaper and
+higher-value refresh effects. The diagnosis was structural: the refresh package
+was *cost-capped* and so could only ever touch chaff — Bram's Vanguard refresh
+was `max_cost 5` (Korgan, his 8000 payoff at cost 7, was ineligible) and
+Stampede was `max_cost 3` (only the smallest bodies). Patch 0.4 removes those
+caps so the tools reach the deck's actual finishers. Three changes, buffs only:
+
+| # | Card | Change | Rationale |
+|---|------|--------|-----------|
+| 1 | Bram Vanguard (wm01-023) | refresh `max_cost` removed | can refresh Korgan (cost 7) for a repeat swing |
+| 2 | Stampede Doctrine (wm01-032) | `max_cost` removed, +2000 rider removed | refresh two of *any* Pact Banners — big bodies, not chaff |
+| 3 | Kaya Vanguard (wm01-012) | rest `max_cost` 4 → 5 | reach Greatox-class Banners |
+
+No engine change was needed (a removed `max_cost` defaults to uncapped; a
+removed rider is a no-op — the engine's rider support is retained and covered by
+a synthetic test). The `refresh_tempo` pilot was rebuilt to the new plan: field
+the **biggest** Pact bodies (no Aura reserve) and loop them via Korgan's
+self-refresh + Bram + Stampede on later turns.
+
+**Measured outcome** (`patch04_report.md`, matched seeds): **Bram/refresh_tempo
+14% → 29% (+15 pts)** — the biggest single-patch move so far; the structural fix
+did what the cost/value tweaks couldn't. The **OVERSHOOT check was not
+triggered** (29% overall < 55%, no Bram matchup > 65%), so the knowingly-accepted
+Korgan-loop risk did not materialise. Rue held (43→42%, untouched control); the
+Kaya rest nudge was inert (27→24%); the field drifted down 2–8 pts as a stronger
+Bram takes points off everyone (zero-sum). Reported, not tuned.
 
 ### Patch 0.3 — "conversion, not cost" (evidence: Patch 0.2 measurement)
 

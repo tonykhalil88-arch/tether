@@ -4,7 +4,7 @@
     "name": "The First Stampede",
     "game": "WILDMIGRATION",
     "world": "Vantara",
-    "patch": "0.3"
+    "patch": "0.4"
   },
   "rules_addenda": {
     "keyword_freeze": "A frozen card does not refresh during its owner's next Refresh Phase.",
@@ -320,7 +320,7 @@
           "action": {
             "type": "rest",
             "target": "enemy_banner",
-            "max_cost": 4,
+            "max_cost": 5,
             "up_to": 1
           }
         }
@@ -617,7 +617,6 @@
           "action": {
             "type": "refresh",
             "target": "own_banner",
-            "max_cost": 5,
             "up_to": 1
           }
         }
@@ -843,14 +842,7 @@
             "type": "refresh",
             "target": "own_banner",
             "filter_tribe": "Pact",
-            "max_cost": 3,
-            "up_to": 2,
-            "rider": {
-              "type": "power_buff",
-              "amount": 2000,
-              "duration": "turn",
-              "applies_to": "refreshed"
-            }
+            "up_to": 2
           }
         }
       ],

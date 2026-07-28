@@ -37,9 +37,118 @@ func _init() -> void:
 			_consolidate(out_dir, games)
 		"consolidate3":
 			_consolidate3(out_dir, games)
+		"consolidate4":
+			_consolidate4(out_dir, games)
 		_:
 			push_error("patch_report: unknown phase '%s'" % phase)
 	quit(0)
+
+
+func _consolidate4(out_dir: String, games: int) -> void:
+	var iso = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("isolation_report.json")))
+	var p02 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch02_arch.json")))
+	var p02c0 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch02_c0.json")))
+	var p03 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch03_arch.json")))
+	var p03c0 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch03_c0.json")))
+	var p04 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch_after_arch.json")))
+	var p04c0 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch_after_c0.json")))
+	for x in [iso, p02, p02c0, p03, p03c0, p04, p04c0]:
+		if x == null:
+			push_error("patch_report: missing an input for consolidate4")
+			return
+	var md := _render4(iso["scenarios"]["A0"]["per_vanguard"], iso["scenarios"]["C0"]["per_vanguard"],
+		p02, p02c0, p03, p03c0, p04, p04c0, games)
+	_write(out_dir.path_join("patch04_report.md"), md)
+	print("Wrote %s" % out_dir.path_join("patch04_report.md"))
+
+
+func _render4(a0: Dictionary, c0a0: Dictionary, p02: Dictionary, p02c0: Dictionary,
+		p03: Dictionary, p03c0: Dictionary, p04: Dictionary, p04c0: Dictionary, games: int) -> String:
+	var vgs: Array = p04["vanguards"]
+	var s := "# WILDMIGRATION — Patch 0.4 (Apply + Measure)\n\n"
+	s += "Structural redesign of Bram's refresh package (uncapped: Bram Vanguard "
+	s += "and Stampede can now refresh *any* Banner, Korgan included; the +2000 "
+	s += "rider is gone) plus a Kaya rest nudge (max_cost 4→5). Everyone else "
+	s += "untouched. Full 8×8 archetype + C0 matrices, %d games/matchup, " % games
+	s += "on the A0 seed blocks.\n\n"
+
+	# Table 1: archetype pilots A0/0.2/0.3/0.4.
+	s += "## Per-Vanguard win rate — archetype pilots\n\n"
+	s += "| Vanguard | A0 | 0.2 | 0.3 | 0.4 | Δ 0.4 vs A0 | Δ 0.4 vs 0.3 |\n|---|---|---|---|---|---|---|\n"
+	for v in vgs:
+		var wa: float = float(a0[v]["win_rate"])
+		var w4: float = _wr(p04, v)
+		s += "| %s | %s | %s | %s | %s | %s | %s |\n" % [
+			_short(v), _pct(wa), _pct(_wr(p02, v)), _pct(_wr(p03, v)), _pct(w4),
+			_d(wa, w4), _d(_wr(p03, v), w4)]
+	s += "\n"
+
+	# Table 2: C0.
+	s += "## Per-Vanguard win rate — C0 shared generic pilot\n\n"
+	s += "| Vanguard | A0-C0 | 0.2-C0 | 0.3-C0 | 0.4-C0 | Δ 0.4 vs A0 |\n|---|---|---|---|---|---|\n"
+	for v in vgs:
+		var wa2: float = float(c0a0[v]["win_rate"])
+		var w4c: float = _wr(p04c0, v)
+		s += "| %s | %s | %s | %s | %s | %s |\n" % [
+			_short(v), _pct(wa2), _pct(_wr(p02c0, v)), _pct(_wr(p03c0, v)), _pct(w4c), _d(wa2, w4c)]
+	s += "\n"
+
+	# Table 3: Bram connect rate + attacker power.
+	s += "## Bram (refresh_tempo) — connect rate & attacker power (A0 → 0.4)\n\n"
+	s += "The redesign should raise attacker power — big bodies attacking repeatedly.\n\n"
+	s += "| Metric | A0 | 0.2 | 0.3 | 0.4 |\n|---|---|---|---|---|\n"
+	s += "| Connect rate | %s | %s | %s | %s |\n" % [
+		_pct(float(a0["wm01-023"]["connect_rate"])), _pct(_cr(p02, "wm01-023")),
+		_pct(_cr(p03, "wm01-023")), _pct(_cr(p04, "wm01-023"))]
+	s += "| Avg attacker power | %.0f | %.0f | %.0f | %.0f |\n" % [
+		float(a0["wm01-023"]["avg_attacker_power"]), _ap(p02, "wm01-023"),
+		_ap(p03, "wm01-023"), _ap(p04, "wm01-023")]
+	s += "\n"
+
+	# Stability callouts.
+	s += "## Stability / trend (untouched or nudge decks)\n\n"
+	var rue03: float = _wr(p03, "wm01-067")
+	var rue04: float = _wr(p04, "wm01-067")
+	s += "- **Rue (drain, untouched)**: 0.3 %s → 0.4 %s (%s) — %s\n" % [
+		_pct(rue03), _pct(rue04), _d(rue03, rue04),
+		("stable" if abs(rue04 - rue03) <= 0.03 else "drifted, investigate")]
+	var kaya03: float = _wr(p03, "wm01-012")
+	var kaya04: float = _wr(p04, "wm01-012")
+	s += "- **Kaya (rest_punish, nudge)**: 0.3 %s → 0.4 %s (%s)\n\n" % [
+		_pct(kaya03), _pct(kaya04), _d(kaya03, kaya04)]
+
+	# OVERSHOOT check.
+	s += "## ⚠ OVERSHOOT check (the accepted Korgan-loop risk)\n\n"
+	var bram_wr: float = _wr(p04, "wm01-023")
+	var hot_matchups: Array = []
+	for b in vgs:
+		var cell: float = float(p04["matrix"]["wm01-023"][b])
+		if cell > MATCHUP_HI:
+			hot_matchups.append("vs %s (%s)" % [_short(b), _pct(cell)])
+	var flagged := bram_wr > VG_HI or not hot_matchups.is_empty()
+	if flagged:
+		s += "**⚠ FLAGGED.** "
+	else:
+		s += "Not triggered. "
+	s += "refresh_tempo overall = **%s** (threshold 55%%). " % _pct(bram_wr)
+	s += "Bram matchups over 65%%: %s.\n\n" % ("none" if hot_matchups.is_empty() else ", ".join(hot_matchups))
+
+	# Remaining REVIEW flags.
+	s += "## Remaining REVIEW flags (Patch 0.4)\n\n"
+	var rev_vg: Array = []
+	for v in vgs:
+		var wr: float = _wr(p04, v)
+		if wr < VG_LO or wr > VG_HI:
+			rev_vg.append("%s (%s)" % [_short(v), _pct(wr)])
+	var rev_mu := 0
+	for a in vgs:
+		for b in vgs:
+			var cell2: float = float(p04["matrix"][a][b])
+			if cell2 < MATCHUP_LO or cell2 > MATCHUP_HI:
+				rev_mu += 1
+	s += "Vanguards outside 45–55%%: %s\n\n" % ("none" if rev_vg.is_empty() else ", ".join(rev_vg))
+	s += "Matchups outside 35–65%%: **%d / %d** cells.\n" % [rev_mu, vgs.size() * vgs.size()]
+	return s
 
 
 # Patch 0.3: consolidate A0 (isolation) / Patch 0.2 / Patch 0.3.
