@@ -69,6 +69,12 @@ static func _read_manifest(dir: String) -> Dictionary:
 static func _texture(dir: String, filename: String, fallback: bool) -> Texture2D:
 	if not filename.is_empty():
 		var path := "%s/%s" % [dir, filename]
+		# Prefer the imported Texture2D (no reimport, no warning); fall back to a
+		# hot Image.load so freshly dropped art still shows before an editor open.
+		if ResourceLoader.exists(path):
+			var res = ResourceLoader.load(path)
+			if res is Texture2D:
+				return res
 		if FileAccess.file_exists(path):
 			var img := Image.new()
 			if img.load(path) == OK:

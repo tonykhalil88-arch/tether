@@ -9,6 +9,13 @@ Two players duel with a 50-card deck plus a single Vanguard. Card types are
 (persistent field). The engine runs the real **WM01 "The First Stampede"** set
 — 88 cards across five tribes (Redgale, Runner, Pact, Consortium, Bulwark).
 
+**Phase 3 adds a playable human-vs-AI 3D client** on top of this frozen engine
+(`client/`, main scene `client/main.tscn`). The client is a pure consumer: it
+drives the engine through the same public API the AI policies use and renders by
+translating the public `state.log` into presentation beats — **zero rules in
+presentation code, engine untouched.** See **[SCREENS.md](SCREENS.md)** for a
+board capture, the mouse controls, and run notes.
+
 ---
 
 ## Requirements
@@ -51,7 +58,17 @@ wildmigration/
 │   ├── ai_policy.gd              # two AI policies (aggro / guard), Rush + Freeze aware
 │   ├── match_runner.gd           # AI-vs-AI game loop, batch runner, watch-list
 │   └── run.gd                    # headless CLI entry point
-├── tests/                        # GUT suites + helpers
+├── client/                       # Phase 3 — playable human-vs-AI 3D client
+│   ├── main.gd / main.tscn       # app root: menu -> table -> win/loss
+│   ├── assets/asset_manifest.gd  # 4-channel art resolver (sprite/SFX/VFX/voice)
+│   ├── present/                  # CardFrame, PixelFont, PresentationQueue, SummonStateMachine, vfx_burst
+│   ├── match/match_controller.gd # drives the frozen engine via its public API
+│   ├── board/                    # 3D table + unit/hand card views + input
+│   └── ui/                       # HUD, main menu, win/loss
+├── assets/cards/<id>/            # per-card art drop (2 fully-wired examples)
+├── tools/gen_client_assets.gd    # procedural placeholder-asset generator
+├── tools/gen_screens.gd          # board-schematic capture for SCREENS.md
+├── tests/                        # GUT suites + helpers (engine + client smoke)
 └── addons/gut/                   # vendored GUT 9.5.0
 ```
 
