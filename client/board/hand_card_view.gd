@@ -1,16 +1,19 @@
 class_name HandCardView
 extends Node3D
 
-## A card in the human's hand (or any zone shown face-up as a frame): a quad
-## textured with the generated CardFrame, tilted toward the camera, clickable.
-## No creature animation — hand cards are inert until played.
+## A card in the human's hand: a full CardVisual (real-font frame with legible
+## name, cost, power, keywords and complete rules text at hand scale), clickable
+## and hoverable for the inspector. No creature animation — hand cards are inert
+## until played.
 
 signal clicked(uid: int)
+signal hovered(uid: int)
+signal unhovered(uid: int)
 
 var uid: int = -1
 var card_id: String = ""
-var _mesh: MeshInstance3D
-var _mat: StandardMaterial3D
+var _frame: CardVisual
+var _dim: MeshInstance3D
 var _lifted: bool = false
 var _base_y: float = 0.0
 
@@ -18,38 +21,47 @@ var _base_y: float = 0.0
 func setup(p_card_id: String, p_uid: int) -> void:
 	card_id = p_card_id
 	uid = p_uid
+	var card := DeckFactory.card(card_id)
 
-	_mesh = MeshInstance3D.new()
-	var quad := QuadMesh.new()
-	quad.size = Vector2(0.62, 0.88)      # 168:240 aspect
-	_mesh.mesh = quad
-	_mat = StandardMaterial3D.new()
-	_mat.albedo_texture = CardFrame.make(DeckFactory.card(card_id))
-	_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_mesh.material_override = _mat
-	add_child(_mesh)
+	_frame = CardVisual.new()
+	add_child(_frame)
+	_frame.build(card, 0.72, true)   # full rules text at hand scale
+
+	# A dim overlay used when the card is not playable.
+	_dim = MeshInstance3D.new()
+	var dq := QuadMesh.new()
+	dq.size = Vector2(_frame.width, _frame.height)
+	_dim.mesh = dq
+	var dm := StandardMaterial3D.new()
+	dm.albedo_color = Color(0.02, 0.02, 0.04, 0.0)
+	dm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	dm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_dim.material_override = dm
+	_dim.position = Vector3(0, 0, 0.03)
+	add_child(_dim)
 
 	var area := Area3D.new()
 	area.input_ray_pickable = true
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = Vector3(0.62, 0.88, 0.12)
+	box.size = Vector3(_frame.width, _frame.height, 0.12)
 	shape.shape = box
 	area.add_child(shape)
 	area.input_event.connect(_on_area_input)
+	area.mouse_entered.connect(func(): hovered.emit(uid))
+	area.mouse_exited.connect(func(): unhovered.emit(uid))
 	add_child(area)
 
 
 func set_playable(on: bool) -> void:
-	if _mat == null:
+	if _dim == null:
 		return
-	_mat.albedo_color = Color(1, 1, 1) if on else Color(0.55, 0.55, 0.6)
+	var m := _dim.material_override as StandardMaterial3D
+	if m != null:
+		m.albedo_color = Color(0.02, 0.02, 0.04, 0.0 if on else 0.55)
 
 
 func set_lifted(on: bool) -> void:
-	# Small hover pop so the selected hand card reads clearly.
 	if on == _lifted:
 		return
 	_lifted = on

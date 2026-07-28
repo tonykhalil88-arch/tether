@@ -37,7 +37,7 @@ static func resolve(card_id: String) -> Dictionary:
 	var bundle := {
 		"id": card_id,
 		"has_manifest": not m.is_empty(),
-		"sprite_idle": _texture(dir, str(sprite.get("idle", "sprite.png")), true),
+		"sprite_idle": _sprite_or_placeholder(dir, str(sprite.get("idle", "sprite.png")), card_id),
 		"sprite_attack": _texture(dir, str(sprite.get("attack", "attack.png")), false),
 		"frames": int(sprite.get("frames", 1)),
 		"fps": int(sprite.get("fps", 8)),
@@ -64,6 +64,19 @@ static func _read_manifest(dir: String) -> Dictionary:
 		return {}
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
 	return parsed if typeof(parsed) == TYPE_DICTIONARY else {}
+
+
+## Idle sprite: a real art file if present, otherwise the DETERMINISTIC per-id
+## placeholder billboard (not the shared diamond) so every creature reads
+## distinctly on the board. Unknown ids (tests) fall back to the diamond.
+static func _sprite_or_placeholder(dir: String, filename: String, card_id: String) -> Texture2D:
+	var tex := _texture(dir, filename, false)
+	if tex != null:
+		return tex
+	var card: CardData = DeckFactory.card(card_id)
+	if card != null:
+		return PlaceholderArt.sprite_for(card)
+	return placeholder_sprite()
 
 
 static func _texture(dir: String, filename: String, fallback: bool) -> Texture2D:
