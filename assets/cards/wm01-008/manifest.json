@@ -1,0 +1,22 @@
+{
+  "card_id": "wm01-008",
+  "name": "Stormfoal Hatchling",
+  "sprite": {
+    "idle": "sprite.png",
+    "attack": "attack.png",
+    "frames": 4,
+    "hframes": 4,
+    "vframes": 1,
+    "fps": 8
+  },
+  "sfx": {
+    "summon": "summon.wav",
+    "hit": "hit.wav"
+  },
+  "voice": {
+    "summon": "voice.wav"
+  },
+  "vfx": {
+    "strike": "res://client/present/vfx_burst.tscn"
+  }
+}

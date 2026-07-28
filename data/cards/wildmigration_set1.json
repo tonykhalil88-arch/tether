@@ -1,0 +1,2275 @@
+{
+  "set": {
+    "code": "WM01",
+    "name": "The First Stampede",
+    "game": "WILDMIGRATION",
+    "world": "Vantara",
+    "patch": "0.5"
+  },
+  "rules_addenda": {
+    "keyword_freeze": "A frozen card does not refresh during its owner's next Refresh Phase.",
+    "banner_freeze_cap": "Each player may freeze at most 1 Banner per turn (engine-enforced).",
+    "aura_freeze_cap": "None \u2014 Aura freezing is uncapped (Tony ruling).",
+    "power_ceiling": 9000
+  },
+  "cards": [
+    {
+      "id": "wm01-001",
+      "name": "Sora Akaza, Redgale Captain",
+      "type": "vanguard",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "power": 5000,
+      "life": 5,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "once_per_turn": true,
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 2000,
+            "target": "own_banner",
+            "filter_tribe": "Redgale",
+            "duration": "turn",
+            "rider": {
+              "if": "played_this_turn",
+              "grant_keyword": "rush",
+              "duration": "turn"
+            }
+          }
+        }
+      ],
+      "flavor": "Ride ahead of the storm, and you never get wet."
+    },
+    {
+      "id": "wm01-002",
+      "name": "Ragnir, Thunder-Maned",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 7,
+      "power": 8000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "cost": {
+            "aura": 2
+          },
+          "action": {
+            "type": "ko",
+            "target": "enemy_banner",
+            "max_power": 5000
+          }
+        }
+      ],
+      "flavor": "Sora's bonded beast. The finisher."
+    },
+    {
+      "id": "wm01-003",
+      "name": "Sora Akaza, First to Ride",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "condition": {
+            "vanguard_name": "Sora Akaza"
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 2000,
+            "target": "self",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-004",
+      "name": "Mika Tetsu, Redgale Quartermaster",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Redgale"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-005",
+      "name": "Denji Kohaku, Outrider",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 3,
+      "power": 5000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-006",
+      "name": "The Redgale Twins",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 4,
+      "power": 5000,
+      "keywords": [
+        "rush"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-007",
+      "name": "Garrow, Beast-Breaker",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 5,
+      "power": 6000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "ko",
+            "target": "enemy_banner",
+            "max_power": 2000
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-008",
+      "name": "Stormfoal Hatchling",
+      "type": "banner",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "play_self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-009",
+      "name": "Redgale Charge!",
+      "type": "technique",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 4000,
+            "targets": 1,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "power_buff",
+            "amount": 1000,
+            "target": "own_vanguard",
+            "duration": "turn"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-010",
+      "name": "Break the Line",
+      "type": "technique",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "ko",
+            "target": "enemy_banner",
+            "max_power": 4000
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-011",
+      "name": "Dunmar Canyon Run",
+      "type": "stage",
+      "colors": [
+        "red"
+      ],
+      "faction": "Redgale Riders",
+      "tribe": "Redgale",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "cost": {
+            "exhaust_self": true
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 1000,
+            "target": "own_banner",
+            "filter_tribe": "Redgale",
+            "duration": "turn"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-012",
+      "name": "Kaya Morrow, Twilight Courier",
+      "type": "vanguard",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "power": 5000,
+      "life": 4,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "once_per_turn": true,
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 5,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-013",
+      "name": "Verdigris, Moss-Antlered",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 6,
+      "power": 7000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "up_to": 2
+          }
+        }
+      ],
+      "flavor": "Kaya's bonded beast \u2014 a silent giant that stops convoys dead."
+    },
+    {
+      "id": "wm01-014",
+      "name": "Kaya Morrow, Smuggler's Debt",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 3,
+      "power": 5000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 3,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-015",
+      "name": "Bo & Lantern, Trail Hounds",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "condition": {
+            "defender_has_rested_banner": true
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 3000,
+            "target": "self",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-016",
+      "name": "Sable Finch, Route Broker",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Runner",
+              "Pact"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-017",
+      "name": "Pact Scout Iva",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Pact",
+      "cost": 2,
+      "power": 3000,
+      "counter": 2000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-018",
+      "name": "Halden Oxhart, Pact Vanguard",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Pact",
+      "cost": 5,
+      "power": 6000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 5,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-019",
+      "name": "Wagon Drake",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 4,
+      "power": 6000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-020",
+      "name": "Toll of the Quiet Road",
+      "type": "technique",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 6,
+            "up_to": 1
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 6,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-021",
+      "name": "Cut the Cargo Loose",
+      "type": "technique",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 4000,
+            "targets": 1,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-022",
+      "name": "The Twilight Road",
+      "type": "stage",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "Morrow Runners (Rider crew, Pact-aligned)",
+      "tribe": "Runner",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "cost": {
+            "exhaust_self": true,
+            "aura": 1
+          },
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 4,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-023",
+      "name": "Bram Oxhart, Warband Chief",
+      "type": "vanguard",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "power": 5000,
+      "life": 4,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "once_per_turn": true,
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "refresh",
+            "target": "own_banner",
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-024",
+      "name": "Korgan, Iron-Hided",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 7,
+      "power": 8000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "once_per_turn": true,
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "refresh",
+            "target": "self",
+            "timing": "end_of_battle"
+          }
+        }
+      ],
+      "flavor": "Bram's bonded beast \u2014 an ox-titan that simply does not stop."
+    },
+    {
+      "id": "wm01-025",
+      "name": "Bram Oxhart, Shieldbrother",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-026",
+      "name": "Pact Drummer Ola",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Pact"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-027",
+      "name": "Warband Outriders",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 3,
+      "power": 5000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-028",
+      "name": "Pact Lancer Rhoswen",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 4,
+      "power": 6000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "refresh",
+            "target": "own_other_banner",
+            "max_cost": 3,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-029",
+      "name": "Greatox Matron",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 5,
+      "power": 6000,
+      "counter": 1000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-030",
+      "name": "Calfling of the Herd",
+      "type": "banner",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "play_self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-031",
+      "name": "Hold the Column",
+      "type": "technique",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 2000,
+            "targets": 2,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "refresh",
+            "target": "own_banner",
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-032",
+      "name": "Stampede Doctrine",
+      "type": "technique",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "refresh",
+            "target": "own_banner",
+            "filter_tribe": "Pact",
+            "up_to": 2
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-033",
+      "name": "Oxhart Warcamp",
+      "type": "stage",
+      "colors": [
+        "red",
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "cost": {
+            "exhaust_self": true,
+            "aura": 1
+          },
+          "action": {
+            "type": "refresh",
+            "target": "own_banner",
+            "filter_tribe": "Pact",
+            "max_cost": 2,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-034",
+      "name": "Elder Neza, Route-Keeper",
+      "type": "vanguard",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "power": 5000,
+      "life": 5,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "once_per_turn": true,
+          "cost": {
+            "aura": 3
+          },
+          "action": {
+            "type": "freeze",
+            "target": "enemy_banner",
+            "require_rested": true,
+            "max_cost": 4,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-035",
+      "name": "Tortallon, the Waystone",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 7,
+      "power": 9000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 5,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": "The ancient tortoise the Routes are mapped by."
+    },
+    {
+      "id": "wm01-036",
+      "name": "Neza, First Steps on the Route",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 2,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-037",
+      "name": "Route-Sage Immi",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Pact"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-038",
+      "name": "Hollow Warden",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 3,
+      "power": 4000,
+      "counter": 1000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-039",
+      "name": "Stone-Sworn Sentinel",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 4,
+      "power": 5000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "freeze",
+            "target": "enemy_banner",
+            "require_rested": true,
+            "max_cost": 3,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-040",
+      "name": "Mirefang Alpha",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 5,
+      "power": 6000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 2,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-041",
+      "name": "Moss Sprite",
+      "type": "banner",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "play_self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-042",
+      "name": "The Route Provides",
+      "type": "technique",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 4000,
+            "targets": 1,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-043",
+      "name": "Roots Around the Wheels",
+      "type": "technique",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "rest_and_freeze",
+            "target": "enemy_banner",
+            "max_cost": 5,
+            "up_to": 1
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "rest",
+            "target": "enemy_banner",
+            "max_cost": 4,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-044",
+      "name": "The Old Hollow",
+      "type": "stage",
+      "colors": [
+        "green"
+      ],
+      "faction": "The Old Pact",
+      "tribe": "Pact",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "passive",
+          "phase": "opponent_turn",
+          "action": {
+            "type": "power_buff",
+            "amount": 1000,
+            "target": "own_banners",
+            "filter_tribe": "Pact",
+            "filter_keyword": "blocker"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-045",
+      "name": "Director Averil Cros, the Kind Face",
+      "type": "vanguard",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "power": 5000,
+      "life": 5,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "once_per_turn": true,
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "draw_then_bottom",
+            "draw": 1,
+            "bottom": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-046",
+      "name": "Cull-Beast 01",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 7,
+      "power": 8000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "bounce",
+            "target": "enemy_banner",
+            "max_cost": 4,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": "A harvested chimera stitched from the herd."
+    },
+    {
+      "id": "wm01-047",
+      "name": "Averil Cros, Junior Auditor",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "draw_then_bottom",
+            "draw": 1,
+            "bottom": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-048",
+      "name": "Recruitment Officer Lin",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Consortium"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-049",
+      "name": "Ledger Clerk",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 2,
+      "power": 3000,
+      "counter": 2000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-050",
+      "name": "PR Directorate Chief",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 3,
+      "power": 5000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-051",
+      "name": "Severance Agent",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 4,
+      "power": 5000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "bounce",
+            "target": "enemy_banner",
+            "max_cost": 2,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-052",
+      "name": "Filing Wisp",
+      "type": "banner",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "play_self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-053",
+      "name": "Hostile Renegotiation",
+      "type": "technique",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 4000,
+            "targets": 1,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-054",
+      "name": "Recall Order",
+      "type": "technique",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "bounce",
+            "target": "enemy_banner",
+            "max_cost": 4,
+            "up_to": 1
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "draw",
+            "count": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-055",
+      "name": "The Grand Exchange",
+      "type": "stage",
+      "colors": [
+        "blue"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "once_per_turn": true,
+          "cost": {
+            "exhaust_self": true,
+            "aura": 1
+          },
+          "action": {
+            "type": "draw_then_bottom",
+            "draw": 1,
+            "bottom": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-056",
+      "name": "Commander Idris Vale, the Liaison",
+      "type": "vanguard",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "power": 5000,
+      "life": 4,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "passive",
+          "phase": "your_turn",
+          "once_per_turn": true,
+          "action": {
+            "type": "cost_reduction",
+            "amount": 1,
+            "minimum": 1,
+            "filter_tribe": "Bulwark",
+            "applies": "banner_play"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-057",
+      "name": "Bastion Engine \"Doctrine\"",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 8,
+      "power": 9000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "bounce",
+            "target": "enemy_banner",
+            "max_cost": 5,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": "The Bulwark's mobile fortress. Wall meets wall."
+    },
+    {
+      "id": "wm01-058",
+      "name": "Idris Vale, Cadet of the Wall",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 2,
+      "power": 3000,
+      "counter": 1000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-059",
+      "name": "Bulwark Signal Officer",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Bulwark"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-060",
+      "name": "Line Infantry",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 3,
+      "power": 5000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-061",
+      "name": "Quartermaster-General Brandt",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 4,
+      "power": 5000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "gain_aura",
+            "amount": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-062",
+      "name": "Artillery Captain Wren",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 5,
+      "power": 6000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "bounce",
+            "target": "enemy_banner",
+            "max_cost": 3,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-063",
+      "name": "Watch-Hound Pup",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "play_self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-064",
+      "name": "Shields Interlock",
+      "type": "technique",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 4000,
+            "targets": 1,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-065",
+      "name": "Requisition Surge",
+      "type": "technique",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "gain_aura",
+            "amount": 1
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "gain_aura",
+            "amount": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-066",
+      "name": "The Canyon Bastion",
+      "type": "stage",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "once_per_turn": true,
+          "cost": {
+            "exhaust_self": true
+          },
+          "action": {
+            "type": "cost_reduction",
+            "amount": 1,
+            "minimum": 1,
+            "filter_tribe": "Bulwark",
+            "applies": "next_banner_this_turn"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-067",
+      "name": "Dr. Halcyon Rue, Chief Harvester",
+      "type": "vanguard",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "power": 5000,
+      "life": 4,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "once_per_turn": true,
+          "action": {
+            "type": "freeze",
+            "target": "enemy_aura",
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-068",
+      "name": "Cull-Beast Prime",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 7,
+      "power": 8000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "freeze",
+            "target": "enemy_aura",
+            "up_to": 2
+          }
+        }
+      ],
+      "flavor": "The perfected sibling of Cull-Beast 01."
+    },
+    {
+      "id": "wm01-069",
+      "name": "Halcyon Rue, Field Vivisector",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 2,
+      "power": 4000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "freeze",
+            "target": "enemy_aura",
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-070",
+      "name": "Lab Adjunct Miro",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Consortium"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-071",
+      "name": "Specimen Handler",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 3,
+      "power": 4000,
+      "counter": 1000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-072",
+      "name": "Harvest Rig Crew",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 4,
+      "power": 6000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-073",
+      "name": "Anaesthetist Voss",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 5,
+      "power": 6000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "cost": {
+            "aura": 1
+          },
+          "action": {
+            "type": "bounce",
+            "target": "enemy_banner",
+            "max_cost": 3,
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-074",
+      "name": "Jarred Sprite",
+      "type": "banner",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "play_self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-075",
+      "name": "Sedation Protocol",
+      "type": "technique",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 4000,
+            "targets": 1,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-076",
+      "name": "Asset Seizure",
+      "type": "technique",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "freeze",
+            "target": "enemy_aura",
+            "up_to": 2
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "freeze",
+            "target": "enemy_aura",
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-077",
+      "name": "The Abattoir Ascendant",
+      "type": "stage",
+      "colors": [
+        "blue",
+        "purple"
+      ],
+      "faction": "The Harvest Consortium",
+      "tribe": "Consortium",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "activate_main",
+          "once_per_turn": true,
+          "cost": {
+            "exhaust_self": true,
+            "aura": 1
+          },
+          "action": {
+            "type": "freeze",
+            "target": "enemy_aura",
+            "up_to": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-078",
+      "name": "Marshal Goran Dreyse, the Siegebreaker",
+      "type": "vanguard",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "power": 5000,
+      "life": 5,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "passive",
+          "phase": "your_turn",
+          "condition": {
+            "min_aura_total": 8
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 1000,
+            "target": "own_banners",
+            "filter_tribe": "Bulwark"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-079",
+      "name": "The Walkbreaker",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 9,
+      "power": 9000,
+      "keywords": [
+        "rush"
+      ],
+      "effects": [],
+      "flavor": "Built to stop the migration itself."
+    },
+    {
+      "id": "wm01-080",
+      "name": "Goran Dreyse, Sapper",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 2,
+      "power": 2000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "gain_aura",
+            "amount": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-081",
+      "name": "Bulwark War-Scribe",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "power": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "on_play",
+          "action": {
+            "type": "search_top",
+            "count": 4,
+            "filter_tribes": [
+              "Bulwark"
+            ],
+            "add": 1,
+            "rest_to": "bottom"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-082",
+      "name": "Trench Engineers",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 3,
+      "power": 4000,
+      "counter": 1000,
+      "keywords": [
+        "blocker"
+      ],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-083",
+      "name": "Ballista Team",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 5,
+      "power": 7000,
+      "counter": 1000,
+      "keywords": [],
+      "effects": [],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-084",
+      "name": "Ram-Titan \"Gatecrusher\"",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 6,
+      "power": 7000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "when_attacking",
+          "condition": {
+            "min_aura_total": 8
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 2000,
+            "target": "self",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-085",
+      "name": "Powder Imp",
+      "type": "banner",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "power": 1000,
+      "counter": 2000,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "play_self"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-086",
+      "name": "Bombard",
+      "type": "technique",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "counter",
+          "action": {
+            "type": "power_buff",
+            "amount": 4000,
+            "targets": 1,
+            "target": "own_unit",
+            "duration": "battle"
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-087",
+      "name": "Total Mobilisation",
+      "type": "technique",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 2,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "main",
+          "action": {
+            "type": "gain_aura",
+            "amount": 2
+          }
+        },
+        {
+          "trigger": "life_trigger",
+          "action": {
+            "type": "gain_aura",
+            "amount": 1
+          }
+        }
+      ],
+      "flavor": ""
+    },
+    {
+      "id": "wm01-088",
+      "name": "Siegeworks Foundry",
+      "type": "stage",
+      "colors": [
+        "purple"
+      ],
+      "faction": "The Bulwark",
+      "tribe": "Bulwark",
+      "cost": 1,
+      "keywords": [],
+      "effects": [
+        {
+          "trigger": "passive",
+          "phase": "your_turn",
+          "condition": {
+            "min_aura_total": 8
+          },
+          "action": {
+            "type": "power_buff",
+            "amount": 1000,
+            "target": "own_vanguard"
+          }
+        }
+      ],
+      "flavor": ""
+    }
+  ]
+}

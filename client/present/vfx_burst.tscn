@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cwmvfxburst01"]
+
+[ext_resource type="Script" path="res://client/present/vfx_burst.gd" id="1"]
+
+[node name="VfxBurst" type="Node3D"]
+script = ExtResource("1")

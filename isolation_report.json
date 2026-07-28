@@ -1,0 +1,579 @@
+{
+  "consolidated_at_seed": 1.0,
+  "scenarios": {
+    "A0": {
+      "first_player_win_rate": 0.553125,
+      "games_per_matchup": 50.0,
+      "label": "new-rules baseline (nothing disabled)",
+      "per_vanguard": {
+        "wm01-001": {
+          "archetype": "rush",
+          "avg_attacker_power": 4662.15993404782,
+          "avg_defender_power": 5213.02555647156,
+          "avg_game_length": 7.32875,
+          "connect_rate": 0.742126957955482,
+          "counters_per_life_lost": 0.0659754948162111,
+          "win_rate": 0.79125
+        },
+        "wm01-012": {
+          "archetype": "rest_punish",
+          "avg_attacker_power": 4662.64035386186,
+          "avg_defender_power": 4656.17556992174,
+          "avg_game_length": 8.27125,
+          "connect_rate": 0.814392650561415,
+          "counters_per_life_lost": 0.125239616613419,
+          "win_rate": 0.23375
+        },
+        "wm01-023": {
+          "archetype": "refresh_tempo",
+          "avg_attacker_power": 3920.12653222618,
+          "avg_defender_power": 5047.25187821273,
+          "avg_game_length": 8.0125,
+          "connect_rate": 0.633254250691973,
+          "counters_per_life_lost": 0.241782553729456,
+          "win_rate": 0.1525
+        },
+        "wm01-034": {
+          "archetype": "lockdown",
+          "avg_attacker_power": 4519.519778891,
+          "avg_defender_power": 5832.61357747452,
+          "avg_game_length": 15.535,
+          "connect_rate": 0.528761444118155,
+          "counters_per_life_lost": 0.365572826712723,
+          "win_rate": 0.54
+        },
+        "wm01-045": {
+          "archetype": "filter_control",
+          "avg_attacker_power": 3964.76154899763,
+          "avg_defender_power": 4781.84534927157,
+          "avg_game_length": 9.71625,
+          "connect_rate": 0.672394471423235,
+          "counters_per_life_lost": 0.426910299003322,
+          "win_rate": 0.49875
+        },
+        "wm01-056": {
+          "archetype": "discount_deploy",
+          "avg_attacker_power": 4420.28278888347,
+          "avg_defender_power": 5174.0614334471,
+          "avg_game_length": 7.1975,
+          "connect_rate": 0.696245733788396,
+          "counters_per_life_lost": 0.0553814002089864,
+          "win_rate": 0.715
+        },
+        "wm01-067": {
+          "archetype": "drain",
+          "avg_attacker_power": 4315.67675613935,
+          "avg_defender_power": 4700.74243289549,
+          "avg_game_length": 9.08375,
+          "connect_rate": 0.721444888635066,
+          "counters_per_life_lost": 0.358271525314415,
+          "win_rate": 0.33625
+        },
+        "wm01-078": {
+          "archetype": "threshold_ramp",
+          "avg_attacker_power": 4935.91880018179,
+          "avg_defender_power": 5310.10452961672,
+          "avg_game_length": 7.6625,
+          "connect_rate": 0.669595515830935,
+          "counters_per_life_lost": 0.0966212211025489,
+          "win_rate": 0.7325
+        }
+      },
+      "scenario": "A0",
+      "seed": 1.0,
+      "total_games": 3200.0
+    },
+    "A1": {
+      "first_player_win_rate": 0.55625,
+      "games_per_matchup": 50.0,
+      "label": "Sora Vanguard Rush rider disabled",
+      "per_vanguard": {
+        "wm01-001": {
+          "archetype": "rush",
+          "avg_attacker_power": 4615.46134663342,
+          "avg_defender_power": 5216.95760598504,
+          "avg_game_length": 7.44625,
+          "connect_rate": 0.741978387364921,
+          "counters_per_life_lost": 0.0683153013910355,
+          "win_rate": 0.76125
+        },
+        "wm01-012": {
+          "archetype": "rest_punish",
+          "avg_attacker_power": 4662.8242074928,
+          "avg_defender_power": 4655.02627563994,
+          "avg_game_length": 8.2925,
+          "connect_rate": 0.814375317850483,
+          "counters_per_life_lost": 0.123961661341853,
+          "win_rate": 0.235
+        },
+        "wm01-023": {
+          "archetype": "refresh_tempo",
+          "avg_attacker_power": 3918.17823343849,
+          "avg_defender_power": 5047.1214511041,
+          "avg_game_length": 8.03,
+          "connect_rate": 0.63288643533123,
+          "counters_per_life_lost": 0.241150442477876,
+          "win_rate": 0.1525
+        },
+        "wm01-034": {
+          "archetype": "lockdown",
+          "avg_attacker_power": 4518.54082422782,
+          "avg_defender_power": 5827.8413490493,
+          "avg_game_length": 15.5675,
+          "connect_rate": 0.529381398950357,
+          "counters_per_life_lost": 0.365783410138249,
+          "win_rate": 0.55
+        },
+        "wm01-045": {
+          "archetype": "filter_control",
+          "avg_attacker_power": 3968.73061173843,
+          "avg_defender_power": 4780.36977292468,
+          "avg_game_length": 9.73,
+          "connect_rate": 0.673656781238367,
+          "counters_per_life_lost": 0.429680998613037,
+          "win_rate": 0.51
+        },
+        "wm01-056": {
+          "archetype": "discount_deploy",
+          "avg_attacker_power": 4422.22942320156,
+          "avg_defender_power": 5174.8217757615,
+          "avg_game_length": 7.2125,
+          "connect_rate": 0.696694750486066,
+          "counters_per_life_lost": 0.0547228999651447,
+          "win_rate": 0.72
+        },
+        "wm01-067": {
+          "archetype": "drain",
+          "avg_attacker_power": 4314.98645372879,
+          "avg_defender_power": 4702.4098103522,
+          "avg_game_length": 9.08625,
+          "connect_rate": 0.720519036075859,
+          "counters_per_life_lost": 0.355046759109965,
+          "win_rate": 0.33625
+        },
+        "wm01-078": {
+          "archetype": "threshold_ramp",
+          "avg_attacker_power": 4935.52293022552,
+          "avg_defender_power": 5310.12562433782,
+          "avg_game_length": 7.6675,
+          "connect_rate": 0.669592856061753,
+          "counters_per_life_lost": 0.0955773226476699,
+          "win_rate": 0.735
+        }
+      },
+      "scenario": "A1",
+      "seed": 1.0,
+      "total_games": 3200.0
+    },
+    "A2": {
+      "first_player_win_rate": 0.551875,
+      "games_per_matchup": 50.0,
+      "label": "Total Mobilisation blanked",
+      "per_vanguard": {
+        "wm01-001": {
+          "archetype": "rush",
+          "avg_attacker_power": 4669.78346456693,
+          "avg_defender_power": 5214.56692913386,
+          "avg_game_length": 7.35,
+          "connect_rate": 0.743766404199475,
+          "counters_per_life_lost": 0.0555908513341804,
+          "win_rate": 0.82
+        },
+        "wm01-012": {
+          "archetype": "rest_punish",
+          "avg_attacker_power": 4665.11782276801,
+          "avg_defender_power": 4647.52738134749,
+          "avg_game_length": 8.345,
+          "connect_rate": 0.81281115167607,
+          "counters_per_life_lost": 0.107805502239283,
+          "win_rate": 0.2525
+        },
+        "wm01-023": {
+          "archetype": "refresh_tempo",
+          "avg_attacker_power": 3910.35818005808,
+          "avg_defender_power": 5045.49854791868,
+          "avg_game_length": 8.06875,
+          "connect_rate": 0.629622458857696,
+          "counters_per_life_lost": 0.225031605562579,
+          "win_rate": 0.15875
+        },
+        "wm01-034": {
+          "archetype": "lockdown",
+          "avg_attacker_power": 4516.53878942882,
+          "avg_defender_power": 5818.41432225064,
+          "avg_game_length": 15.64375,
+          "connect_rate": 0.531116794543904,
+          "counters_per_life_lost": 0.357638888888889,
+          "win_rate": 0.57625
+        },
+        "wm01-045": {
+          "archetype": "filter_control",
+          "avg_attacker_power": 3969.04441453567,
+          "avg_defender_power": 4777.31555120519,
+          "avg_game_length": 9.79,
+          "connect_rate": 0.673803988743424,
+          "counters_per_life_lost": 0.402398215281651,
+          "win_rate": 0.535
+        },
+        "wm01-056": {
+          "archetype": "discount_deploy",
+          "avg_attacker_power": 4426.47296206618,
+          "avg_defender_power": 5174.49556093624,
+          "avg_game_length": 7.22,
+          "connect_rate": 0.697659402744149,
+          "counters_per_life_lost": 0.0482686253934942,
+          "win_rate": 0.7325
+        },
+        "wm01-067": {
+          "archetype": "drain",
+          "avg_attacker_power": 4324.30536065114,
+          "avg_defender_power": 4696.74431658715,
+          "avg_game_length": 9.1425,
+          "connect_rate": 0.721021611001965,
+          "counters_per_life_lost": 0.334518422753717,
+          "win_rate": 0.3575
+        },
+        "wm01-078": {
+          "archetype": "threshold_ramp",
+          "avg_attacker_power": 4576.51735208684,
+          "avg_defender_power": 5241.85904295979,
+          "avg_game_length": 8.1575,
+          "connect_rate": 0.64745451765785,
+          "counters_per_life_lost": 0.107270233196159,
+          "win_rate": 0.5675
+        }
+      },
+      "scenario": "A2",
+      "seed": 1.0,
+      "total_games": 3200.0
+    },
+    "A3": {
+      "first_player_win_rate": 0.556875,
+      "games_per_matchup": 50.0,
+      "label": "Vale discount Vanguard-only (Canyon disabled)",
+      "per_vanguard": {
+        "wm01-001": {
+          "archetype": "rush",
+          "avg_attacker_power": 4665.95253790376,
+          "avg_defender_power": 5213.41463414634,
+          "avg_game_length": 7.32875,
+          "connect_rate": 0.743078444297956,
+          "counters_per_life_lost": 0.0640378548895899,
+          "win_rate": 0.79875
+        },
+        "wm01-012": {
+          "archetype": "rest_punish",
+          "avg_attacker_power": 4662.98811544992,
+          "avg_defender_power": 4654.49915110357,
+          "avg_game_length": 8.28,
+          "connect_rate": 0.814770797962649,
+          "counters_per_life_lost": 0.125599232981783,
+          "win_rate": 0.235
+        },
+        "wm01-023": {
+          "archetype": "refresh_tempo",
+          "avg_attacker_power": 3921.02665350444,
+          "avg_defender_power": 5047.97630799605,
+          "avg_game_length": 8.025,
+          "connect_rate": 0.633366238894373,
+          "counters_per_life_lost": 0.242730720606827,
+          "win_rate": 0.1525
+        },
+        "wm01-034": {
+          "archetype": "lockdown",
+          "avg_attacker_power": 4518.59201104305,
+          "avg_defender_power": 5830.90328703304,
+          "avg_game_length": 15.5425,
+          "connect_rate": 0.528772323354327,
+          "counters_per_life_lost": 0.365179856115108,
+          "win_rate": 0.54
+        },
+        "wm01-045": {
+          "archetype": "filter_control",
+          "avg_attacker_power": 3965.26826839288,
+          "avg_defender_power": 4781.27723142039,
+          "avg_game_length": 9.7175,
+          "connect_rate": 0.672476036350056,
+          "counters_per_life_lost": 0.425802879291251,
+          "win_rate": 0.5
+        },
+        "wm01-056": {
+          "archetype": "discount_deploy",
+          "avg_attacker_power": 4406.0576611597,
+          "avg_defender_power": 5175.57499190152,
+          "avg_game_length": 7.26625,
+          "connect_rate": 0.690152251376741,
+          "counters_per_life_lost": 0.0577455048409405,
+          "win_rate": 0.70125
+        },
+        "wm01-067": {
+          "archetype": "drain",
+          "avg_attacker_power": 4314.50924608819,
+          "avg_defender_power": 4699.00426742532,
+          "avg_game_length": 9.10625,
+          "connect_rate": 0.72176386913229,
+          "counters_per_life_lost": 0.36181876813931,
+          "win_rate": 0.33625
+        },
+        "wm01-078": {
+          "archetype": "threshold_ramp",
+          "avg_attacker_power": 4939.3479909022,
+          "avg_defender_power": 5311.44806671721,
+          "avg_game_length": 7.66125,
+          "connect_rate": 0.670811220621683,
+          "counters_per_life_lost": 0.0961139127855236,
+          "win_rate": 0.73625
+        }
+      },
+      "scenario": "A3",
+      "seed": 1.0,
+      "total_games": 3200.0
+    },
+    "A4": {
+      "first_player_win_rate": 0.5534375,
+      "games_per_matchup": 50.0,
+      "label": "Verdigris rests 1 instead of 2",
+      "per_vanguard": {
+        "wm01-001": {
+          "archetype": "rush",
+          "avg_attacker_power": 4664.15218104296,
+          "avg_defender_power": 5208.92095769105,
+          "avg_game_length": 7.35125,
+          "connect_rate": 0.741882584453919,
+          "counters_per_life_lost": 0.0657276995305164,
+          "win_rate": 0.78875
+        },
+        "wm01-012": {
+          "archetype": "rest_punish",
+          "avg_attacker_power": 4668.42105263158,
+          "avg_defender_power": 4654.83870967742,
+          "avg_game_length": 8.28375,
+          "connect_rate": 0.813752122241087,
+          "counters_per_life_lost": 0.125918823905401,
+          "win_rate": 0.23625
+        },
+        "wm01-023": {
+          "archetype": "refresh_tempo",
+          "avg_attacker_power": 3919.77869986169,
+          "avg_defender_power": 5046.82868998222,
+          "avg_game_length": 8.01375,
+          "connect_rate": 0.632878877692156,
+          "counters_per_life_lost": 0.242098609355247,
+          "win_rate": 0.15125
+        },
+        "wm01-034": {
+          "archetype": "lockdown",
+          "avg_attacker_power": 4519.1261549089,
+          "avg_defender_power": 5832.48424142993,
+          "avg_game_length": 15.5375,
+          "connect_rate": 0.528797167774804,
+          "counters_per_life_lost": 0.365678088108264,
+          "win_rate": 0.54
+        },
+        "wm01-045": {
+          "archetype": "filter_control",
+          "avg_attacker_power": 3965.1784603905,
+          "avg_defender_power": 4781.7435642333,
+          "avg_game_length": 9.73,
+          "connect_rate": 0.6723044397463,
+          "counters_per_life_lost": 0.43086727625381,
+          "win_rate": 0.4975
+        },
+        "wm01-056": {
+          "archetype": "discount_deploy",
+          "avg_attacker_power": 4420.63363119415,
+          "avg_defender_power": 5174.00487408611,
+          "avg_game_length": 7.19875,
+          "connect_rate": 0.696344435418359,
+          "counters_per_life_lost": 0.0560975609756098,
+          "win_rate": 0.71625
+        },
+        "wm01-067": {
+          "archetype": "drain",
+          "avg_attacker_power": 4316.11982881598,
+          "avg_defender_power": 4701.28388017118,
+          "avg_game_length": 9.09125,
+          "connect_rate": 0.721540656205421,
+          "counters_per_life_lost": 0.362491930277598,
+          "win_rate": 0.33625
+        },
+        "wm01-078": {
+          "archetype": "threshold_ramp",
+          "avg_attacker_power": 4936.09933373713,
+          "avg_defender_power": 5309.96365838886,
+          "avg_game_length": 7.66375,
+          "connect_rate": 0.669745608721987,
+          "counters_per_life_lost": 0.0968888888888889,
+          "win_rate": 0.73375
+        }
+      },
+      "scenario": "A4",
+      "seed": 1.0,
+      "total_games": 3200.0
+    },
+    "A5": {
+      "first_player_win_rate": 0.553125,
+      "games_per_matchup": 50.0,
+      "label": "Korgan self-refresh disabled",
+      "per_vanguard": {
+        "wm01-001": {
+          "archetype": "rush",
+          "avg_attacker_power": 4660.62005277045,
+          "avg_defender_power": 5212.89577836412,
+          "avg_game_length": 7.33125,
+          "connect_rate": 0.741919525065963,
+          "counters_per_life_lost": 0.0659547738693467,
+          "win_rate": 0.78875
+        },
+        "wm01-012": {
+          "archetype": "rest_punish",
+          "avg_attacker_power": 4660.93617021277,
+          "avg_defender_power": 4656.34042553191,
+          "avg_game_length": 8.27125,
+          "connect_rate": 0.814127659574468,
+          "counters_per_life_lost": 0.124960051134548,
+          "win_rate": 0.23375
+        },
+        "wm01-023": {
+          "archetype": "refresh_tempo",
+          "avg_attacker_power": 3920.12653222618,
+          "avg_defender_power": 5047.25187821273,
+          "avg_game_length": 8.0125,
+          "connect_rate": 0.633254250691973,
+          "counters_per_life_lost": 0.241782553729456,
+          "win_rate": 0.1525
+        },
+        "wm01-034": {
+          "archetype": "lockdown",
+          "avg_attacker_power": 4519.68571921948,
+          "avg_defender_power": 5832.15334139182,
+          "avg_game_length": 15.5375,
+          "connect_rate": 0.52892419271283,
+          "counters_per_life_lost": 0.365207373271889,
+          "win_rate": 0.5425
+        },
+        "wm01-045": {
+          "archetype": "filter_control",
+          "avg_attacker_power": 3964.76154899763,
+          "avg_defender_power": 4781.84534927157,
+          "avg_game_length": 9.71625,
+          "connect_rate": 0.672394471423235,
+          "counters_per_life_lost": 0.426910299003322,
+          "win_rate": 0.49875
+        },
+        "wm01-056": {
+          "archetype": "discount_deploy",
+          "avg_attacker_power": 4420.28278888347,
+          "avg_defender_power": 5174.0614334471,
+          "avg_game_length": 7.1975,
+          "connect_rate": 0.696245733788396,
+          "counters_per_life_lost": 0.0553814002089864,
+          "win_rate": 0.715
+        },
+        "wm01-067": {
+          "archetype": "drain",
+          "avg_attacker_power": 4315.67675613935,
+          "avg_defender_power": 4700.74243289549,
+          "avg_game_length": 9.08375,
+          "connect_rate": 0.721444888635066,
+          "counters_per_life_lost": 0.358271525314415,
+          "win_rate": 0.33625
+        },
+        "wm01-078": {
+          "archetype": "threshold_ramp",
+          "avg_attacker_power": 4935.91880018179,
+          "avg_defender_power": 5310.10452961672,
+          "avg_game_length": 7.6625,
+          "connect_rate": 0.669595515830935,
+          "counters_per_life_lost": 0.0966212211025489,
+          "win_rate": 0.7325
+        }
+      },
+      "scenario": "A5",
+      "seed": 1.0,
+      "total_games": 3200.0
+    },
+    "C0": {
+      "first_player_win_rate": 0.59875,
+      "games_per_matchup": 50.0,
+      "label": "pilot-skill control (shared generic pilot)",
+      "per_vanguard": {
+        "wm01-001": {
+          "archetype": "rush",
+          "avg_attacker_power": 4826.30691399663,
+          "avg_defender_power": 4824.76110174255,
+          "avg_game_length": 8.73875,
+          "connect_rate": 0.797639123102867,
+          "counters_per_life_lost": 0.0524534686971235,
+          "win_rate": 0.59625
+        },
+        "wm01-012": {
+          "archetype": "rest_punish",
+          "avg_attacker_power": 4716.88682613352,
+          "avg_defender_power": 4661.19243127455,
+          "avg_game_length": 8.53625,
+          "connect_rate": 0.856479828632631,
+          "counters_per_life_lost": 0.10429252782194,
+          "win_rate": 0.23125
+        },
+        "wm01-023": {
+          "archetype": "refresh_tempo",
+          "avg_attacker_power": 4300.50546225338,
+          "avg_defender_power": 4678.13468123268,
+          "avg_game_length": 8.8575,
+          "connect_rate": 0.775476928093918,
+          "counters_per_life_lost": 0.143224149004496,
+          "win_rate": 0.26
+        },
+        "wm01-034": {
+          "archetype": "lockdown",
+          "avg_attacker_power": 4487.84008883953,
+          "avg_defender_power": 4708.16213214881,
+          "avg_game_length": 10.49375,
+          "connect_rate": 0.762243198223209,
+          "counters_per_life_lost": 0.123004953219593,
+          "win_rate": 0.66125
+        },
+        "wm01-045": {
+          "archetype": "filter_control",
+          "avg_attacker_power": 4101.52784622967,
+          "avg_defender_power": 4690.24149827501,
+          "avg_game_length": 9.5075,
+          "connect_rate": 0.708230655495318,
+          "counters_per_life_lost": 0.173593440769013,
+          "win_rate": 0.7375
+        },
+        "wm01-056": {
+          "archetype": "discount_deploy",
+          "avg_attacker_power": 4607.93763288448,
+          "avg_defender_power": 4708.57547838412,
+          "avg_game_length": 8.0725,
+          "connect_rate": 0.770800850460666,
+          "counters_per_life_lost": 0.0340870739115761,
+          "win_rate": 0.61
+        },
+        "wm01-067": {
+          "archetype": "drain",
+          "avg_attacker_power": 4361.25580740532,
+          "avg_defender_power": 4639.72969167957,
+          "avg_game_length": 9.2775,
+          "connect_rate": 0.755033084612136,
+          "counters_per_life_lost": 0.203638684966486,
+          "win_rate": 0.37
+        },
+        "wm01-078": {
+          "archetype": "threshold_ramp",
+          "avg_attacker_power": 5297.21125684452,
+          "avg_defender_power": 4852.41309053865,
+          "avg_game_length": 9.09625,
+          "connect_rate": 0.774735769769515,
+          "counters_per_life_lost": 0.0883306320907618,
+          "win_rate": 0.53375
+        }
+      },
+      "scenario": "C0",
+      "seed": 1.0,
+      "total_games": 3200.0
+    }
+  }
+}
