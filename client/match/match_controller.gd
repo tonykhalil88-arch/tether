@@ -61,6 +61,13 @@ var _pending_def: Dictionary = {}
 
 
 func _ready() -> void:
+	ensure_infra()
+
+
+## Create the presentation queue if it doesn't exist yet. Safe to call before
+## _ready (bind() and begin_match() both call it) so listeners never race a
+## null queue regardless of node-ready ordering.
+func ensure_infra() -> void:
 	if queue == null:
 		queue = PresentationQueue.new()
 		add_child(queue)
@@ -72,9 +79,7 @@ func begin_match(p_human_vg: String, p_ai_vg: String, seed_value: int = 0,
 		first: int = HUMAN) -> void:
 	human_vg_id = p_human_vg
 	ai_vg_id = p_ai_vg
-	if queue == null:
-		queue = PresentationQueue.new()
-		add_child(queue)
+	ensure_infra()
 
 	var van0 := DeckFactory.card(human_vg_id)
 	var van1 := DeckFactory.card(ai_vg_id)
