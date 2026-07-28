@@ -4,7 +4,7 @@
     "name": "The First Stampede",
     "game": "WILDMIGRATION",
     "world": "Vantara",
-    "patch": "0.2"
+    "patch": "0.3"
   },
   "rules_addenda": {
     "keyword_freeze": "A frozen card does not refresh during its owner's next Refresh Phase.",
@@ -364,7 +364,7 @@
       "faction": "Morrow Runners (Rider crew, Pact-aligned)",
       "tribe": "Runner",
       "cost": 3,
-      "power": 4000,
+      "power": 5000,
       "counter": 1000,
       "keywords": [],
       "effects": [
@@ -398,7 +398,7 @@
         {
           "trigger": "when_attacking",
           "condition": {
-            "target_is_rested": true
+            "defender_has_rested_banner": true
           },
           "action": {
             "type": "power_buff",
@@ -729,7 +729,7 @@
       "faction": "The Old Pact",
       "tribe": "Pact",
       "cost": 4,
-      "power": 5000,
+      "power": 6000,
       "keywords": [],
       "effects": [
         {
@@ -847,7 +847,7 @@
             "up_to": 2,
             "rider": {
               "type": "power_buff",
-              "amount": 1000,
+              "amount": 2000,
               "duration": "turn",
               "applies_to": "refreshed"
             }

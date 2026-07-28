@@ -35,9 +35,123 @@ func _init() -> void:
 			print("Wrote patch_after_c0.json")
 		"consolidate":
 			_consolidate(out_dir, games)
+		"consolidate3":
+			_consolidate3(out_dir, games)
 		_:
 			push_error("patch_report: unknown phase '%s'" % phase)
 	quit(0)
+
+
+# Patch 0.3: consolidate A0 (isolation) / Patch 0.2 / Patch 0.3.
+func _consolidate3(out_dir: String, games: int) -> void:
+	var iso = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("isolation_report.json")))
+	var p02 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch02_arch.json")))
+	var p02c0 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch02_c0.json")))
+	var p03 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch_after_arch.json")))
+	var p03c0 = JSON.parse_string(FileAccess.get_file_as_string(out_dir.path_join("patch_after_c0.json")))
+	if iso == null or p02 == null or p02c0 == null or p03 == null or p03c0 == null:
+		push_error("patch_report: missing an input (isolation_report / patch02_* / patch_after_*)")
+		return
+	var md := _render3(iso["scenarios"]["A0"]["per_vanguard"], iso["scenarios"]["C0"]["per_vanguard"],
+		p02, p02c0, p03, p03c0, games)
+	_write(out_dir.path_join("patch03_report.md"), md)
+	print("Wrote %s" % out_dir.path_join("patch03_report.md"))
+
+
+func _render3(a0: Dictionary, c0a0: Dictionary, p02: Dictionary, p02c0: Dictionary,
+		p03: Dictionary, p03c0: Dictionary, games: int) -> String:
+	var vgs: Array = p03["vanguards"]
+	var s := "# WILDMIGRATION — Patch 0.3 (Apply + Measure)\n\n"
+	s += "Four conversion-targeted buffs for Kaya & Bram (Rue deliberately "
+	s += "untouched as a stability control). Full 8×8 archetype matrix + C0 "
+	s += "shared-pilot matrix, %d games/matchup, on the A0 seed blocks.\n\n" % games
+
+	# Table 1: archetype pilots, A0 / 0.2 / 0.3.
+	s += "## Per-Vanguard win rate — archetype pilots\n\n"
+	s += "| Vanguard | A0 | Patch 0.2 | Patch 0.3 | Δ 0.3 vs A0 | Δ 0.3 vs 0.2 |\n|---|---|---|---|---|---|\n"
+	for v in vgs:
+		var wa: float = float(a0[v]["win_rate"])
+		var w2: float = _wr(p02, v)
+		var w3: float = _wr(p03, v)
+		s += "| %s | %s | %s | %s | %s | %s |\n" % [
+			_short(v), _pct(wa), _pct(w2), _pct(w3), _d(wa, w3), _d(w2, w3)]
+	s += "\n"
+
+	# Table 2: C0 shared generic pilot.
+	s += "## Per-Vanguard win rate — C0 shared generic pilot\n\n"
+	s += "| Vanguard | A0-C0 | 0.2-C0 | 0.3-C0 | Δ 0.3 vs A0 |\n|---|---|---|---|---|\n"
+	for v in vgs:
+		var wa2: float = float(c0a0[v]["win_rate"])
+		var w2c: float = _wr(p02c0, v)
+		var w3c: float = _wr(p03c0, v)
+		s += "| %s | %s | %s | %s | %s |\n" % [_short(v), _pct(wa2), _pct(w2c), _pct(w3c), _d(wa2, w3c)]
+	s += "\n"
+
+	# Table 3: connect rate for Kaya & Bram.
+	s += "## Connect rate — Kaya & Bram (A0 → 0.2 → 0.3)\n\n"
+	s += "| Vanguard | Connect A0 | Connect 0.2 | Connect 0.3 | Avg atk pow A0 → 0.3 |\n|---|---|---|---|---|\n"
+	for v in ["wm01-012", "wm01-023"]:
+		s += "| %s | %s | %s | %s | %.0f → %.0f |\n" % [
+			_short(v), _pct(float(a0[v]["connect_rate"])), _pct(_cr(p02, v)), _pct(_cr(p03, v)),
+			float(a0[v]["avg_attacker_power"]), _ap(p03, v)]
+	s += "\n"
+
+	# Rue stability callout (control: 0.3 must hold her 0.2 value, ~44%).
+	s += "## Rue stability control\n\n"
+	var rue_02: float = _wr(p02, "wm01-067")
+	var rue_03: float = _wr(p03, "wm01-067")
+	s += "Rue (drain) was **not** touched in Patch 0.3, so her 0.3 number should "
+	s += "hold her 0.2 value. Patch 0.2 %s → Patch 0.3 %s (%s) — " % [
+		_pct(rue_02), _pct(rue_03), _d(rue_02, rue_03)]
+	s += ("**stable**, measurement is sound.\n\n" if abs(rue_03 - rue_02) <= 0.03 else "**drifted >3 pts — investigate.**\n\n")
+
+	# Success check.
+	s += "## Patch success check\n\n"
+	s += "Target: Kaya & Bram move meaningfully toward tolerance; nobody overshoots 55%; Rue stable.\n\n"
+	for v in ["wm01-012", "wm01-023"]:
+		var b3: float = float(a0[v]["win_rate"])
+		var n3: float = _wr(p03, v)
+		var verdict := "✓ moved up" if n3 > b3 + 0.02 else ("~ flat" if n3 >= b3 - 0.02 else "✗ down")
+		if n3 > VG_HI:
+			verdict += ", ⚠ OVERSHOT >55%"
+		s += "- **%s**: %s → %s (%s) — %s\n" % [_short(v), _pct(b3), _pct(n3), _d(b3, n3), verdict]
+	s += "\n"
+
+	# Remaining REVIEW flags under 0.3.
+	s += "## Remaining REVIEW flags (Patch 0.3)\n\n"
+	var rev_vg: Array = []
+	for v in vgs:
+		var wr: float = _wr(p03, v)
+		if wr < VG_LO or wr > VG_HI:
+			rev_vg.append("%s (%s)" % [_short(v), _pct(wr)])
+	var rev_mu := 0
+	for a in vgs:
+		for b in vgs:
+			var cell: float = float(p03["matrix"][a][b])
+			if cell < MATCHUP_LO or cell > MATCHUP_HI:
+				rev_mu += 1
+	s += "Vanguards outside 45–55%%: %s\n\n" % ("none" if rev_vg.is_empty() else ", ".join(rev_vg))
+	s += "Matchups outside 35–65%%: **%d / %d** cells.\n" % [rev_mu, vgs.size() * vgs.size()]
+	return s
+
+
+func _wr(mtx: Dictionary, v: String) -> float:
+	var e: Dictionary = mtx["per_vanguard"][v]
+	return _rate(e["wins"], e["games"])
+
+
+func _cr(mtx: Dictionary, v: String) -> float:
+	var m: Dictionary = mtx["per_vanguard"][v]["metrics"]
+	return _rate(m["connects"], m["attacks"])
+
+
+func _ap(mtx: Dictionary, v: String) -> float:
+	var m: Dictionary = mtx["per_vanguard"][v]["metrics"]
+	return _rate(m["atk_power_sum"], m["attacks"])
+
+
+func _d(before: float, after: float) -> String:
+	return "%+.0f" % ((after - before) * 100.0)
 
 
 func _consolidate(out_dir: String, games: int) -> void:

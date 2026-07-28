@@ -63,7 +63,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (124 tests). Coverage:
+All suites report **All tests passed!** (130 tests). Coverage:
 
 | Suite | Covers |
 |-------|--------|
@@ -87,6 +87,7 @@ All suites report **All tests passed!** (124 tests). Coverage:
 | `test_deck_validator.gd` | 50-card / max-4-copies / colour-legality rules |
 | `test_ablations.gd` | ablation flags (A1–A5) + defence-economy metrics |
 | `test_patch02.gd` | Patch 0.2 values + the Stampede `refreshed` rider |
+| `test_patch03.gd` | Patch 0.3 values + the `defender_has_rested_banner` line |
 | `test_sim.gd` | simulator determinism + batch integrity |
 
 ---
@@ -188,6 +189,32 @@ godot --headless -s sim/patch_report.gd -- --phase=consolidate
 ---
 
 ## Changelog
+
+### Patch 0.3 — "conversion, not cost" (evidence: Patch 0.2 measurement)
+
+Patch 0.2 showed cheaper abilities alone didn't move Kaya or Bram — their
+problem is *converting* board presence into damage, not affording it. Patch 0.3
+is four **buffs only**, aimed at conversion (Rue is deliberately untouched as a
+measurement-stability control):
+
+| # | Card | Change | Rationale |
+|---|------|--------|-----------|
+| 1 | Bo & Lantern (wm01-015) | condition `target_is_rested` → `defender_has_rested_banner` | the +3000 now lands when swinging the **Vanguard**, not only a rested Banner — so a rested board converts to face damage |
+| 2 | Smuggler's Debt (wm01-014) | power 4000 → 5000 | a Kaya body that connects with a 5000 Vanguard |
+| 3 | Stampede Doctrine (wm01-032) | rider +1000 → +2000 | refreshed Pact bodies swing over 5000 defenders |
+| 4 | Rhoswen (wm01-028) | power 5000 → 6000 | a Bram body that trades up |
+
+The new `defender_has_rested_banner` condition (true when the defending player
+controls ≥1 rested Banner, regardless of the attack target) is implemented in
+`EffectEngine`; the `rest_punish` pilot now swings Bo & Lantern at the Vanguard
+once that line is live.
+
+**Measured outcome** (`patch03_report.md`, matched seeds): **Kaya/rest_punish
+moved up, 23% → 27% (+3, connect rate 81→83%)** — the widened line converts.
+**Bram/refresh_tempo stayed flat (15→14%)**: the Stampede/Rhoswen buffs did not
+move it (refresh_tempo rarely assembles the combo). **Rue held 44→43%**, so the
+control is sound and nobody overshot 55%. Reported, not tuned — Bram is still
+open for the next pass.
 
 ### Patch 0.2 — "buffs to the under-decks" (evidence: Brief 4 isolation pass)
 

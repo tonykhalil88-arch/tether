@@ -12,21 +12,15 @@ func test_changelog_values_loaded():
 	assert_eq(int(kit["wm01-015"].effects[0]["action"]["amount"]), 3000, "Bo & Lantern +3000")
 	# 3. Bram refresh ability Aura cost 2 -> 1
 	assert_eq(int(kit["wm01-023"].effects[0]["cost"]["aura"]), 1, "Bram refresh costs 1")
-	# 4. Stampede rider present
+	# 4. Stampede rider present (amount became 2000 in Patch 0.3)
 	var rider: Dictionary = kit["wm01-032"].effects[0]["action"].get("rider", {})
 	assert_eq(str(rider.get("applies_to", "")), "refreshed", "Stampede rider applies_to refreshed")
-	assert_eq(int(rider.get("amount", 0)), 1000)
+	assert_eq(int(rider.get("amount", 0)), 2000)
 	# 5. Rue freeze cost removed (no cost key, still once per turn)
 	assert_false(kit["wm01-067"].effects[0].has("cost"), "Rue freeze has no Aura cost")
 	assert_true(bool(kit["wm01-067"].effects[0].get("once_per_turn", false)), "still once per turn")
 	# 6. Field Vivisector power 3000 -> 4000
 	assert_eq(int(kit["wm01-069"].power), 4000, "Vivisector power 4000")
-
-func test_set_is_patch_02():
-	# The importer preserves nothing about set metadata, so read the raw file.
-	var text := FileAccess.get_file_as_string(DeckFactory.KIT_PATH)
-	var parsed = JSON.parse_string(text)
-	assert_eq(str(parsed["set"]["patch"]), "0.2")
 
 # --- Stampede rider: buffs exactly the refreshed Banners -------------------
 
@@ -40,8 +34,8 @@ func test_stampede_rider_buffs_only_the_refreshed_banners():
 	var stampede: CardInstance = g._make_instance(DeckFactory.card("wm01-032"), 0)
 	g._fire(stampede, CardEnums.EV_MAIN)
 
-	assert_eq(a.current_power(), 6000, "refreshed Banner +1000 (5000 -> 6000)")
-	assert_eq(b.current_power(), 4000, "refreshed Banner +1000 (3000 -> 4000)")
+	assert_eq(a.current_power(), 7000, "refreshed Banner +2000 (5000 -> 7000)")
+	assert_eq(b.current_power(), 5000, "refreshed Banner +2000 (3000 -> 5000)")
 	assert_false(a.exhausted, "and it was refreshed")
 	assert_eq(untouched_ready.current_power(), 3000, "already-ready Banner not buffed")
 	assert_eq(untouched_big.current_power(), 9000, "over-cost Banner not buffed")
@@ -51,7 +45,7 @@ func test_stampede_rider_buff_expires_at_end_of_turn():
 	var a: CardInstance = Scenario.spawn_banner(g, 0, "wm01-027", true)
 	var stampede: CardInstance = g._make_instance(DeckFactory.card("wm01-032"), 0)
 	g._fire(stampede, CardEnums.EV_MAIN)
-	assert_eq(a.current_power(), 6000, "buffed for the turn")
+	assert_eq(a.current_power(), 7000, "buffed for the turn")
 	g.end_turn()
 	assert_eq(a.current_power(), 5000, "turn-duration buff expired")
 

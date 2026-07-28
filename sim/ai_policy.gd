@@ -197,6 +197,13 @@ func _ready_attacker(game: GameEngine, me: int) -> CardInstance:
 
 func choose_target(game: GameEngine, me: int, attacker: CardInstance) -> CardInstance:
 	var enemy: PlayerState = game.state.players[game.state.opponent_of(me)]
+	# Patch 0.3: rest_punish swings Bo & Lantern at the Vanguard when the widened
+	# line is live (the defender already controls a rested Banner), because the
+	# +3000 lands regardless of target — 3000 + 3000 connects with a 5000 VG.
+	if archetype == "rest_punish" and attacker.data.id == "wm01-015" \
+			and _enemy_has_rested_banner(enemy) \
+			and attacker.data.power + 3000 >= game.effective_power(enemy.vanguard):
+		return enemy.vanguard
 	# Board-control / punish plans clear a beatable rested enemy Banner with a
 	# Banner attacker (Bo & Lantern etc.); the Vanguard still hits face.
 	if attacker != game.state.players[me].vanguard \
@@ -369,6 +376,13 @@ func _technique_has_main_action(inst: CardInstance, action_type: String) -> bool
 	for eff in inst.data.effects:
 		if str(eff.get("trigger", "")) == CardEnums.EV_MAIN \
 				and str(eff.get("action", {}).get("type", "")) == action_type:
+			return true
+	return false
+
+
+func _enemy_has_rested_banner(enemy: PlayerState) -> bool:
+	for b in enemy.battle_area:
+		if b.type() == CardEnums.TYPE_BANNER and b.exhausted:
 			return true
 	return false
 

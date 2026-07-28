@@ -67,6 +67,17 @@ static func _condition_holds(game, source: CardInstance, eff: Dictionary, ctx: D
 		var tgt = ctx.get("defender", null)
 		if tgt == null or not tgt.exhausted:
 			return false
+	if cond.has("defender_has_rested_banner"):
+		# True when the DEFENDING player controls at least one rested Banner,
+		# regardless of what is being attacked (Patch 0.3 Bo & Lantern).
+		var enemy: PlayerState = game.state.players[game.state.opponent_of(source.owner)]
+		var has_rested := false
+		for b in enemy.battle_area:
+			if b.type() == CardEnums.TYPE_BANNER and b.exhausted:
+				has_rested = true
+				break
+		if bool(cond["defender_has_rested_banner"]) != has_rested:
+			return false
 	if cond.has("min_aura_total"):
 		if game.state.players[source.owner].aura_total < int(cond["min_aura_total"]):
 			return false
