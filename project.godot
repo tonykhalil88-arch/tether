@@ -1,0 +1,15 @@
+; Engine configuration file for WILDMIGRATION.
+; Headless rules engine — no visuals, no autoloads that touch rendering.
+
+config_version=5
+
+[application]
+
+config/name="wildmigration"
+config/description="WILDMIGRATION — headless TCG rules engine (Phase 2)."
+config/features=PackedStringArray("4.5")
+run/disable_stdout=false
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")

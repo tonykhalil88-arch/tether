@@ -1,0 +1,33 @@
+# Godot 4 -----------------------------------------------------------------
+# Imported/generated engine cache — never committed.
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+
+# Mono/C# (unused here, kept for safety)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Godot editor binaries / logs that may land in the tree
+Godot_v*
+*.log
+
+# GUT run artifacts ---------------------------------------------------------
+# GUT can write per-run json/state under user:// — never in the repo, but
+# ignore any local dumps a contributor points here.
+tests/**/*.tmp
+
+# Simulator output ----------------------------------------------------------
+# Batch logs are generated; keep them out of version control.
+sim_logs/
+*.simlog.json
+
+# OS / editor noise ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
