@@ -221,7 +221,7 @@ the previous *share-a-colour* legality and a smaller pool, so it is not
 comparable, only historical. A fresh full 8×8 matrix + C0 control was re-run on
 the same seed protocol → [`revalidation_report.md`](revalidation_report.md).
 
-**Baseline commit:** the v1.1 Strict-Purity baseline is commit `__BASELINE_SHA__`
+**Baseline commit:** the v1.1 Strict-Purity baseline is commit `4cc2dea`
 (the "re-freeze at v1.1" commit that records this section). Check it
 out directly to reproduce; the environment's git proxy blocks tag pushes
 (feature-branch pushes only), so a `v1.1-strict-purity-baseline` tag may need to
