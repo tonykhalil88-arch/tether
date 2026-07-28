@@ -383,6 +383,14 @@ func declare_attack(attacker: CardInstance, target: CardInstance,
 	var def_power := effective_power(current_target) + defense_bonus
 	var attacker_wins := atk_power >= def_power
 
+	# Defence-economy metrics for the attacking player.
+	var am: Dictionary = state.metrics[attacker.owner]
+	am["attacks"] += 1
+	am["atk_power_sum"] += atk_power
+	am["def_power_sum"] += def_power
+	if attacker_wins:
+		am["connects"] += 1
+
 	var result := {
 		"ok": true,
 		"attacker": attacker.uid,
@@ -450,6 +458,7 @@ func _apply_defender_counters(defender_idx: int, target: CardInstance, def_choic
 		if card == null or card.zone != CardEnums.ZONE_HAND or card.owner != defender_idx:
 			continue
 		bonus += card.data.counter
+		state.metrics[defender_idx]["counter_cards_spent"] += 1
 		ps.send_to_trash(card)
 
 	return bonus
@@ -460,6 +469,7 @@ func _resolve_life_hit(defender_idx: int, def_choices: Dictionary, result: Dicti
 	if ps.life.is_empty():
 		_declare_winner(state.opponent_of(defender_idx), "life_zero")
 		return
+	state.metrics[defender_idx]["life_lost"] += 1
 	var card: CardInstance = ps.life.pop_front()
 	var has_trigger := not card.data.effects_for(CardEnums.EV_LIFE_TRIGGER).is_empty()
 	var resolve_trigger := bool(def_choices.get("resolve_trigger", true))

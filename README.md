@@ -63,7 +63,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (106 tests). Coverage:
+All suites report **All tests passed!** (119 tests). Coverage:
 
 | Suite | Covers |
 |-------|--------|
@@ -84,6 +84,8 @@ All suites report **All tests passed!** (106 tests). Coverage:
 | `test_watch.gd` | balance watch-list counters increment on resolution |
 | `test_ai_behavior.gd` | AI understands Rush and Freeze |
 | `test_policies.gd` | each archetype's signature line (incl. Stampede loops) |
+| `test_deck_validator.gd` | 50-card / max-4-copies / colour-legality rules |
+| `test_ablations.gd` | ablation flags (A1–A5) + defence-economy metrics |
 | `test_sim.gd` | simulator determinism + batch integrity |
 
 ---
@@ -137,10 +139,36 @@ Flags: `--games=N` per matchup (default 50), `--seed=S` (default 1), `--out=DIR`
 (default: project root). The report contains the 8×8 win-rate matrix (row =
 Player A's Vanguard), per-Vanguard overall win rate and average game length, the
 first-player win rate (overall and per matchup), the watch-list normalised per
-game, the exact decklists, and **REVIEW** flags for any matchup outside 35–65%
-or Vanguard outside 45–55%. Results reflect both card balance *and* pilot
-skill — the harness is the first-pass evidence for the Set 1 review, not a
-verdict.
+game, the **defence economy** (connect rate, counters per Life lost, avg
+attacker vs defender power), the exact decklists, and **REVIEW** flags for any
+matchup outside 35–65% or Vanguard outside 45–55%. Results reflect both card
+balance *and* pilot skill — first-pass evidence, not a verdict.
+
+### Isolation pass (ablations + control)
+
+`sim/isolation.gd` separates card power from pilot skill. It runs the full
+matrix once per scenario on the *same* seed blocks as the baseline, so
+per-Vanguard win-rate deltas are apples-to-apples:
+
+- **A0** new-rules baseline · **A1** Sora Rush rider off · **A2** Total
+  Mobilisation blanked · **A3** Canyon discount off (Vale passive stays) ·
+  **A4** Verdigris rests 1 · **A5** Korgan self-refresh off · **C0** every deck
+  piloted by one shared generic pilot.
+
+Each scenario writes a partial, then a consolidation step produces
+`isolation_report.md`:
+
+```bash
+for S in A0 A1 A2 A3 A4 A5 C0; do
+  godot --headless -s sim/isolation.gd -- --scenario=$S --games=50 --seed=1
+done
+godot --headless -s sim/isolation.gd -- --consolidate
+```
+
+Ablations are pure runtime config (`GameState.ablations`) — **no card data is
+changed**. A suspect card is `REAL` if its owning Vanguard shifts >5 points,
+`acquit` if <2. C0 shows which win rates are cards (persist under one pilot) vs
+pilot skill (collapse toward 50%).
 
 ### Balance watch-list
 
@@ -192,6 +220,22 @@ Refresh Phase.*
   **Aura freezing is uncapped.**
 
 **Keywords:** Rush, Blocker, Freeze (status). **Power ceiling:** 9000.
+
+### Deckbuilding rules
+
+Enforced by `DeckValidator` (used by `DeckFactory`, the tests, and available to
+the engine) — an illegal deck is a hard failure with a reason:
+
+1. A deck is **exactly 50 cards** plus 1 Vanguard.
+2. At most **4 copies** of any card id.
+3. **Colour legality:** every deck card shares at least one colour with the
+   Vanguard.
+
+Sim decks are built per archetype as **kit ×4 (40) + 10 filler** drawn from
+colour-legal neighbour kits by a simple heuristic (aggro bodies for aggressive
+kits, Blockers/counters for control kits — e.g. Neza fills with Pact Blockers
+from Bram). Every balance/isolation report lists the exact 50-card decklists so
+runs are reproducible.
 
 ### House rule: deck-out
 

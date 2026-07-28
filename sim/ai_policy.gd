@@ -200,7 +200,7 @@ func choose_target(game: GameEngine, me: int, attacker: CardInstance) -> CardIns
 	# Board-control / punish plans clear a beatable rested enemy Banner with a
 	# Banner attacker (Bo & Lantern etc.); the Vanguard still hits face.
 	if attacker != game.state.players[me].vanguard \
-			and archetype in ["rest_punish", "lockdown", "filter_control", "drain"]:
+			and archetype in ["rest_punish", "lockdown", "filter_control", "drain", "generic"]:
 		var best: CardInstance = null
 		for t in game.legal_attack_targets(attacker):
 			if t == enemy.vanguard or t.type() != CardEnums.TYPE_BANNER:

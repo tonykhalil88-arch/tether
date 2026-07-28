@@ -59,7 +59,7 @@ func _build_report(vgs: Array, matchups: Dictionary, games: int, seed_value: int
 	var first_wins_total := 0
 
 	for v in vgs:
-		per_vg[v] = { "wins": 0, "games": 0, "turns": 0 }
+		per_vg[v] = { "wins": 0, "games": 0, "turns": 0, "metrics": GameState._new_metrics() }
 
 	for a in vgs:
 		matrix[a] = {}
@@ -71,9 +71,11 @@ func _build_report(vgs: Array, matchups: Dictionary, games: int, seed_value: int
 			per_vg[a]["wins"] += int(m["a_wins"])
 			per_vg[a]["games"] += games
 			per_vg[a]["turns"] += int(m["total_turns"])
+			_add_metrics(per_vg[a]["metrics"], m["metrics_a"])
 			per_vg[b]["wins"] += int(m["b_wins"])
 			per_vg[b]["games"] += games
 			per_vg[b]["turns"] += int(m["total_turns"])
+			_add_metrics(per_vg[b]["metrics"], m["metrics_b"])
 			# Watch-list normalised per game.
 			var wn := {}
 			for k in MatchRunner.WATCH_KEYS:
@@ -85,11 +87,17 @@ func _build_report(vgs: Array, matchups: Dictionary, games: int, seed_value: int
 	for v in vgs:
 		var wr := _rate(per_vg[v]["wins"], per_vg[v]["games"])
 		var avg_turns := _rate(per_vg[v]["turns"], per_vg[v]["games"])
+		var mv: Dictionary = per_vg[v]["metrics"]
+		var atk: int = mv["attacks"]
 		per_vanguard[v] = {
 			"archetype": AIPolicy.ARCHETYPE_BY_VANGUARD.get(v, "?"),
 			"win_rate": wr,
 			"avg_game_length": avg_turns,
 			"games": per_vg[v]["games"],
+			"connect_rate": _rate(mv["connects"], atk),
+			"counters_per_life_lost": _rate(mv["counter_cards_spent"], max(1, int(mv["life_lost"]))),
+			"avg_attacker_power": _rate(mv["atk_power_sum"], atk),
+			"avg_defender_power": _rate(mv["def_power_sum"], atk),
 		}
 		if wr < VG_LO or wr > VG_HI:
 			review_vgs.append({ "vanguard": v, "win_rate": wr })
@@ -133,11 +141,16 @@ func _decklists(vgs: Array) -> Dictionary:
 	var kit := DeckFactory.load_kit()
 	var out := {}
 	for v in vgs:
+		var deck := DeckFactory.deck_for(kit[v])
+		var counts := {}
+		for c in deck:
+			counts[c.id] = int(counts.get(c.id, 0)) + 1
 		out[v] = {
 			"vanguard": kit[v].name,
 			"kit_cards": DeckFactory.kit_ids(kit[v]),
-			"copies_each": 5,
-			"deck_size": 50,
+			"filler_cards": DeckFactory.filler_ids_for(kit[v]).slice(0, 3),
+			"counts": counts,
+			"deck_size": deck.size(),
 		}
 	return out
 
@@ -182,6 +195,20 @@ func _render_markdown(report: Dictionary) -> String:
 			_short(v), pv["archetype"], round(pv["win_rate"] * 100), flag, pv["avg_game_length"]]
 	s += "\n"
 
+	# Defence economy.
+	s += "## Defence economy (per Vanguard)\n\n"
+	s += "Connect rate = attacks that won / attacks declared. A low connect rate "
+	s += "with avg attacker power well under avg defender power means small bodies "
+	s += "bouncing off big Vanguards.\n\n"
+	s += "| Vanguard | Connect rate | Counters / Life lost | Avg attacker pow | Avg defender pow |\n"
+	s += "|---|---|---|---|---|\n"
+	for v in vgs:
+		var pv2: Dictionary = report["per_vanguard"][v]
+		s += "| %s | %d%% | %.2f | %.0f | %.0f |\n" % [
+			_short(v), round(pv2["connect_rate"] * 100), pv2["counters_per_life_lost"],
+			pv2["avg_attacker_power"], pv2["avg_defender_power"]]
+	s += "\n"
+
 	# First player.
 	s += "## First-player advantage\n\n"
 	s += "Overall first-player win rate: **%d%%**.\n\n" % round(report["first_player"]["overall_win_rate"] * 100)
@@ -215,11 +242,14 @@ func _render_markdown(report: Dictionary) -> String:
 
 	# Decklists.
 	s += "## Decklists (reproducible)\n\n"
-	s += "Each deck is a pure kit: the Vanguard's ten non-Vanguard cards, "
-	s += "**5 copies of each = 50** (4× core + 1× same-kit filler; hybrids out of scope).\n\n"
+	s += "Each deck is **kit ×4 (40)** — the Vanguard's ten non-Vanguard cards, "
+	s += "4 copies each — **plus 10 filler** from colour-legal neighbour kits "
+	s += "(4/4/2 of the top-ranked picks). All decks are 50 cards, ≤4 copies, "
+	s += "colour-legal.\n\n"
 	for v in vgs:
 		var dl: Dictionary = report["decklists"][v]
-		s += "- **%s** (%s): %s\n" % [dl["vanguard"], _short(v), ", ".join(dl["kit_cards"])]
+		s += "- **%s** (%s): kit %s ×4 + filler %s\n" % [
+			dl["vanguard"], _short(v), ", ".join(dl["kit_cards"]), ", ".join(dl["filler_cards"])]
 	s += "\n"
 	return s
 
@@ -249,6 +279,11 @@ func _short(vg_id: String) -> String:
 
 func _rate(num, den) -> float:
 	return 0.0 if int(den) == 0 else float(num) / float(den)
+
+
+func _add_metrics(acc: Dictionary, m: Dictionary) -> void:
+	for k in m:
+		acc[k] += int(m[k])
 
 
 func _parse_args() -> Dictionary:

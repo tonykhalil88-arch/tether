@@ -25,6 +25,25 @@ var game_over: bool = false
 var rng: RandomNumberGenerator
 var log: Array = []                      # structured game-log entries
 var watch: Dictionary = {}               # balance watch-list counters (per game)
+var ablations: Dictionary = {}           # active ablation flags (isolation runs)
+var metrics: Array = [                    # defence-economy metrics, per player
+	_new_metrics(), _new_metrics(),
+]
+
+
+static func _new_metrics() -> Dictionary:
+	return {
+		"attacks": 0,            # attacks this player declared
+		"connects": 0,           # attacks that won (dealt a KO or Life hit)
+		"counter_cards_spent": 0,  # counter-value cards this player pitched on defence
+		"life_lost": 0,          # Life cards this player lost
+		"atk_power_sum": 0,      # sum of attacker power at declare (this player attacking)
+		"def_power_sum": 0,      # sum of defender power at declare
+	}
+
+
+func ablated(flag: String) -> bool:
+	return bool(ablations.get(flag, false))
 
 
 func _init(seed_value: int = 0) -> void:

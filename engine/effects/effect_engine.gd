@@ -22,6 +22,9 @@ extends RefCounted
 static func fire(game, source: CardInstance, trigger: String, ctx: Dictionary = {}) -> int:
 	if source == null or source.data == null:
 		return 0
+	# Ablation A2: Total Mobilisation is blanked — none of its effects fire.
+	if source.data.id == "wm01-087" and game.state.ablated("blank_total_mobilisation"):
+		return 0
 	var resolved := 0
 	var effects: Array = source.data.effects
 	for i in range(effects.size()):
@@ -133,6 +136,9 @@ static func _apply_rider(game, source: CardInstance, rider: Dictionary, target: 
 		return
 	if str(rider.get("if", "")) == "played_this_turn" and target.played_on_turn == game.state.turn_number:
 		if rider.has("grant_keyword"):
+			# Ablation A1: Sora's Rush rider is disabled (the buff still lands).
+			if source.data.id == "wm01-001" and game.state.ablated("sora_no_rush_rider"):
+				return
 			target.grant_keyword(str(rider["grant_keyword"]))
 			if source.data.id == "wm01-001":
 				game.note_watch("sora_rush_grants")
@@ -147,6 +153,9 @@ static func _act_ko(game, source: CardInstance, action: Dictionary) -> void:
 
 static func _act_rest(game, source: CardInstance, action: Dictionary) -> void:
 	var up_to := int(action.get("up_to", 1))
+	# Ablation A4: Verdigris rests 1 instead of 2.
+	if source.data.id == "wm01-013" and game.state.ablated("verdigris_rest_1"):
+		up_to = 1
 	var filter := { "max_cost": int(action.get("max_cost", 99)) }
 	var targets: Array = game.select_enemy_banners(source.owner, filter, up_to)
 	for b in targets:
@@ -159,6 +168,9 @@ static func _act_refresh(game, source: CardInstance, action: Dictionary, ctx: Di
 	var target := str(action.get("target", CardEnums.TGT_SELF))
 	if target == CardEnums.TGT_SELF:
 		if str(action.get("timing", "")) == "end_of_battle":
+			# Ablation A5: Korgan's self-refresh is disabled.
+			if source.data.id == "wm01-024" and game.state.ablated("korgan_no_refresh"):
+				return
 			game.schedule_end_of_battle_refresh(source, ctx)
 		else:
 			game.refresh_unit(source)
@@ -218,6 +230,9 @@ static func _act_draw_then_bottom(game, source: CardInstance, action: Dictionary
 
 
 static func _act_cost_reduction(game, source: CardInstance, action: Dictionary) -> void:
+	# Ablation A3: Canyon Bastion's discount is disabled (Vale passive remains).
+	if source.data.id == "wm01-066" and game.state.ablated("canyon_no_discount"):
+		return
 	game.add_cost_charge(source.owner,
 		int(action.get("amount", 1)),
 		str(action.get("filter_tribe", "")),

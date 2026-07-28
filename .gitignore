@@ -31,3 +31,6 @@ Thumbs.db
 *~
 .idea/
 .vscode/
+
+# Isolation-pass intermediate partials (consolidated into isolation_report.*)
+iso_*.json
