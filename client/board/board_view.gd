@@ -58,52 +58,123 @@ func _ensure_built() -> void:
 # =========================================================================
 
 func _build_static() -> void:
+	# Camera: tighter framing, slightly lower angle for depth.
 	camera = Camera3D.new()
-	camera.position = Vector3(0, 7.0, 7.6)
-	camera.look_at_from_position(camera.position, Vector3(0, 0, 0.3), Vector3.UP)
-	camera.fov = 55.0
+	camera.position = Vector3(0, 5.6, 7.4)
+	camera.look_at_from_position(camera.position, Vector3(0, 0.1, 0.2), Vector3.UP)
+	camera.fov = 50.0
 	add_child(camera)
 
-	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-55, -35, 0)
-	sun.light_energy = 1.1
-	add_child(sun)
+	# Warm key light with soft shadows.
+	var key := DirectionalLight3D.new()
+	key.rotation_degrees = Vector3(-58, -34, 0)
+	key.light_color = Color(1.0, 0.93, 0.82)
+	key.light_energy = 1.35
+	key.shadow_enabled = true
+	key.shadow_bias = 0.04
+	add_child(key)
 
+	# Cool fill, no shadow, opposite side.
+	var fill := DirectionalLight3D.new()
+	fill.rotation_degrees = Vector3(-32, 140, 0)
+	fill.light_color = Color(0.72, 0.82, 1.0)
+	fill.light_energy = 0.45
+	add_child(fill)
+
+	# WorldEnvironment: gentle tonemapping + a touch of glow + soft ambient.
 	var env := WorldEnvironment.new()
 	var e := Environment.new()
 	e.background_mode = Environment.BG_COLOR
-	e.background_color = Color(0.06, 0.07, 0.09)
-	e.ambient_light_color = Color(0.5, 0.52, 0.58)
-	e.ambient_light_energy = 0.6
+	e.background_color = Color(0.045, 0.05, 0.065)
+	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	e.ambient_light_color = Color(0.42, 0.45, 0.52)
+	e.ambient_light_energy = 0.5
+	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	e.tonemap_white = 1.1
+	e.glow_enabled = true
+	e.glow_intensity = 0.5
+	e.glow_bloom = 0.15
+	e.glow_hdr_threshold = 1.0
 	env.environment = e
 	add_child(env)
 
+	# Table: dark stone/wood tone with a low sheen.
 	var table := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(11, 10)
+	plane.size = Vector2(12, 10.5)
 	table.mesh = plane
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.13, 0.16, 0.20)
+	mat.albedo_color = Color(0.11, 0.09, 0.075)     # dark wood
+	mat.roughness = 0.75
+	mat.metallic = 0.05
 	table.material_override = mat
+	table.position = Vector3(0, -0.02, 0)
 	add_child(table)
 
-	# Faint slot outlines for both seats.
+	# Carved zone inlays for both seats.
 	for seat in [SEAT_HUMAN, SEAT_AI]:
 		for i in range(5):
-			_add_slot_pad(_banner_slot(seat, i), Color(0.22, 0.25, 0.30))
-		_add_slot_pad(_vanguard_slot(seat), Color(0.30, 0.26, 0.20))
+			_add_slot_pad(_banner_slot(seat, i), 0.92, Color(0.17, 0.19, 0.23))
+		_add_slot_pad(_vanguard_slot(seat), 1.0, Color(0.28, 0.22, 0.14))
+		_add_slot_pad(_stage_slot(seat), 0.9, Color(0.20, 0.18, 0.24))
+
+	_build_vignette()
 
 
-func _add_slot_pad(pos: Vector3, color: Color) -> void:
-	var pad := MeshInstance3D.new()
+## A carved-looking inlay: a recessed dark plate with a bright rim so slots read
+## as cut into the table rather than floating on it.
+func _add_slot_pad(pos: Vector3, size: float, color: Color) -> void:
+	var rim := MeshInstance3D.new()
+	var rm := PlaneMesh.new()
+	rm.size = Vector2(size + 0.06, size + 0.06)
+	rim.mesh = rm
+	var rmat := StandardMaterial3D.new()
+	rmat.albedo_color = color.lightened(0.25)
+	rmat.emission_enabled = true
+	rmat.emission = color.lightened(0.1)
+	rmat.emission_energy_multiplier = 0.25
+	rim.material_override = rmat
+	rim.position = pos + Vector3(0, 0.008, 0)
+	add_child(rim)
+
+	var inlay := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
-	pm.size = Vector2(0.9, 0.9)
-	pad.mesh = pm
+	pm.size = Vector2(size, size)
+	inlay.mesh = pm
 	var m := StandardMaterial3D.new()
-	m.albedo_color = color
-	pad.material_override = m
-	pad.position = pos + Vector3(0, 0.01, 0)
-	add_child(pad)
+	m.albedo_color = color.darkened(0.35)
+	m.roughness = 0.9
+	inlay.material_override = m
+	inlay.position = pos + Vector3(0, 0.014, 0)
+	add_child(inlay)
+
+
+## Subtle screen vignette (generated radial alpha, no shader) so the eye settles
+## on the board centre. Darkens corners only.
+func _build_vignette() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 1
+	add_child(layer)
+	var tr := TextureRect.new()
+	tr.set_anchors_preset(Control.PRESET_FULL_RECT)
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_SCALE
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tr.texture = _vignette_texture()
+	layer.add_child(tr)
+
+
+func _vignette_texture() -> Texture2D:
+	var n := 128
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	var c := (n - 1) * 0.5
+	var maxd := sqrt(2.0) * c
+	for y in range(n):
+		for x in range(n):
+			var d := sqrt(pow(x - c, 2) + pow(y - c, 2)) / maxd
+			var a := clampf((d - 0.55) / 0.45, 0.0, 1.0)
+			img.set_pixel(x, y, Color(0, 0, 0, a * 0.55))
+	return ImageTexture.create_from_image(img)
 
 
 # =========================================================================
@@ -220,56 +291,96 @@ func _rebuild_markers() -> void:
 		c.queue_free()
 	for seat in [SEAT_HUMAN, SEAT_AI]:
 		var ps: PlayerState = mc.player(seat)
-		_aura_chips(ps, seat)
+		_aura_rack(ps, seat)
 		var s := _seat_sign(seat)
-		_count_marker("LIFE %d" % ps.life.size(), Vector3(3.4, 0.02, 2.0 * s), Color(0.8, 0.3, 0.3))
-		_count_marker("DECK %d" % ps.deck.size(), Vector3(3.4, 0.02, 3.0 * s), Color(0.3, 0.4, 0.7))
-		_count_marker("TRASH %d" % ps.trash.size(), Vector3(3.4, 0.02, 3.7 * s), Color(0.4, 0.4, 0.45))
-		if seat == SEAT_AI:
-			_count_marker("HAND %d" % ps.hand.size(), Vector3(-3.4, 0.02, 3.0 * s), Color(0.5, 0.45, 0.3))
+		_plaque("LIFE %d" % ps.life.size(), Vector3(3.7, 0.02, 1.9 * s), Color(0.95, 0.5, 0.5))
+		_plaque("DECK %d" % ps.deck.size(), Vector3(3.7, 0.02, 2.9 * s), Color(0.55, 0.65, 0.95))
+		_plaque("TRASH %d" % ps.trash.size(), Vector3(3.7, 0.02, 3.7 * s), Color(0.7, 0.7, 0.75))
+		_plaque("HAND %d" % ps.hand.size(), Vector3(-3.7, 0.02, 3.2 * s), Color(0.9, 0.82, 0.55))
 
 
-func _aura_chips(ps: PlayerState, seat: int) -> void:
+## Aura rack v2: a fixed rack of large chips — bright when refreshed, dim when
+## exhausted, ice-blue when frozen — with a numeric counter, readable for both
+## players at all times.
+func _aura_rack(ps: PlayerState, seat: int) -> void:
 	var s := _seat_sign(seat)
+	var z := 4.15 * s
 	var avail := ps.aura_available()
 	var frozen := ps.aura_frozen_pending
-	for i in range(ps.aura_total):
+	var total := ps.aura_total
+
+	# Rack base plate.
+	var base := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(2.5, 0.05, 0.4)
+	base.mesh = bm
+	var basemat := StandardMaterial3D.new()
+	basemat.albedo_color = Color(0.08, 0.08, 0.1)
+	base.material_override = basemat
+	base.position = Vector3(-0.1, 0.03, z)
+	_markers.add_child(base)
+
+	for i in range(maxi(total, 1)):
+		if i >= total:
+			break
 		var chip := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(0.16, 0.1, 0.16)
-		chip.mesh = bm
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.11
+		cm.bottom_radius = 0.11
+		cm.height = 0.12
+		chip.mesh = cm
 		var m := StandardMaterial3D.new()
-		var color := Color(0.3, 0.7, 0.4)          # available
-		if i >= ps.aura_total - frozen:
-			color = Color(0.4, 0.7, 1.0)            # frozen
+		var color := Color(0.35, 0.85, 0.5)              # refreshed (bright)
+		var energy := 0.7
+		if i >= total - frozen:
+			color = Color(0.5, 0.8, 1.0)                 # frozen (ice-blue)
+			energy = 0.9
 		elif i >= avail:
-			color = Color(0.4, 0.4, 0.45)           # exhausted
+			color = Color(0.32, 0.34, 0.4)               # exhausted (dim)
+			energy = 0.05
 		m.albedo_color = color
 		m.emission_enabled = true
-		m.emission = color * 0.4
+		m.emission = color
+		m.emission_energy_multiplier = energy
 		chip.material_override = m
-		chip.position = Vector3(-2.2 + i * 0.22, 0.05, 3.9 * s)
+		chip.position = Vector3(-1.2 + i * 0.24, 0.11, z)
 		_markers.add_child(chip)
 
-
-func _count_marker(text: String, pos: Vector3, color: Color) -> void:
-	var sp := Sprite3D.new()
-	sp.texture = _label_texture(text, color)
-	sp.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	sp.pixel_size = 0.01
-	sp.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	sp.shaded = false
-	sp.position = pos + Vector3(0, 0.3, 0)
-	_markers.add_child(sp)
+	var counter := "AURA %d/%d" % [avail, total]
+	if frozen > 0:
+		counter += " (%d frozen)" % frozen
+	_label3d(counter, Vector3(-1.35, 0.34, z), 30, Color(0.75, 0.95, 0.85),
+		HORIZONTAL_ALIGNMENT_LEFT)
 
 
-func _label_texture(text: String, color: Color) -> Texture2D:
-	var w := PixelFont.measure(text, 2) + 8
-	var h := 20
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0.08, 0.09, 0.11, 0.85))
-	PixelFont.draw_text(img, text, 4, 3, color, 2)
-	return ImageTexture.create_from_image(img)
+## A small billboarded plaque (real font) anchored at a zone.
+func _plaque(text: String, pos: Vector3, color: Color) -> void:
+	var plate := MeshInstance3D.new()
+	var pm := BoxMesh.new()
+	pm.size = Vector3(0.95, 0.04, 0.34)
+	plate.mesh = pm
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.06, 0.06, 0.08)
+	plate.material_override = mat
+	plate.position = pos + Vector3(0, 0.02, 0)
+	_markers.add_child(plate)
+	_label3d(text, pos + Vector3(0, 0.34, 0), 26, color, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _label3d(text: String, pos: Vector3, font_size: int, color: Color,
+		align: int) -> void:
+	var l := Label3D.new()
+	l.text = text
+	l.font_size = font_size
+	l.pixel_size = 0.005
+	l.modulate = color
+	l.outline_size = 6
+	l.outline_modulate = Color(0, 0, 0, 0.9)
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.horizontal_alignment = align
+	l.position = pos
+	_markers.add_child(l)
 
 
 # =========================================================================
