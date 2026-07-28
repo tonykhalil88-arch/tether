@@ -6,11 +6,17 @@ extends CanvasLayer
 ## drives the MatchController (end turn, activate, attach, answer prompts) and
 ## the BoardView (attach count), and reflects their signals.
 
+const PHASE_YOU := Color(0.35, 0.85, 0.5)
+const PHASE_AI := Color(0.9, 0.45, 0.4)
+
 var mc: MatchController
 var board: BoardView
 
+var _root: Control
 var _status: Label
-var _turn_label: Label
+var _banner: PanelContainer
+var _banner_label: Label
+var _banner_style: StyleBoxFlat
 var _attach_label: Label
 var _speed_btn: Button
 var _prompt_panel: PanelContainer
@@ -26,6 +32,7 @@ func setup(controller: MatchController, board_view: BoardView) -> void:
 	mc.prompt_defense.connect(_on_prompt_defense)
 	mc.prompt_life_trigger.connect(_on_prompt_life_trigger)
 	board.action_message.connect(_set_status)
+	board.card_reason.connect(_float_reason)
 	board.attacker_selected.connect(_on_attacker_selected)
 
 
@@ -34,10 +41,25 @@ func _build() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
+	_root = root
 
-	_turn_label = _mk_label(Vector2(16, 12), 22, Color(0.95, 0.95, 0.98))
-	root.add_child(_turn_label)
-	_status = _mk_label(Vector2(16, 44), 16, Color(0.8, 0.85, 0.7))
+	# Phase banner (top-left): large, phase-coloured.
+	_banner = PanelContainer.new()
+	_banner.position = Vector2(16, 12)
+	_banner_style = StyleBoxFlat.new()
+	_banner_style.bg_color = Color(0.1, 0.11, 0.14, 0.9)
+	_banner_style.set_corner_radius_all(6)
+	_banner_style.set_content_margin_all(8)
+	_banner_style.border_color = PHASE_YOU
+	_banner_style.set_border_width_all(3)
+	_banner.add_theme_stylebox_override("panel", _banner_style)
+	root.add_child(_banner)
+	_banner_label = Label.new()
+	_banner_label.add_theme_font_size_override("font_size", 28)
+	_banner_label.text = "WILDMIGRATION"
+	_banner.add_child(_banner_label)
+
+	_status = _mk_label(Vector2(16, 66), 18, Color(0.82, 0.86, 0.72))
 	root.add_child(_status)
 
 	# Bottom action bar.
@@ -117,15 +139,40 @@ func _on_attacker_selected(has: bool) -> void:
 # =========================================================================
 
 func _on_turn_began(seat: int, turn: int) -> void:
-	var who := "YOUR TURN" if seat == MatchController.HUMAN else "AI TURN"
-	_turn_label.text = "Turn %d — %s" % [turn, who]
-	if seat == MatchController.HUMAN:
-		_set_status("Play cards, then attack. Click a unit to select an attacker.")
+	var human := seat == MatchController.HUMAN
+	var color := PHASE_YOU if human else PHASE_AI
+	_banner_label.text = "TURN %d  ·  %s" % [turn, "YOUR TURN" if human else "AI TURN"]
+	_banner_label.add_theme_color_override("font_color", color)
+	if _banner_style != null:
+		_banner_style.border_color = color
+	if human:
+		_set_status("Play cards, then attack. Click a unit to select an attacker; hover any card to read it.")
 
 
 func _set_status(text: String) -> void:
 	if _status != null:
 		_status.text = text
+
+
+## Floating reason label anchored near the card that caused it (world -> screen),
+## so "can't attack: exhausted" appears at the unit, not only in the corner.
+func _float_reason(uid: int, text: String) -> void:
+	if board == null or _root == null:
+		return
+	var screen := board.camera_unproject(board.world_pos_for_uid(uid))
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 17)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	lbl.add_theme_constant_override("outline_size", 6)
+	lbl.position = screen - Vector2(60, 10)
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(lbl)
+	var tw := create_tween()
+	tw.tween_interval(1.4)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.tween_callback(lbl.queue_free)
 
 
 # =========================================================================

@@ -13,12 +13,14 @@ extends Node3D
 
 signal action_message(text: String)
 signal attacker_selected(has_attacker: bool)
+signal card_reason(uid: int, text: String)
 
 const SEAT_HUMAN := 0
 const SEAT_AI := 1
 
 var mc: MatchController
 var camera: Camera3D
+var inspector: CardInspector
 
 var _units: Dictionary = {}       # uid -> UnitView
 var _hand: Dictionary = {}        # uid -> HandCardView
@@ -161,6 +163,8 @@ func _place_unit(inst: CardInstance, pos: Vector3, live: Dictionary) -> void:
 		add_child(uv)
 		uv.setup(inst.data.id, inst.uid)
 		uv.clicked.connect(_on_unit_clicked)
+		uv.hovered.connect(_on_card_hovered)
+		uv.unhovered.connect(_on_card_unhovered)
 		_units[inst.uid] = uv
 	uv.position = pos
 	uv.set_status(inst.exhausted, inst.frozen)
@@ -179,6 +183,8 @@ func _reconcile_hand() -> void:
 			add_child(hv)
 			hv.setup(inst.data.id, inst.uid)
 			hv.clicked.connect(_on_hand_clicked)
+			hv.hovered.connect(_on_card_hovered)
+			hv.unhovered.connect(_on_card_unhovered)
 			_hand[inst.uid] = hv
 		hv.position = _hand_slot(i, n)
 		hv.rotation_degrees = Vector3(-62, 0, 0)
@@ -313,13 +319,14 @@ func _flash_target(uid: int) -> void:
 # =========================================================================
 
 func _on_hand_clicked(uid: int) -> void:
-	if not mc.is_human_turn():
-		return
 	var inst := _find_hand(uid)
 	if inst == null:
 		return
+	_pin(inst)                      # click pins the inspector for reading
+	if not mc.is_human_turn():
+		return
 	if not _can_play(inst):
-		action_message.emit("Can't play %s yet (need Aura or a free slot)." % inst.data.name)
+		_reason(uid, "Can't play %s: need Aura or a free slot." % inst.data.name)
 		return
 	if mc.human_play_card(inst):
 		action_message.emit("Played %s." % inst.data.name)
@@ -327,6 +334,9 @@ func _on_hand_clicked(uid: int) -> void:
 
 
 func _on_unit_clicked(uid: int) -> void:
+	var clicked := _find_unit_inst(uid)
+	if clicked != null:
+		_pin(clicked)               # click pins the inspector for reading
 	if not mc.is_human_turn():
 		return
 	# Second click on a highlighted enemy -> attack.
@@ -345,10 +355,24 @@ func _on_unit_clicked(uid: int) -> void:
 		_clear_selection()
 		return
 	if not mc.engine.can_attack(inst):
-		action_message.emit("%s can't attack right now." % inst.data.name)
+		_reason(uid, "%s can't attack: %s." % [inst.data.name, _why_cant_attack(inst)])
 		_clear_selection()
 		return
 	_select_attacker(uid)
+
+
+## Human-readable reason a unit can't attack (presentation-only inference from
+## public state — mirrors the engine's can_attack rule).
+func _why_cant_attack(inst: CardInstance) -> String:
+	if inst.owner != SEAT_HUMAN:
+		return "not yours"
+	if inst.frozen:
+		return "frozen"
+	if inst.exhausted:
+		return "exhausted (rested)"
+	if inst.summoning_sick and not inst.has_keyword(CardEnums.KW_RUSH):
+		return "summoning sick this turn"
+	return "not right now"
 
 
 func _select_attacker(uid: int) -> void:
@@ -396,6 +420,55 @@ func pending_attach() -> int:
 
 func has_attacker() -> bool:
 	return _selected_attacker >= 0
+
+
+# --- inspector + reasons --------------------------------------------------
+
+func set_inspector(insp: CardInspector) -> void:
+	inspector = insp
+
+
+func _on_card_hovered(uid: int) -> void:
+	if inspector != null:
+		inspector.hover_show(_card_for_uid(uid))
+
+
+func _on_card_unhovered(_uid: int) -> void:
+	if inspector != null:
+		inspector.hover_out()
+
+
+func _pin(inst: CardInstance) -> void:
+	if inspector != null and inst != null:
+		inspector.pin(inst.data)
+
+
+func _reason(uid: int, text: String) -> void:
+	action_message.emit(text)
+	card_reason.emit(uid, text)
+
+
+func _card_for_uid(uid: int) -> CardData:
+	var u := _find_unit_inst(uid)
+	if u != null:
+		return u.data
+	var h := _find_hand(uid)
+	return h.data if h != null else null
+
+
+## World position just above a unit/hand card (for floating reason labels).
+func world_pos_for_uid(uid: int) -> Vector3:
+	if _units.has(uid):
+		return (_units[uid] as Node3D).global_position + Vector3(0, 1.2, 0)
+	if _hand.has(uid):
+		return (_hand[uid] as Node3D).global_position + Vector3(0, 0.6, 0)
+	return Vector3.ZERO
+
+
+func camera_unproject(world: Vector3) -> Vector2:
+	if camera != null:
+		return camera.unproject_position(world)
+	return Vector2.ZERO
 
 
 # --- lookups --------------------------------------------------------------

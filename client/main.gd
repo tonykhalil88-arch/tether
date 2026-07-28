@@ -10,6 +10,7 @@ var _board: BoardView
 var _hud: Hud
 var _win: WinLoss
 var _mc: MatchController
+var _inspector: CardInspector
 var _seed_counter: int = 1
 
 
@@ -38,6 +39,10 @@ func _start_match(human_vg: String, ai_vg: String) -> void:
 	_board = BoardView.new()
 	add_child(_board)
 	_board.bind(_mc)
+
+	_inspector = CardInspector.new()
+	add_child(_inspector)
+	_board.set_inspector(_inspector)
 
 	_hud = Hud.new()
 	add_child(_hud)
@@ -71,10 +76,11 @@ func _collect_stats() -> Dictionary:
 
 
 func _teardown_match() -> void:
-	for n in [_board, _hud, _win, _mc]:
+	for n in [_board, _hud, _win, _mc, _inspector]:
 		if n != null and is_instance_valid(n):
 			n.queue_free()
 	_board = null
 	_hud = null
 	_win = null
 	_mc = null
+	_inspector = null
