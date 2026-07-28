@@ -24,6 +24,7 @@ var game_over: bool = false
 
 var rng: RandomNumberGenerator
 var log: Array = []                      # structured game-log entries
+var watch: Dictionary = {}               # balance watch-list counters (per game)
 
 
 func _init(seed_value: int = 0) -> void:

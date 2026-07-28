@@ -4,8 +4,8 @@ extends GutTest
 
 func test_kit_imports():
 	var kit: Dictionary = DeckFactory.load_kit()
-	assert_eq(kit.size(), 11, "Kit should contain 11 cards")
-	assert_true(kit.has("sora_akaza_vg"), "Vanguard present")
+	assert_eq(kit.size(), 88, "WM01 contains 88 cards")
+	assert_true(kit.has("wm01-001"), "Sora Vanguard present")
 
 func test_engine_setup_places_life():
 	var g := GameEngine.new(12345)
@@ -15,6 +15,5 @@ func test_engine_setup_places_life():
 	g.setup(deck0, vg, deck1, vg, 0)
 	assert_eq(g.state.players[0].hand.size(), 5, "Opening hand is 5")
 	g.start_game()
-	# Mono-colour Vanguard => 5 Life.
 	assert_eq(g.state.players[0].life.size(), 5, "Mono-colour Vanguard: 5 Life")
 	assert_eq(g.state.players[0].deck.size(), 40, "50 - 5 hand - 5 life = 40")

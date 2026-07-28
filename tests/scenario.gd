@@ -17,6 +17,26 @@ static func fresh(seed_value: int = 999) -> GameEngine:
 	return g
 
 
+## A game led by specific Vanguards, parked in P0's Main phase on turn 1 with
+## cost-reduction charges primed (via begin_turn). Used by passive / cost tests.
+static func fresh_with_vanguards(vg0_id: String, vg1_id: String, seed_value: int = 777) -> GameEngine:
+	var g := GameEngine.new(seed_value)
+	var v0: CardData = DeckFactory.card(vg0_id)
+	var v1: CardData = DeckFactory.card(vg1_id)
+	g.setup(DeckFactory.deck_for(v0), v0, DeckFactory.deck_for(v1), v1, 0)
+	g.start_game()
+	g.begin_turn()  # turn 1, P0 — primes passive cost charges
+	return g
+
+
+## Give a player a Stage directly (bypassing the cost).
+static func set_stage(g: GameEngine, player: int, card_id: String) -> CardInstance:
+	var inst: CardInstance = g._make_instance(DeckFactory.card(card_id), player)
+	inst.zone = CardEnums.ZONE_STAGE
+	g.state.players[player].stage = inst
+	return inst
+
+
 ## Put a Banner directly into a player's Battle Area with explicit state.
 static func spawn_banner(g: GameEngine, player: int, card_id: String,
 		exhausted: bool = false, summoning_sick: bool = false) -> CardInstance:

@@ -1,24 +1,24 @@
-# WILDMIGRATION — Rules Engine (Phase 2)
+# WILDMIGRATION — Rules Engine
 
 A **headless** digital TCG rules engine for WILDMIGRATION, built in Godot 4.5 /
-GDScript. This phase is engine-only: pure logic, zero rendering, everything
-testable and runnable from the command line. Presentation comes later.
+GDScript. Engine-only: pure logic, zero rendering, everything testable and
+runnable from the command line. Presentation comes later.
 
 Two players duel with a 50-card deck plus a single Vanguard. Card types are
 **Vanguard**, **Banner** (creature), **Technique** (one-shot) and **Stage**
-(persistent field). See [The rules](#the-rules) below for the full model.
+(persistent field). The engine runs the real **WM01 "The First Stampede"** set
+— 88 cards across five tribes (Redgale, Runner, Pact, Consortium, Bulwark).
 
 ---
 
 ## Requirements
 
-- **Godot 4.5** (headless is fine — no GPU needed).
-- **GUT 9.5.0** — the Godot Unit Test framework, vendored under `addons/gut/`.
-  9.5.0 is the release that targets Godot 4.5 (it uses the 4.5 `Logger` API but
-  none of the newer editor-only APIs). No other third-party dependencies.
+- **Godot 4.5** (headless — no GPU needed).
+- **GUT 9.5.0**, the Godot Unit Test framework, vendored under `addons/gut/`
+  (the release that targets Godot 4.5). No other third-party dependencies.
 
-Godot resolves `class_name` globals during an editor import scan. If you add or
-rename a script, run one import pass before testing:
+Godot resolves `class_name` globals during an editor import scan. After adding
+or renaming a script, run one import pass before testing:
 
 ```bash
 godot --headless --editor --quit
@@ -30,71 +30,68 @@ godot --headless --editor --quit
 
 ```
 wildmigration/
-├── project.godot            # Godot project (headless)
-├── engine/                  # rules engine — pure logic, no rendering
-│   ├── game_engine.gd       # turn structure + combat orchestration (the core)
+├── project.godot
+├── engine/                       # rules engine — pure logic, no rendering
+│   ├── game_engine.gd            # turn structure, combat, freeze, passives (core)
 │   ├── cards/
-│   │   ├── card_enums.gd     # canonical type/keyword/zone/event vocabularies
-│   │   └── card_data.gd      # immutable printed card definition (Resource)
+│   │   ├── card_enums.gd         # canonical vocab (types, keywords, triggers, actions)
+│   │   └── card_data.gd          # immutable printed card definition (Resource)
 │   ├── state/
-│   │   ├── game_state.gd     # per-game container (players, turn, rng, log)
-│   │   ├── player_state.gd   # zones + the Aura economy
-│   │   ├── card_instance.gd  # a physical card in play (runtime state)
-│   │   └── event_bus.gd      # synchronous publish/subscribe hub
+│   │   ├── game_state.gd         # per-game container (players, turn, rng, log, watch)
+│   │   ├── player_state.gd       # zones + Aura economy + freeze / cost bookkeeping
+│   │   ├── card_instance.gd      # a physical card in play (runtime state)
+│   │   └── event_bus.gd          # synchronous publish/subscribe hub
 │   └── effects/
-│       ├── effect_engine.gd  # data-driven effect resolver
-│       └── hooks.gd          # GDScript hook escape hatch for bespoke effects
+│       ├── effect_engine.gd      # data-driven effect resolver (WM01 schema)
+│       └── hooks.gd              # GDScript hook escape hatch for bespoke effects
 ├── data/cards/
-│   └── sora_akaza.json       # seed kit: 1 Vanguard, 7 Banners, 2 Techniques, 1 Stage
-├── tools/
-│   └── importer.gd           # JSON <-> CardData importer (lossless)
+│   └── wildmigration_set1.json   # WM01 — 88 cards
+├── tools/importer.gd             # JSON <-> CardData importer (lossless)
 ├── sim/
-│   ├── ai_policy.gd          # two scripted AI policies (aggro / guard)
-│   ├── match_runner.gd       # AI-vs-AI game loop + batch runner (reusable)
-│   └── run.gd                # headless CLI entry point (`godot -s sim/run.gd`)
-├── tests/
-│   ├── deck_factory.gd       # loads the kit, builds decks
-│   ├── scenario.gd           # builds controlled states for deterministic tests
-│   └── unit/                 # GUT suites (see coverage below)
-└── addons/gut/               # vendored GUT 9.5.0
+│   ├── ai_policy.gd              # two AI policies (aggro / guard), Rush + Freeze aware
+│   ├── match_runner.gd           # AI-vs-AI game loop, batch runner, watch-list
+│   └── run.gd                    # headless CLI entry point
+├── tests/                        # GUT suites + helpers
+└── addons/gut/                   # vendored GUT 9.5.0
 ```
 
 ---
 
 ## Running the tests
 
-The engine is validated by the GUT command-line runner (the in-editor GUT panel
-is not needed for headless use):
-
 ```bash
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites should report **All tests passed!**. Coverage maps directly to the
-Definition of Done:
+All suites report **All tests passed!** (94 tests). Coverage:
 
 | Suite | Covers |
 |-------|--------|
-| `test_importer.gd` | JSON round-trip losslessness, validation, dir import |
+| `test_importer.gd` | round-trip over all 88 cards, validation, power ceiling |
 | `test_setup.gd` | opening hand, 5-mono / 4-dual Life, free mulligan |
-| `test_turn_flow.gd` | phase order, Refresh unexhausts, no hand cap |
+| `test_turn_flow.gd` | phase order, Refresh, turn/battle buff expiry, no hand cap |
 | `test_first_player.gd` | first-player skip-draw + 1-Aura asymmetries |
 | `test_aura.gd` | Aura gain / spend / refresh and the cap of 10 |
-| `test_combat.gd` | power math, KO, attach-Aura, counters, Blocker, targeting |
+| `test_combat.gd` | power math, KO, attach-Aura, counters, Blocker, When-Attacking |
 | `test_rush.gd` | summoning sickness and the Rush exception |
-| `test_life_trigger.gd` | Life-to-hand flip and [Trigger] resolution |
+| `test_freeze.gd` | freeze persistence, Banner-freeze cap, uncapped Aura freeze |
+| `test_life_trigger.gd` | Life-to-hand flip, `play_self` life triggers |
 | `test_win_condition.gd` | lethal hit at 0 Life |
 | `test_zones_limits.gd` | Battle Area cap of 5, Stage uniqueness |
-| `test_effects.gd` | event bus, data-driven actions, hook escape hatch |
+| `test_cost_reduction.gd` | Vale + Canyon stack to -2, floored at cost 1 |
+| `test_passives.gd` | Dreyse dynamic threshold, Siegeworks, Old Hollow |
+| `test_effects.gd` | event bus, WM01 actions, hook escape hatch |
+| `test_watch.gd` | balance watch-list counters increment on resolution |
+| `test_ai_behavior.gd` | AI understands Rush and Freeze |
 | `test_sim.gd` | simulator determinism + batch integrity |
 
 ---
 
 ## Running the simulator
 
-`sim/run.gd` runs AI-vs-AI games headlessly and prints a per-game summary plus
-an aggregate report. With `--out` it also writes a structured JSON log per game
-(the balance-testing harness for later phases).
+`sim/run.gd` plays AI-vs-AI games headlessly, rotating through every Vanguard
+match-up, and prints a per-game summary plus an aggregate report. With `--out`
+it writes a structured JSON log per game.
 
 ```bash
 # 100 games, seeded, logs written to ./sim_logs/
@@ -104,23 +101,30 @@ godot --headless -s sim/run.gd -- --games=100 --seed=1 --out=sim_logs
 godot --headless -s sim/run.gd -- --games=10 --seed=1 --quiet
 ```
 
-Flags (after the `--`):
+Flags (after `--`): `--games=N` (default 10), `--seed=S` (default 1; game `i`
+uses `S+i`), `--out=DIR`, `--quiet`.
 
-| Flag | Default | Meaning |
-|------|---------|---------|
-| `--games=N` | 10 | number of games to play |
-| `--seed=S` | 1 | base RNG seed (game `i` uses `S + i`) |
-| `--out=DIR` | — | write `game_NNN.simlog.json` per game |
-| `--quiet` | off | suppress the per-game lines |
+The two policies (`sim/ai_policy.gd`) both play on curve and both understand
+**Rush** (a fresh Banner with Rush can attack) and **Freeze** (a frozen enemy
+Banner stays rested, so it is a target rather than a blocker):
 
-Each log records the seed, first player, both policies, winner, turn count and
-the full structured game log (setup, plays, attacks, KOs, game-over).
+- **aggro** — attacks the enemy Vanguard, never defends.
+- **guard** — clears rested/frozen enemy Banners first, and blocks / pitches
+  counter cards to protect its Vanguard when Life is low.
 
-The two policies (`sim/ai_policy.gd`) both play on curve:
+### Balance watch-list
 
-- **aggro** — always attacks the enemy Vanguard, never defends. Races Life.
-- **guard** — clears exhausted enemy Banners first, and uses a Blocker / counter
-  cards to protect its Vanguard when Life is low.
+Each game log carries a `watch` object, aggregated per batch, flagging when the
+cards under balance review resolve:
+
+| Flag | Fires when |
+|------|-----------|
+| `sora_rush_grants` | Sora's buff grants Rush to a Banner played this turn |
+| `verdigris_double_rest` | Verdigris rests two enemy Banners on entry |
+| `korgan_repeat_attacks` | Korgan refreshes itself at end of battle |
+| `stampede_multi_refresh` | Stampede Doctrine refreshes two Banners |
+| `averil_cards_seen` | cards seen through Averil's draw/bottom filtering |
+| `rue_aura_frozen` | total enemy Aura frozen by Rue |
 
 ---
 
@@ -129,114 +133,117 @@ The two policies (`sim/ai_policy.gd`) both play on curve:
 **Zones (per player):** Deck, Hand, Life (face-down), Battle Area (max 5
 Banners), Stage slot (max 1), Aura pool, Trash, Vanguard zone.
 
-**Setup:** draw 5, one free mulligan (shuffle back, redraw 5). Place the top
-*N* deck cards face-down as Life, where *N* is the Vanguard's printed life —
-**5** for a mono-colour Vanguard, **4** for a dual-colour one.
+**Setup:** draw 5, one free mulligan. Place the top *N* cards face-down as Life,
+where *N* is the Vanguard's printed life — **5** mono-colour, **4** dual-colour.
 
-**Turn structure:**
+**Turn:** 1) **Refresh** — unexhaust your cards (frozen ones skip this once);
+2) **Draw** — draw 1 (first player skips on turn 1 only); 3) **Aura** — gain 2
+(first player gains 1 on turn 1), pool capped at 10, frozen Aura stays
+unavailable this turn; 4) **Main** — plays, activations, attach Aura, attacks;
+5) **End** — turn-duration effects expire, no hand-size cap.
 
-1. **Refresh** — unexhaust all your cards (Vanguard, Banners, Aura, Stage).
-2. **Draw** — draw 1. The first player skips this on turn 1 only.
-3. **Aura** — gain 2 Aura, except the first player gains only 1 on turn 1.
-   Active (unexhausted) Aura is capped at 10.
-4. **Main** — in any order: play Banners / Techniques / Stages by exhausting
-   Aura equal to cost; attach Aura (exhaust 1 Aura = +1000 power for the
-   battle); declare attacks.
-5. **End** — end-of-turn effects expire. No hand-size cap.
+**Combat:** attackers are your unexhausted Vanguard or Banners (a Banner needs
+**Rush** to attack the turn it's played). Legal targets: the enemy Vanguard or a
+**rested** (exhausted/frozen) enemy Banner. Resolution: declare → attacker may
+attach Aura → defender may play [Counter] Techniques and discard counter-value
+cards → compare power. Attacker wins on **≥**: vs a Banner it is KO'd; vs the
+Vanguard the defender flips 1 Life to hand (or resolves its life-trigger). A hit
+at 0 Life ends the game. **Blocker** Banners may exhaust to become the new
+target.
 
-**Combat:**
+**Freeze** (WM01): *a frozen card does not refresh during its owner's next
+Refresh Phase.*
 
-- Attackers are your unexhausted Vanguard or Banners. A Banner cannot attack
-  the turn it is played unless it has **Rush**. Attacking exhausts the attacker.
-- Legal targets: the enemy Vanguard, or an **exhausted** enemy Banner.
-- Resolution: declare → attacker may attach Aura → defender may play [Counter]
-  Techniques and discard counter-value cards (+power to the defender) → compare
-  power.
-- The attacker wins if **attacker power ≥ defender power**.
-  - vs a Banner → the defender's Banner is KO'd to Trash.
-  - vs the Vanguard → the defender flips 1 Life card into hand; if it is a
-    [Trigger] they may resolve the trigger instead. A hit while 0 Life remain
-    ends the game — the attacker wins.
-- **Blocker:** when attacked, the defender may exhaust a Banner with Blocker to
-  become the new defend target.
+- Applies to **Banners** and **Aura**. Frozen Banners stay rested (still legal
+  attack targets); frozen Aura is unavailable for one turn, reducing spendable
+  Aura.
+- **Cap (engine-enforced):** each player may freeze at most **1 Banner per
+  turn** across all sources; additional Banner-freezes that turn are ignored.
+  **Aura freezing is uncapped.**
 
-**Keywords:** Rush, Blocker, [On Play], [When Attacking], [Activate: Main],
-[Once Per Turn], [Counter], [Trigger], [Your Turn].
+**Keywords:** Rush, Blocker, Freeze (status). **Power ceiling:** 9000.
 
 ### House rule: deck-out
 
-The printed rules only end a game via a lethal Vanguard hit. To guarantee that
-simulations always terminate, a player who must draw from an **empty deck
-loses**. This is the only rule here not drawn from the card game itself.
+The printed rules end a game only via a lethal Vanguard hit. To guarantee
+simulations terminate, a player who must draw from an **empty deck loses**. This
+is the only rule not drawn from the card game itself.
 
 ---
 
 ## Card data & the effect system
 
 Cards are authored as JSON (`data/cards/*.json`) and imported to `CardData`
-Resources by `tools/importer.gd`. The schema, one object per card:
+Resources by `tools/importer.gd`. The file may be a bare array of cards or an
+object with a `"cards"` array (WM01 uses the latter, alongside `set` /
+`rules_addenda` metadata the importer ignores). The importer is **lossless**:
+`dict → CardData → dict` is a stable fixed point over all 88 cards. Malformed
+rows are skipped into `CardImporter.last_issues`; cards over the power ceiling
+are flagged there too.
+
+Card schema (lower-case, matching the set exactly):
 
 ```json
 {
-  "id": "cinder_darter",
-  "name": "Cinder Darter",
-  "type": "Banner",
-  "colors": ["Red"],
-  "cost": 2,
-  "power": 3000,
-  "counter": 1000,
-  "life": 0,
-  "keywords": ["Rush"],
-  "effects": [],
-  "flavor": "It strikes before the smoke clears.",
-  "faction": "Emberwing Host",
-  "tribe": "Redgale"
+  "id": "wm01-024", "name": "Korgan, Iron-Hided",
+  "type": "banner",                     // vanguard | banner | technique | stage
+  "colors": ["red", "green"], "faction": "The Old Pact", "tribe": "Pact",
+  "cost": 7, "power": 8000, "counter": 0, "life": 0,
+  "keywords": [], "effects": [ /* see below */ ], "flavor": "..."
 }
 ```
 
-- `type` is one of `Vanguard | Banner | Technique | Stage`.
-- `counter` is the value contributed when the card is discarded on defense.
-- `life` is Vanguard-only.
-
-The importer is **lossless**: `dict → CardData → dict` is a stable fixed point
-(exercised by `test_importer.gd`). A file may be a bare array of cards or an
-object with a `"cards"` array. Malformed rows are skipped and recorded in
-`CardImporter.last_issues` rather than aborting the batch.
-
-**Effects** are event-driven and data-first. Each effect names a `trigger`
-(matched against event-bus events such as `on_play`, `when_attacking`,
-`on_trigger_reveal`, `on_turn_start`) plus an `action` and `params`:
+**Effects** are event-driven. Each names a `trigger`, an optional `cost`,
+`condition` and `once_per_turn` latch, and an `action` object whose `type`
+selects the behaviour:
 
 ```json
-{ "trigger": "on_play", "action": "draw", "params": { "amount": 1 } }
+{
+  "trigger": "activate_main", "once_per_turn": true,
+  "cost": { "aura": 1 },
+  "condition": { "min_aura_total": 8 },
+  "action": { "type": "power_buff", "amount": 2000, "target": "own_banner",
+              "filter_tribe": "Redgale", "duration": "turn",
+              "rider": { "if": "played_this_turn", "grant_keyword": "rush" } }
+}
 ```
 
-Built-in actions: `draw`, `power_buff` (targets `self` / `vanguard` /
-`attacker` / `defender` / `chosen_ally`), `ko_enemy_banner_max_power`,
-`gain_rush`, `search_top`. Anything the vocabulary can't express uses the
-**hook escape hatch**:
+Triggers: `on_play`, `main` (Technique in Main), `counter` (defensive
+Technique), `life_trigger` (revealed from Life), `when_attacking`,
+`activate_main`, `passive` (continuous while in play).
+
+Action types implemented: `power_buff` (duration `battle`/`turn`, multi-target,
+`rider`), `ko`, `rest`, `refresh` (incl. `end_of_battle` timing), `freeze`
+(Banner or Aura), `rest_and_freeze`, `bounce`, `draw`, `draw_then_bottom`,
+`gain_aura`, `cost_reduction` (stacking, floored at a minimum), `search_top`,
+`play_self`, and `hook`.
+
+The **hook escape hatch** covers anything the data vocabulary can't express:
 
 ```json
-{ "trigger": "on_play", "action": "hook", "params": { "hook": "my_bespoke_id" } }
+{ "trigger": "on_play", "action": { "type": "hook", "hook": "my_bespoke_id" } }
 ```
 
-Register the hook in GDScript (`EffectHooks.register("my_bespoke_id", cb)`);
-`cb` receives `(game, source, ctx)`. This is how bespoke card text will be wired
-up as real cards arrive.
+Register it in GDScript — `EffectHooks.register("my_bespoke_id", cb)` — where
+`cb(game, source, ctx)` runs the bespoke logic.
 
-> The seed kit (`data/cards/sora_akaza.json`) is **placeholder** text for engine
-> bring-up — real card text lands next session.
+**Passive, conditional power** (Marshal Dreyse's +1000 to Bulwark Banners at 8+
+Aura, Siegeworks, Old Hollow) is recomputed on demand via
+`GameEngine.effective_power()`, so thresholds apply and unapply the instant Aura
+crosses them.
 
 ---
 
 ## Design notes
 
-- The engine is built from plain `RefCounted` / `Resource` classes, never
-  `Node`s — no scene tree, no rendering, no input. `GameEngine` exposes the full
-  public API (`begin_turn`, `play_card`, `attach_aura`, `declare_attack`, …);
-  the AI policies call only that API, so they double as usage documentation.
+- Built from plain `RefCounted` / `Resource` classes, never `Node`s — no scene
+  tree, no rendering, no input. `GameEngine` exposes the full public API; the AI
+  policies call only that API, so they double as usage documentation.
 - All randomness flows through one seeded `RandomNumberGenerator`, so any game
   is exactly reproducible from its seed — essential for the balance harness.
 - Combat decisions are passed in as plain choice dictionaries
-  (`atk_choices` / `def_choices`), which keeps resolution deterministic and lets
+  (`atk_choices` / `def_choices`), keeping resolution deterministic and letting
   tests drive every branch (attach-Aura, counters, Blocker, Trigger) directly.
+- `EffectEngine` is pure interpretation: every mutation and target selection
+  goes through `GameEngine`, so effects stay data-driven and testable.
+```

@@ -1,12 +1,12 @@
 class_name DeckFactory
 extends RefCounted
 
-## Test/sim helper: loads the seeded card kit and builds legal decks.
+## Test/sim helper: loads the WM01 card set and builds tribe-coherent decks.
 
-const KIT_PATH := "res://data/cards/sora_akaza.json"
+const KIT_PATH := "res://data/cards/wildmigration_set1.json"
 
 
-## id -> CardData for the whole Sora Akaza kit.
+## id -> CardData for the whole set.
 static func load_kit() -> Dictionary:
 	var cards := CardImporter.import_file(KIT_PATH)
 	var out: Dictionary = {}
@@ -15,33 +15,48 @@ static func load_kit() -> Dictionary:
 	return out
 
 
-static func vanguard() -> CardData:
-	return load_kit()["sora_akaza_vg"]
+static func card(id: String) -> CardData:
+	return load_kit().get(id)
 
 
-## Return the single Vanguard plus all non-Vanguard cards in the kit.
-static func non_vanguards() -> Array:
-	var kit := load_kit()
+## Every Vanguard in the set.
+static func vanguards() -> Array:
 	var out: Array = []
-	for id in kit:
-		if kit[id].type != CardEnums.TYPE_VANGUARD:
-			out.append(kit[id])
+	for c in load_kit().values():
+		if c.type == CardEnums.TYPE_VANGUARD:
+			out.append(c)
 	return out
 
 
-## Build a 50-card deck by cycling the kit's non-Vanguard cards. Each CardData
-## definition is shared (immutable); the engine wraps them in CardInstances.
+## Default Vanguard used by generic tests (Sora Akaza, mono-red, 5 Life).
+static func vanguard() -> CardData:
+	return load_kit()["wm01-001"]
+
+
+## Build a ~tribe-coherent 50-card deck for a Vanguard: cycle that tribe's
+## non-Vanguard cards (broadened to the faction if too few) up to `size`.
+static func deck_for(vg: CardData, size: int = 50) -> Array:
+	var kit := load_kit()
+	var pool: Array = []
+	for c in kit.values():
+		if c.type == CardEnums.TYPE_VANGUARD:
+			continue
+		if c.tribe == vg.tribe:
+			pool.append(c)
+	if pool.size() < 8:
+		for c in kit.values():
+			if c.type != CardEnums.TYPE_VANGUARD and c.faction == vg.faction and not pool.has(c):
+				pool.append(c)
+	pool.sort_custom(func(a, b): return a.cost < b.cost)
+	return _cycle(pool, size)
+
+
+## Generic deck for the default Vanguard.
 static func build_deck(size: int = 50) -> Array:
-	var pool := non_vanguards()
-	var deck: Array = []
-	var i := 0
-	while deck.size() < size:
-		deck.append(pool[i % pool.size()])
-		i += 1
-	return deck
+	return deck_for(vanguard(), size)
 
 
-## Build a deck stacked with a specific card id on top, padded with filler.
+## A deck stacked with specific card ids on top, padded with a filler id.
 static func stacked_deck(top_ids: Array, filler_id: String, size: int = 50) -> Array:
 	var kit := load_kit()
 	var deck: Array = []
@@ -49,4 +64,13 @@ static func stacked_deck(top_ids: Array, filler_id: String, size: int = 50) -> A
 		deck.append(kit[id])
 	while deck.size() < size:
 		deck.append(kit[filler_id])
+	return deck
+
+
+static func _cycle(pool: Array, size: int) -> Array:
+	var deck: Array = []
+	var i := 0
+	while deck.size() < size and not pool.is_empty():
+		deck.append(pool[i % pool.size()])
+		i += 1
 	return deck

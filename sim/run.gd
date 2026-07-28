@@ -29,14 +29,16 @@ func _init() -> void:
 		var r: Dictionary = results[i]
 		var winner_txt := ("draw" if r["winner"] < 0 else "P%d (%s)" % [r["winner"], r["styles"][r["winner"]]])
 		if not quiet:
-			print("Game %3d | seed %d | first=P%d | winner=%s | turns=%d | life=%s" % [
-				i, r["seed"], r["first_player"], winner_txt, r["turns"], str(r["final_life"])])
+			print("Game %3d | seed %d | %s vs %s | first=P%d | winner=%s | turns=%d | life=%s" % [
+				i, r["seed"], r["vanguards"][0], r["vanguards"][1],
+				r["first_player"], winner_txt, r["turns"], str(r["final_life"])])
 		if not out_dir.is_empty():
 			_write_log(out_dir, i, r)
 
 	print("-------------------------------------------------------------")
 	print("Wins by seat : %s" % JSON.stringify(report["wins_by_seat"]))
 	print("Wins by style: %s" % JSON.stringify(report["wins_by_style"]))
+	print("Watch-list   : %s" % JSON.stringify(report["watch_totals"]))
 	var capped := 0
 	for r in results:
 		if r["capped"]:

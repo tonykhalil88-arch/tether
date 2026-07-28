@@ -1,15 +1,17 @@
 class_name AIPolicy
 extends RefCounted
 
-## Scripted, deterministic AI used by the headless simulator. Two styles:
+## Scripted, deterministic AI for the headless simulator. Two styles:
 ##
-##   "aggro" - play on curve, always attack the enemy Vanguard, never defend.
-##             Races the opponent's Life to zero.
-##   "guard" - play on curve, clear exhausted enemy Banners first, and use a
-##             Blocker / counter cards to defend the Vanguard when Life is low.
+##   "aggro" - play on curve, attack the enemy Vanguard, never defend.
+##   "guard" - play on curve, clear rested/frozen enemy Banners first, defend
+##             the Vanguard with a Blocker / counter cards when Life is low.
 ##
-## Policies never reach into private engine state; they only call the public
-## GameEngine API, so they double as living documentation of that API.
+## Both styles understand Rush (a fresh Banner with Rush can attack) and Freeze
+## (a frozen enemy Banner stays rested next turn, so it is a safe attack target
+## and a poor block), so the balance watch-list flags are meaningful.
+##
+## Policies only call the public GameEngine API, so they also document it.
 
 var name: String = "aggro"
 var style: String = "aggro"
@@ -22,8 +24,6 @@ func _init(policy_style: String = "aggro") -> void:
 
 # --- Mulligan -------------------------------------------------------------
 
-## Mulligan a hand that cannot act early: keep only if it has at least two
-## cards costing 2 or less.
 func want_mulligan(game: GameEngine, player: int) -> bool:
 	var cheap := 0
 	for inst in game.state.players[player].hand:
@@ -34,90 +34,98 @@ func want_mulligan(game: GameEngine, player: int) -> bool:
 
 # --- Main phase -----------------------------------------------------------
 
-## Play on curve: deploy a Stage if useful, then the most expensive affordable
-## Banner while Battle Area space remains, then fire any main-phase abilities.
 func do_main_phase(game: GameEngine, player: int) -> void:
 	var ps: PlayerState = game.state.players[player]
 
-	# Deploy a Stage if we hold one and none is in play.
+	# Deploy a Stage if we hold one and none is in play, then activate the
+	# Stage ability BEFORE Banners (cost reduction / board control help now).
 	if ps.stage == null:
 		var stage := _cheapest_of_type(ps.hand, CardEnums.TYPE_STAGE, ps.aura_available())
 		if stage != null:
 			game.play_card(player, stage)
+	if ps.stage != null:
+		game.activate_main(ps.stage)
 
-	# Deploy Banners on curve (most expensive first), up to the area cap.
+	# Deploy Banners on curve (most expensive affordable first).
 	var progressed := true
 	while progressed and not ps.battle_area_full():
 		progressed = false
-		var pick := _best_affordable_banner(ps.hand, ps.aura_available())
-		if pick != null:
-			if game.play_card(player, pick):
-				progressed = true
+		var pick := _best_affordable_banner(game, ps, player)
+		if pick != null and game.play_card(player, pick):
+			progressed = true
 
-	# Fire [Activate: Main] abilities (e.g. buff the Vanguard before attacks).
+	# Main-phase Techniques with a board-affecting effect (rest/ko/freeze/
+	# bounce) — play the cheapest we can afford, once.
+	var tech := _useful_main_technique(game, ps, player)
+	if tech != null:
+		game.play_card(player, tech)
+
+	# Now that Banners are deployed, fire the Vanguard ability (e.g. Sora's
+	# buff + Rush rider needs a Banner on board) and any Banner abilities.
+	game.activate_main(ps.vanguard)
 	for b in ps.battle_area:
-		if b.has_keyword(CardEnums.KW_ACTIVATE_MAIN):
-			game.activate_main(b)
+		game.activate_main(b)
 
 
 # --- Attacks --------------------------------------------------------------
 
-## Next unit that can legally attack, or null when the turn's attacks are done.
 func choose_attacker(game: GameEngine, player: int) -> CardInstance:
 	var ps: PlayerState = game.state.players[player]
 	if ps.vanguard and game.can_attack(ps.vanguard):
 		return ps.vanguard
+	# Highest-power ready Banner first (Rush-aware via can_attack).
+	var best: CardInstance = null
 	for b in ps.battle_area:
-		if game.can_attack(b):
-			return b
-	return null
+		if game.can_attack(b) and (best == null or game.effective_power(b) > game.effective_power(best)):
+			best = b
+	return best
 
 
-## Aggro hits the Vanguard; guard clears an exhausted enemy Banner first.
 func choose_target(game: GameEngine, player: int, attacker: CardInstance) -> CardInstance:
 	var targets := game.legal_attack_targets(attacker)
 	var enemy: PlayerState = game.state.players[game.state.opponent_of(player)]
 	if style == "guard":
+		# Clear the strongest rested/frozen enemy Banner we can beat.
+		var best: CardInstance = null
 		for t in targets:
-			if t != enemy.vanguard and t.type() == CardEnums.TYPE_BANNER:
-				return t
+			if t == enemy.vanguard or t.type() != CardEnums.TYPE_BANNER:
+				continue
+			if game.effective_power(attacker) >= game.effective_power(t):
+				if best == null or game.effective_power(t) > game.effective_power(best):
+					best = t
+		if best != null:
+			return best
 	return enemy.vanguard
 
 
-## Attach just enough Aura to make the hit connect against the target's
-## current power; never waste Aura beyond that.
 func attacker_choices(game: GameEngine, player: int, attacker: CardInstance, target: CardInstance) -> Dictionary:
-	var deficit := target.current_power() - attacker.current_power()
+	var deficit := game.effective_power(target) - game.effective_power(attacker)
 	var attach := 0
 	if deficit > 0:
 		attach = min(int(ceil(float(deficit) / 1000.0)), game.state.players[player].aura_available())
 	return { "attach_aura": attach }
 
 
-## Defensive decisions. Aggro never defends; guard blocks / counters to protect
-## its Vanguard when Life is running out.
 func defender_choices(game: GameEngine, defender: int, attacker: CardInstance, target: CardInstance) -> Dictionary:
 	var choices := { "resolve_trigger": true }
 	if style != "guard":
 		return choices
 	var ps: PlayerState = game.state.players[defender]
-	var defending_vanguard := (target == ps.vanguard)
-	if not defending_vanguard or ps.life.size() > 1:
+	if target != ps.vanguard or ps.life.size() > 1:
 		return choices
 
-	# Life is low: throw up a Blocker if we have one.
+	# Life is low: block with a ready Blocker (never a frozen/rested one).
 	for b in ps.battle_area:
 		if b.has_keyword(CardEnums.KW_BLOCKER) and not b.exhausted:
 			choices["blocker"] = b
 			break
 
-	# And pitch counter-value cards from hand to survive the swing.
-	var need := attacker.current_power()
+	var need := game.effective_power(attacker)
 	var block_power := 0
 	if choices.has("blocker"):
-		block_power = choices["blocker"].current_power()
+		block_power = game.effective_power(choices["blocker"])
 	else:
-		block_power = ps.vanguard.current_power()
+		block_power = game.effective_power(ps.vanguard)
 	var counters: Array = []
 	if block_power < need:
 		for c in ps.hand:
@@ -133,14 +141,37 @@ func defender_choices(game: GameEngine, defender: int, attacker: CardInstance, t
 
 # --- helpers --------------------------------------------------------------
 
-func _best_affordable_banner(hand: Array, aura: int) -> CardInstance:
+func _best_affordable_banner(game: GameEngine, ps: PlayerState, player: int) -> CardInstance:
 	var best: CardInstance = null
-	for inst in hand:
+	var best_cost := -1
+	for inst in ps.hand:
 		if inst.type() != CardEnums.TYPE_BANNER:
 			continue
-		if inst.data.cost > aura:
+		var cost: int = game._effective_play_cost(player, inst)
+		if cost > ps.aura_available():
 			continue
-		if best == null or inst.data.cost > best.data.cost:
+		if cost > best_cost:
+			best = inst
+			best_cost = cost
+	return best
+
+
+func _useful_main_technique(game: GameEngine, ps: PlayerState, player: int) -> CardInstance:
+	# Only bother with a main Technique if it can affect the board and there is
+	# an enemy Banner to affect.
+	var enemy: PlayerState = game.state.players[game.state.opponent_of(player)]
+	if enemy.battle_area.is_empty():
+		return null
+	var best: CardInstance = null
+	for inst in ps.hand:
+		if inst.type() != CardEnums.TYPE_TECHNIQUE or inst.data.cost > ps.aura_available():
+			continue
+		var affects := false
+		for eff in inst.data.effects:
+			if str(eff.get("trigger", "")) == CardEnums.EV_MAIN:
+				affects = true
+				break
+		if affects and (best == null or inst.data.cost < best.data.cost):
 			best = inst
 	return best
 

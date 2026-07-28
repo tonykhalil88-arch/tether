@@ -3,13 +3,10 @@ extends GutTest
 ## Setup: opening hand, Life placement (5 mono / 4 dual), and the free mulligan.
 
 func _mono_vg() -> CardData:
-	return DeckFactory.vanguard()
+	return DeckFactory.card("wm01-001")   # Sora, mono-red, life 5
 
 func _dual_vg() -> CardData:
-	var vg: CardData = CardData.from_dict(DeckFactory.vanguard().to_dict())
-	vg.colors = ["Red", "Blue"]
-	vg.life = 0  # force derivation from colour count
-	return vg
+	return DeckFactory.card("wm01-012")   # Kaya, red/green, life 4
 
 func test_opening_hand_is_five():
 	var g := GameEngine.new(1)
@@ -25,7 +22,8 @@ func test_mono_colour_vanguard_places_five_life():
 
 func test_dual_colour_vanguard_places_four_life():
 	var g := GameEngine.new(3)
-	g.setup(DeckFactory.build_deck(50), _dual_vg(), DeckFactory.build_deck(50), _dual_vg(), 0)
+	var dv := _dual_vg()
+	g.setup(DeckFactory.deck_for(dv), dv, DeckFactory.deck_for(dv), dv, 0)
 	g.start_game()
 	assert_eq(g.state.players[0].life.size(), 4, "dual => 4 Life")
 

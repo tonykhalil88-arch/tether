@@ -1,27 +1,32 @@
 class_name MatchRunner
 extends RefCounted
 
-## Drives complete AI-vs-AI games using GameEngine + AIPolicy. Pure logic and
-## deterministic given a seed, so both the CLI simulator (sim/run.gd) and the
-## GUT tests share it.
+## Drives complete AI-vs-AI games using GameEngine + AIPolicy. Deterministic
+## given a seed; shared by the CLI simulator and the GUT tests.
 
-const MAX_TURNS := 300  # safety cap so a pathological game still terminates
+const MAX_TURNS := 300
+
+# Watch-list keys surfaced per game and aggregated per batch.
+const WATCH_KEYS := [
+	"sora_rush_grants", "verdigris_double_rest", "korgan_repeat_attacks",
+	"stampede_multi_refresh", "averil_cards_seen", "rue_aura_frozen",
+]
 
 
-## Play one full game. Returns a structured result Dictionary including the
-## engine's game log.
-static func play_game(seed_value: int, style_a: String, style_b: String, first: int) -> Dictionary:
+## Play one full game between two named Vanguards. Returns a structured result
+## including the engine game log and the balance watch-list counters.
+static func play_game(seed_value: int, vg_a: String, vg_b: String,
+		style_a: String, style_b: String, first: int) -> Dictionary:
 	var g := GameEngine.new(seed_value)
-	var vg: CardData = DeckFactory.vanguard()
-	g.setup(DeckFactory.build_deck(50), vg, DeckFactory.build_deck(50), vg, first)
+	var kit := DeckFactory.load_kit()
+	var van_a: CardData = kit[vg_a]
+	var van_b: CardData = kit[vg_b]
+	g.setup(DeckFactory.deck_for(van_a), van_a, DeckFactory.deck_for(van_b), van_b, first)
 
 	var policies := [AIPolicy.new(style_a), AIPolicy.new(style_b)]
-
-	# Mulligan decisions before Life is set.
 	for p in range(2):
 		if policies[p].want_mulligan(g, p):
 			g.mulligan(p)
-
 	g.start_game()
 
 	var capped := false
@@ -42,11 +47,13 @@ static func play_game(seed_value: int, style_a: String, style_b: String, first: 
 	return {
 		"seed": seed_value,
 		"first_player": first,
+		"vanguards": [vg_a, vg_b],
 		"styles": [style_a, style_b],
 		"winner": g.state.winner,
 		"turns": g.state.turn_number,
 		"capped": capped,
 		"final_life": [g.state.players[0].life.size(), g.state.players[1].life.size()],
+		"watch": g.state.watch.duplicate(),
 		"log": g.state.log,
 	}
 
@@ -57,7 +64,7 @@ static func _run_attacks(g: GameEngine, active: int, policies: Array) -> void:
 	var guard := 0
 	while not g.state.game_over:
 		guard += 1
-		if guard > 64:  # defensive: never loop forever within one turn
+		if guard > 64:
 			break
 		var attacker: CardInstance = pol.choose_attacker(g, active)
 		if attacker == null:
@@ -68,18 +75,25 @@ static func _run_attacks(g: GameEngine, active: int, policies: Array) -> void:
 		g.declare_attack(attacker, target, atk_choices, def_choices)
 
 
-## Run a batch of `n` games alternating first player and match-ups. Returns an
-## aggregate report with per-game results.
+## Run `n` games, rotating through every Vanguard match-up and alternating the
+## first player. Returns an aggregate report with per-game results and summed
+## watch-list flags.
 static func run_batch(n: int, base_seed: int, style_a: String = "aggro", style_b: String = "guard") -> Dictionary:
+	var vgs := _vanguard_ids()
 	var results: Array = []
 	var wins := { "0": 0, "1": 0, "draw": 0 }
 	var style_wins := {}
+	var watch_totals := {}
+	for k in WATCH_KEYS:
+		watch_totals[k] = 0
+
 	for i in range(n):
 		var first := i % 2
-		# Alternate which seat plays which style so neither seat/style is fixed.
+		var va: String = vgs[i % vgs.size()]
+		var vb: String = vgs[(i + 1 + i / vgs.size()) % vgs.size()]
 		var sa := style_a if i % 2 == 0 else style_b
 		var sb := style_b if i % 2 == 0 else style_a
-		var r := play_game(base_seed + i, sa, sb, first)
+		var r := play_game(base_seed + i, va, vb, sa, sb, first)
 		results.append(r)
 		var w: int = r["winner"]
 		if w < 0:
@@ -88,10 +102,22 @@ static func run_batch(n: int, base_seed: int, style_a: String = "aggro", style_b
 			wins[str(w)] += 1
 			var winning_style: String = r["styles"][w]
 			style_wins[winning_style] = int(style_wins.get(winning_style, 0)) + 1
+		for k in WATCH_KEYS:
+			watch_totals[k] += int(r["watch"].get(k, 0))
+
 	return {
 		"games": n,
 		"base_seed": base_seed,
 		"wins_by_seat": wins,
 		"wins_by_style": style_wins,
+		"watch_totals": watch_totals,
 		"results": results,
 	}
+
+
+static func _vanguard_ids() -> Array:
+	var ids: Array = []
+	for v in DeckFactory.vanguards():
+		ids.append(v.id)
+	ids.sort()
+	return ids

@@ -1,25 +1,30 @@
 class_name CardInstance
 extends RefCounted
 
-## A single physical card in play. Wraps an immutable CardData definition
-## with the mutable, per-game state the rules engine mutates: which player
-## controls it, whether it is exhausted, temporary battle buffs, etc.
+## A single physical card in play. Wraps an immutable CardData definition with
+## the mutable, per-game state the rules engine mutates.
+##
+## Terminology: a "rested" card is an exhausted one — the set's `rest` action
+## simply exhausts a unit. `frozen` is the new status: a frozen card is skipped
+## by exactly one of its owner's Refresh Phases.
 
-var uid: int = 0                    # unique within a game, for logging/targeting
+var uid: int = 0
 var data: CardData
-var owner: int = 0                  # controlling player index (0 or 1)
-var exhausted: bool = false
-var zone: String = ""              # CardEnums.ZONE_*
-var summoning_sick: bool = true    # true the turn a Banner enters the battle area
+var owner: int = 0
+var exhausted: bool = false        # "rested" in card text
+var frozen: bool = false           # skip the next Refresh, then thaw
+var zone: String = ""
+var summoning_sick: bool = true    # true the turn a Banner enters the Battle Area
+var played_on_turn: int = -1       # turn number this unit entered play
 
-# Temporary power granted for the duration of the current battle only
-# (attached Aura, counter techniques, "when attacking" buffs...).
+# Temporary power granted for the duration of the current battle only.
 var battle_power_bonus: int = 0
+# Temporary power granted for the rest of the current turn.
+var turn_power_bonus: int = 0
 
 # Per-turn / persistent flags used by effects (e.g. Once Per Turn latches).
 var flags: Dictionary = {}
-
-# Keywords granted at runtime by effects (e.g. an effect that gives Rush).
+# Keywords granted at runtime by effects (e.g. an effect that grants Rush).
 var granted_keywords: Array = []
 
 
@@ -48,14 +53,20 @@ func grant_keyword(kw: String) -> void:
 		granted_keywords.append(kw)
 
 
-## Base printed power plus any temporary battle bonus.
+## Printed power plus temporary battle- and turn-duration bonuses. Passive,
+## conditional buffs (Dreyse, Old Hollow, Siegeworks) are layered on top by
+## GameEngine.effective_power().
 func current_power() -> int:
 	var base := data.power if data else 0
-	return base + battle_power_bonus
+	return base + battle_power_bonus + turn_power_bonus
 
 
 func clear_battle_bonus() -> void:
 	battle_power_bonus = 0
+
+
+func clear_turn_bonus() -> void:
+	turn_power_bonus = 0
 
 
 func exhaust() -> void:
@@ -74,5 +85,6 @@ func to_log_dict() -> Dictionary:
 		"type": type(),
 		"owner": owner,
 		"exhausted": exhausted,
+		"frozen": frozen,
 		"power": current_power(),
 	}

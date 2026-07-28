@@ -1,28 +1,31 @@
 class_name PlayerState
 extends RefCounted
 
-## All per-player game state: the zones and the Aura economy.
-##
-## Zone contents are Arrays of CardInstance except `stage` (single slot) and
-## `vanguard` (single card). Aura is modelled as a token pool with a total
-## size and an exhausted count; "active" (spendable) Aura is the difference.
+## All per-player game state: the zones, the Aura economy, and the freeze /
+## cost-reduction bookkeeping introduced by set WM01.
 
 const MAX_BATTLE_AREA := 5
 const MAX_ACTIVE_AURA := 10
 
-var index: int = 0                       # 0 or 1
+var index: int = 0
 
-var deck: Array = []                     # Array[CardInstance] (top = index 0)
+var deck: Array = []
 var hand: Array = []
-var life: Array = []                     # face-down; index 0 = top
-var battle_area: Array = []              # Array[CardInstance] Banners, max 5
-var stage: CardInstance = null           # single Stage slot
+var life: Array = []
+var battle_area: Array = []
+var stage: CardInstance = null
 var trash: Array = []
 var vanguard: CardInstance = null
 
 # Aura economy -------------------------------------------------------------
-var aura_total: int = 0                  # size of the Aura pool
-var aura_exhausted: int = 0              # tokens currently spent/exhausted
+var aura_total: int = 0
+var aura_exhausted: int = 0
+# Aura tokens that stay exhausted through the NEXT Refresh Phase (frozen).
+var aura_frozen_pending: int = 0
+
+# Freeze / cost-reduction bookkeeping --------------------------------------
+var banner_freezes_used: int = 0            # this turn; capped per turn
+var cost_charges: Array = []                # pending {amount, filter_tribe, minimum}
 
 
 func _init(player_index: int = 0) -> void:
@@ -31,18 +34,14 @@ func _init(player_index: int = 0) -> void:
 
 # --- Aura -----------------------------------------------------------------
 
-## Spendable (unexhausted) Aura.
 func aura_available() -> int:
 	return aura_total - aura_exhausted
 
 
-## Gain Aura tokens this turn; the pool total is capped at MAX_ACTIVE_AURA.
 func gain_aura(amount: int) -> void:
 	aura_total = min(MAX_ACTIVE_AURA, aura_total + amount)
 
 
-## Exhaust `amount` Aura to pay a cost. Returns false (no change) if the
-## player cannot afford it.
 func spend_aura(amount: int) -> bool:
 	if amount < 0 or aura_available() < amount:
 		return false
@@ -50,9 +49,12 @@ func spend_aura(amount: int) -> bool:
 	return true
 
 
-## Refresh step: all exhausted Aura becomes available again.
+## Refresh step for Aura: all exhausted Aura becomes available again, except a
+## quantity equal to the pending frozen amount, which stays exhausted for this
+## turn (then thaws).
 func refresh_aura() -> void:
-	aura_exhausted = 0
+	aura_exhausted = min(aura_total, aura_frozen_pending)
+	aura_frozen_pending = 0
 
 
 # --- Battle area ----------------------------------------------------------
@@ -61,21 +63,8 @@ func battle_area_full() -> bool:
 	return battle_area.size() >= MAX_BATTLE_AREA
 
 
-# --- Refresh (unexhaust everything the player controls) -------------------
-
-func refresh_all() -> void:
-	refresh_aura()
-	if vanguard:
-		vanguard.refresh()
-	for b in battle_area:
-		b.refresh()
-	if stage:
-		stage.refresh()
-
-
 # --- Zone bookkeeping -----------------------------------------------------
 
-## Remove a CardInstance from whatever zone array it currently sits in.
 func remove_from_current_zone(inst: CardInstance) -> void:
 	match inst.zone:
 		CardEnums.ZONE_DECK: deck.erase(inst)
@@ -95,7 +84,9 @@ func send_to_trash(inst: CardInstance) -> void:
 	remove_from_current_zone(inst)
 	inst.zone = CardEnums.ZONE_TRASH
 	inst.exhausted = false
+	inst.frozen = false
 	inst.clear_battle_bonus()
+	inst.clear_turn_bonus()
 	trash.append(inst)
 
 

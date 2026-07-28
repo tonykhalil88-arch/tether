@@ -102,6 +102,9 @@ static func _cards_from_parsed(parsed, source: String) -> Array:
 			last_issues.append("card '%s' in %s has invalid type '%s'" % [
 				str(entry.get("id", "?")), source, str(entry.get("type", ""))])
 			continue
+		if int(entry.get("power", 0)) > CardEnums.POWER_CEILING:
+			last_issues.append("card '%s' in %s exceeds the power ceiling (%d)" % [
+				str(entry.get("id", "?")), source, CardEnums.POWER_CEILING])
 		out.append(CardData.from_dict(entry))
 	return out
 
