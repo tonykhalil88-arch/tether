@@ -81,7 +81,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (157 tests: 141 engine + 16 client).
+All suites report **All tests passed!** (164 tests: 144 engine + 20 client).
 The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
 Phase 3 presentation layer and the Brief 10 readability pass (card-text
 synthesis, inspector data binding, deterministic placeholder art). Coverage:
@@ -170,11 +170,12 @@ matchup outside 35–65% or Vanguard outside 45–55%. Results reflect both card
 balance *and* pilot skill — first-pass evidence, not a verdict.
 
 `sim/revalidation.gd` runs the matrix **and** the C0 shared-generic-pilot control
-together (matched seeds) and writes `revalidation_report.md` — this is what
-produced the current **v1.1 Strict-Purity baseline**:
+together (matched seeds) and writes a revalidation report. `sim/revalidation_v12.gd`
+is the current runner — it produced the **v1.2 mono-recolour baseline**
+(`revalidation_v12_report.md`):
 
 ```bash
-godot --headless -s sim/revalidation.gd -- --games=50 --seed=1
+godot --headless -s sim/revalidation_v12.gd -- --games=50 --seed=1
 ```
 
 ### Isolation pass (ablations + control)
@@ -219,51 +220,52 @@ godot --headless -s sim/patch_report.gd -- --phase=consolidate
 
 ---
 
-## Balance status: FROZEN at v1.1 (Strict Purity baseline)
+## Balance status: FROZEN at v1.2 (Mono-recolour baseline)
 
-Set 1 balance is **re-frozen at patch 1.1**. The **Strict Purity** rule change
-(§ *Deckbuilding*: a deck card's colour set must be a **subset** of the
-Vanguard's) together with the **Purity Twelve** (wm01-089..100, three mono
-Banners per colour) changed both deck legality *and* the card pool. That resets
-the measurement: the old Patch 0.5 alpha baseline is **VOID** — measured under
-the previous *share-a-colour* legality and a smaller pool, so it is not
-comparable, only historical. A fresh full 8×8 matrix + C0 control was re-run on
-the same seed protocol → [`revalidation_report.md`](revalidation_report.md).
+Set 1 balance is **re-frozen at patch 1.2**. The **mono recolour** — 40 cards
+recoloured so that only Vanguards are multi-coloured (new set invariant) —
+enlarged every colour pool under Strict Purity (**Red 18 / Green 28 / Blue 21 /
+Purple 25** subset-legal uniques; dual Vanguards see both full mono pools). That
+changes *which decks exist*, so the v1.1 baseline is **VOID** — not comparable,
+only historical. A fresh full 8×8 matrix + C0 control was re-run on the same seed
+protocol → [`revalidation_v12_report.md`](revalidation_v12_report.md).
 
-**Baseline commit:** the v1.1 Strict-Purity baseline is commit `4cc2dea`
-(the "re-freeze at v1.1" commit that records this section). Check it
-out directly to reproduce; the environment's git proxy blocks tag pushes
-(feature-branch pushes only), so a `v1.1-strict-purity-baseline` tag may need to
-be created on that SHA from an environment with tag-push permission — same
-practice as the 0.5 baseline (`54cbe82`).
+**Baseline commit:** the v1.2 mono-recolour baseline is commit `__BASELINE_SHA__`
+(the "re-freeze at v1.2" commit that records this section). Check it out directly
+to reproduce; the environment's git proxy blocks tag pushes (feature-branch
+pushes only), so a `v1.2-mono-recolour-baseline` tag may need to be created on
+that SHA from an environment with tag-push permission — same practice as the 0.5
+(`54cbe82`) and v1.1 (`4cc2dea`) baselines.
 
-**New per-Vanguard standings** (patch 1.1, archetype pilots, 50 games × 64
-matchups; C0 = shared generic pilot; ~~struck~~ = old 0.5, **VOID**):
+**New per-Vanguard standings** (patch 1.2, archetype pilots, 50 games × 64
+matchups; C0 = shared generic pilot; ~~struck~~ = old 1.1, **VOID**):
 
-| Vanguard | Archetype | 1.1 win rate | 1.1 C0 | ~~0.5 (VOID)~~ | Status |
+| Vanguard | Archetype | 1.2 win rate | 1.2 C0 | ~~1.1 (VOID)~~ | Status |
 |----------|-----------|--------------|--------|----------------|--------|
-| Sora (001) | rush | 81% | 68% | ~~77%~~ | over — for playtesting |
-| Threshold (078) | threshold_ramp | 70% | 52% | ~~70%~~ | over — mostly pilot (C0 −18) |
-| Discount (056) | discount_deploy | 63% | 56% | ~~67%~~ | over — for playtesting |
-| Filter (045) | filter_control | 46% | 69% | ~~45%~~ | in tolerance (strong under C0) |
-| Drain (067) | drain | 45% | 54% | ~~42%~~ | in tolerance |
-| Lockdown (034) | lockdown | 40% | 54% | ~~46%~~ | under — pilot-driven dip |
-| Rest-punish (012) | rest_punish | 28% | 25% | ~~25%~~ | under — card-weak, persists in C0 |
-| Refresh-tempo (023) | refresh_tempo | 28% | 22% | ~~28%~~ | under — card-weak, persists in C0 |
+| Sora (001) | rush | 78% | 63% | ~~81%~~ | over — for playtesting |
+| Threshold (078) | threshold_ramp | 69% | 48% | ~~70%~~ | over — mostly pilot (C0 −21) |
+| Discount (056) | discount_deploy | 63% | 55% | ~~63%~~ | over — for playtesting |
+| Lockdown (034) | lockdown | 48% | 61% | ~~40%~~ | in tolerance (recovered) |
+| Filter (045) | filter_control | 48% | 75% | ~~46%~~ | in tolerance (strong under C0) |
+| Drain (067) | drain | 43% | 52% | ~~45%~~ | under — marginal |
+| Rest-punish (012) | rest_punish | 26% | 26% | ~~28%~~ | under — card-weak, persists in C0 |
+| Refresh-tempo (023) | refresh_tempo | 27% | 21% | ~~28%~~ | under — card-weak, persists in C0 |
 
-**Reading:** under Strict Purity the mono decks lose their off-colour splashes
-and the dual decks gain a wider legal pool, which is exactly where the numbers
-moved. rush stays dominant and pilot-independent; **threshold's 70% is now
-mostly pilot** (C0 collapses it to 52%); the two persistent under-decks
-(rest_punish, refresh_tempo) stay weak under *both* pilots, so their weakness is
-**cards, not piloting**. 6/8 Vanguards and 45/64 matchups sit outside tolerance
-— a first-set spread, handed to **human playtesting in the client**, not tuned
-here. This brief only **re-measured** the new rules; it applied no card patches.
+**Reading:** the wider mono pools gave the control decks real cross-kit bodies —
+**lockdown recovered to 48%** (40→48) now that Neza's green pool reaches Korgan
+and Greatox-class blockers — while the aggro high end barely moved. rush stays
+dominant and pilot-independent; **threshold's 69% is again mostly pilot** (C0
+collapses it to 48%); the two persistent under-decks (rest_punish, refresh_tempo)
+stay weak under *both* pilots, so their weakness is **cards, not piloting**. 6/8
+Vanguards and 44/64 matchups sit outside tolerance — a first-set spread, handed to
+**human playtesting in the client**, not tuned here. This brief only
+**re-measured** the recolour; it applied no card patches.
 
-The prior five-patch alpha campaign (Patches 0.2–0.5) remains documented in
-[`docs/balance-campaign.md`](docs/balance-campaign.md) and `patch0{2..5}_report.md`
-as history — its numbers are **VOID** under Strict Purity but its *method* is the
-template this revalidation followed.
+The prior baselines (Patches 0.2–0.5 alpha campaign, then v1.1 Strict Purity)
+remain documented in [`docs/balance-campaign.md`](docs/balance-campaign.md),
+`patch0{2..5}_report.md`, and `revalidation_report.md` as history — their numbers
+are **VOID** under the mono recolour, but the *method* is the template this
+revalidation followed.
 
 ---
 
