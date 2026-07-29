@@ -269,6 +269,32 @@ template this revalidation followed.
 
 ## Changelog
 
+### Patch 1.2 — Mono recolour (baseline reset)
+
+A **data recolour** and a **deck-construction rebuild**, no card-behaviour or
+engine changes. This resets the balance baseline again (the v1.1 numbers are VOID
+under the new colour structure).
+
+**Colour structure — "Only Vanguards may be multi-coloured."** 40 cards were
+recoloured mono per Tony's approved mapping (colour-only edits; every other field
+byte-identical). The only multi-coloured cards left are the four dual
+**Vanguards** (Kaya 012, Bram 023, Idris 056, Rue 067). A new set invariant test
+enforces this and guards Set 2: no Banner, Technique or Stage may carry more than
+one colour.
+
+**What it does to the pools.** Strict Purity is unchanged, but the recolour
+enlarges every mono pool — **Red 18 / Green 28 / Blue 21 / Purple 25** subset-legal
+uniques — and dual Vanguards now see both full mono pools (40+). So real cross-kit
+tech appears: e.g. Sora (mono red) runs **Wagon Drake** and **Warband Outriders**;
+Neza (mono green) may run **Korgan** as a big body.
+
+**Deck construction unified.** Because every pool now exceeds the deck, all eight
+Vanguards build identically — own kit ×4 (40) + 10 ranked filler (4+4+2) from the
+subset-legal pool. The v1.1 mono special case (13 uniques ×4 − 2) is retired.
+Split frames are data-driven, so the dual-colour split now renders **only on
+Vanguards** automatically (a recoloured ex-dual Banner renders solid) — verified
+by test, no visual code changed.
+
 ### Patch 1.1 — Strict Purity + the Purity Twelve (baseline reset)
 
 A **rule change** and a **12-card addition**, no card patches. This resets the

@@ -218,3 +218,33 @@ keeping with rule 6 above (*report, don't tune*).
 prescribes for Set 2: full 8×8 matrix, C0 shared-pilot control, matched seeds,
 defence-economy and watch-list instrumentation, REVIEW tolerances — just re-run
 because the ground under the old baseline moved.
+
+---
+
+## Addendum — v1.2 baseline reset (Mono recolour)
+
+*Added for patch 1.2. Same reasoning as the v1.1 addendum: a change to which
+decks exist voids the prior numbers, so we re-measure rather than diff.*
+
+**Why the baseline was reset again.** Patch 1.2 recoloured 40 cards so that only
+Vanguards are multi-coloured (new set invariant: every Banner / Technique / Stage
+is mono). No card behaviour changed — but colour identity is deck-legality, and
+under Strict Purity that means the legal pools moved a lot:
+
+- Mono pools grew to **Red 18 / Green 28 / Blue 21 / Purple 25** subset-legal
+  uniques. A mono Vanguard now shops a real cross-kit pool (Sora picks up Wagon
+  Drake and Warband Outriders; Neza can field Korgan), where before it had only
+  its own kit + three staples.
+- Dual Vanguards now see both full mono pools (40+), not a mix of dual kits.
+
+Because the decks the pilots fly are materially different, the v1.1 win rates
+measure a game that no longer exists. So the v1.1 baseline is **VOID** and we
+re-ran the full 8×8 + C0 on the same matched-seed protocol →
+[`revalidation_v12_report.md`](../revalidation_v12_report.md).
+
+**What we did NOT do.** No card was patched, no pilot logic changed, and no visual
+code changed — the split frame follows the data (it now appears only on
+Vanguards) automatically. Deck construction was rebuilt only because the pool
+sizes changed: with every pool larger than the deck, all eight Vanguards now build
+as kit ×4 + 10 ranked filler (the v1.1 mono 13×4−2 special case is gone). This
+brief **re-measured**; it did not tune.
