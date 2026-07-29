@@ -2,7 +2,8 @@ class_name WinLoss
 extends Control
 
 ## End-of-match screen: result banner + a few honest stats pulled from public
-## engine state, and a button back to the menu.
+## engine state, and a button back to the menu. 100% anchors + containers, no
+## absolute positions, so it centres at any window size.
 
 signal play_again()
 
@@ -15,17 +16,31 @@ func show_result(won: bool, stats: Dictionary) -> void:
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.06, 0.08, 0.94)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(center)
+
+	var card := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.10, 0.11, 0.14, 0.98)
+	sb.border_color = Color(0.45, 0.40, 0.28)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(10)
+	sb.set_content_margin_all(28)
+	card.add_theme_stylebox_override("panel", sb)
+	center.add_child(card)
+
 	var box := VBoxContainer.new()
-	box.set_anchors_preset(Control.PRESET_CENTER)
-	box.position = Vector2(-180, -140)
-	box.custom_minimum_size = Vector2(360, 0)
+	box.custom_minimum_size = Vector2(380, 0)
 	box.add_theme_constant_override("separation", 10)
-	add_child(box)
+	card.add_child(box)
 
 	var banner := Label.new()
 	banner.text = "VICTORY" if won else "DEFEAT"
+	banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	banner.add_theme_font_size_override("font_size", 48)
 	banner.add_theme_color_override("font_color",
 		Color(0.4, 0.9, 0.5) if won else Color(0.9, 0.4, 0.4))
@@ -43,7 +58,7 @@ func show_result(won: bool, stats: Dictionary) -> void:
 		l.add_theme_font_size_override("font_size", 18)
 		box.add_child(l)
 
-	box.add_child(_spacer(16))
+	box.add_child(_gap(16))
 	var again := Button.new()
 	again.text = "Back to Menu"
 	again.add_theme_font_size_override("font_size", 20)
@@ -51,7 +66,7 @@ func show_result(won: bool, stats: Dictionary) -> void:
 	box.add_child(again)
 
 
-func _spacer(h: int) -> Control:
+func _gap(h: int) -> Control:
 	var c := Control.new()
 	c.custom_minimum_size = Vector2(0, h)
 	return c

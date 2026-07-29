@@ -81,7 +81,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (164 tests: 144 engine + 20 client).
+All suites report **All tests passed!** (167 tests: 144 engine + 23 client).
 The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
 Phase 3 presentation layer and the Brief 10 readability pass (card-text
 synthesis, inspector data binding, deterministic placeholder art). Coverage:
@@ -270,6 +270,30 @@ revalidation followed.
 ---
 
 ## Changelog
+
+### Client 12.1 — Menu layout, window scaling & scene exposure (hotfix)
+
+Client-only presentation hotfix; engine, data and the v1.2 balance baseline are
+untouched.
+
+- **Window scaling.** Added display settings — 1920×1080 design resolution,
+  `canvas_items` stretch, `expand` aspect — so the 3D viewport and the 2D UI fill
+  the window at any size (no letterboxed sub-rect, no clipped menu).
+- **Anchored UI.** The main menu and win/loss screen are rebuilt with
+  `CenterContainer` / `VBoxContainer` and a styled card — no absolute pixel
+  positions. The HUD prompt panel moved into a `CenterContainer` and got an
+  explicit StyleBox (the stray grey default-theme panel is gone); the banner,
+  action bar, status line and card inspector stay edge-anchored at any size.
+- **Scene exposure.** Raised ambient + key/fill light, switched to a LINEAR
+  tonemap and eased the vignette so every slot, inlay, aura rack and plaque reads
+  at default settings (readable first, moody second). Brightened the table and
+  slot inlays for separation from the background.
+- **Brightness control.** A brightness slider (menu) and Dim/Bright buttons
+  (in-match) drive the Environment exposure multiplier, so per-monitor variance is
+  user-fixable.
+- **Tests.** `test_layout_smoke.gd` asserts the stretch settings and that menu
+  controls stay inside the frame at 1152×648 / 1280×720 / 1920×1080 / 1600×900.
+  Suite now **167/167**.
 
 ### Patch 1.2 — Mono recolour (baseline reset)
 

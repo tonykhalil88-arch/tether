@@ -82,14 +82,27 @@ func _build() -> void:
 	_speed_btn = _mk_button("Speed 1x", _on_speed)
 	bar.add_child(_speed_btn)
 	bar.add_child(_mk_button("Skip", func(): mc.queue.skip()))
+	# In-match brightness (the "pause" adjust) — user-fixable per monitor.
+	bar.add_child(_mk_button("Dim", func(): _brighten(-0.15)))
+	bar.add_child(_mk_button("Bright", func(): _brighten(0.15)))
 
-	# Center prompt panel (hidden until needed).
+	# Center prompt panel (hidden until needed). A CenterContainer keeps it centred
+	# at any window size; an explicit StyleBox keeps it off the grey theme panel.
+	var prompt_center := CenterContainer.new()
+	prompt_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	prompt_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(prompt_center)
 	_prompt_panel = PanelContainer.new()
-	_prompt_panel.set_anchors_preset(Control.PRESET_CENTER)
-	_prompt_panel.position = Vector2(-180, -120)
-	_prompt_panel.custom_minimum_size = Vector2(360, 0)
+	var psb := StyleBoxFlat.new()
+	psb.bg_color = Color(0.10, 0.11, 0.14, 0.98)
+	psb.border_color = Color(0.45, 0.40, 0.28)
+	psb.set_border_width_all(2)
+	psb.set_corner_radius_all(8)
+	psb.set_content_margin_all(16)
+	_prompt_panel.add_theme_stylebox_override("panel", psb)
+	_prompt_panel.custom_minimum_size = Vector2(380, 0)
 	_prompt_panel.visible = false
-	root.add_child(_prompt_panel)
+	prompt_center.add_child(_prompt_panel)
 	_prompt_box = VBoxContainer.new()
 	_prompt_box.add_theme_constant_override("separation", 8)
 	_prompt_panel.add_child(_prompt_box)
@@ -127,6 +140,12 @@ func _attach(delta: int) -> void:
 func _on_speed() -> void:
 	var m := mc.queue.toggle_speed()
 	_speed_btn.text = "Speed %dx" % int(m)
+
+
+func _brighten(delta: float) -> void:
+	if board != null:
+		board.set_brightness(board.brightness() + delta)
+		_set_status("Brightness %d%%." % round(board.brightness() * 100))
 
 
 func _on_attacker_selected(has: bool) -> void:

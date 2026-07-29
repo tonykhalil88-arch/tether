@@ -12,6 +12,7 @@ var _win: WinLoss
 var _mc: MatchController
 var _inspector: CardInspector
 var _seed_counter: int = 1
+var _brightness: float = 1.0
 
 
 func _ready() -> void:
@@ -22,6 +23,7 @@ func _show_menu() -> void:
 	_teardown_match()
 	_menu = MainMenu.new()
 	_menu.start_match.connect(_start_match)
+	_menu.brightness_changed.connect(func(v): _brightness = v)
 	add_child(_menu)
 
 
@@ -39,6 +41,7 @@ func _start_match(human_vg: String, ai_vg: String) -> void:
 	_board = BoardView.new()
 	add_child(_board)
 	_board.bind(_mc)
+	_board.set_brightness(_brightness)   # carry the menu's brightness choice in
 
 	_inspector = CardInspector.new()
 	add_child(_inspector)

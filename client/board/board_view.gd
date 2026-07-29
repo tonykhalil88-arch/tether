@@ -17,10 +17,14 @@ signal card_reason(uid: int, text: String)
 
 const SEAT_HUMAN := 0
 const SEAT_AI := 1
+const _AMBIENT_BASE := 1.15
 
 var mc: MatchController
 var camera: Camera3D
 var inspector: CardInspector
+
+var _env: Environment
+var _brightness: float = 1.0
 
 var _units: Dictionary = {}       # uid -> UnitView
 var _hand: Dictionary = {}        # uid -> HandCardView
@@ -68,8 +72,8 @@ func _build_static() -> void:
 	# Warm key light with soft shadows.
 	var key := DirectionalLight3D.new()
 	key.rotation_degrees = Vector3(-58, -34, 0)
-	key.light_color = Color(1.0, 0.93, 0.82)
-	key.light_energy = 1.35
+	key.light_color = Color(1.0, 0.95, 0.86)
+	key.light_energy = 1.7
 	key.shadow_enabled = true
 	key.shadow_bias = 0.04
 	add_child(key)
@@ -77,48 +81,54 @@ func _build_static() -> void:
 	# Cool fill, no shadow, opposite side.
 	var fill := DirectionalLight3D.new()
 	fill.rotation_degrees = Vector3(-32, 140, 0)
-	fill.light_color = Color(0.72, 0.82, 1.0)
-	fill.light_energy = 0.45
+	fill.light_color = Color(0.78, 0.86, 1.0)
+	fill.light_energy = 0.8
 	add_child(fill)
 
-	# WorldEnvironment: gentle tonemapping + a touch of glow + soft ambient.
-	var env := WorldEnvironment.new()
+	# WorldEnvironment. READABLE FIRST, moody second (Brief 10): strong ambient,
+	# LINEAR tonemap (no midtone crush) with an exposure the brightness slider
+	# drives, and only a whisper of glow. Default exposure lands every slot and
+	# zone clearly readable on normally lit monitors.
 	var e := Environment.new()
 	e.background_mode = Environment.BG_COLOR
-	e.background_color = Color(0.045, 0.05, 0.065)
+	e.background_color = Color(0.10, 0.11, 0.14)
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color(0.42, 0.45, 0.52)
-	e.ambient_light_energy = 0.5
-	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	e.tonemap_white = 1.1
+	e.ambient_light_color = Color(0.62, 0.65, 0.72)
+	e.ambient_light_energy = _AMBIENT_BASE
+	e.tonemap_mode = Environment.TONE_MAPPER_LINEAR
+	e.tonemap_exposure = 1.0
 	e.glow_enabled = true
-	e.glow_intensity = 0.5
-	e.glow_bloom = 0.15
-	e.glow_hdr_threshold = 1.0
+	e.glow_intensity = 0.25
+	e.glow_bloom = 0.1
+	e.glow_hdr_threshold = 1.2
+	_env = e
+	var env := WorldEnvironment.new()
 	env.environment = e
 	add_child(env)
 
-	# Table: dark stone/wood tone with a low sheen.
+	# Table: warm stone/wood tone, lifted so it reads against the background.
 	var table := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(12, 10.5)
 	table.mesh = plane
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.11, 0.09, 0.075)     # dark wood
-	mat.roughness = 0.75
+	mat.albedo_color = Color(0.18, 0.15, 0.12)
+	mat.roughness = 0.7
 	mat.metallic = 0.05
 	table.material_override = mat
 	table.position = Vector3(0, -0.02, 0)
 	add_child(table)
 
-	# Carved zone inlays for both seats.
+	# Carved zone inlays for both seats (brighter so slots clearly separate from
+	# the table and the background).
 	for seat in [SEAT_HUMAN, SEAT_AI]:
 		for i in range(5):
-			_add_slot_pad(_banner_slot(seat, i), 0.92, Color(0.17, 0.19, 0.23))
-		_add_slot_pad(_vanguard_slot(seat), 1.0, Color(0.28, 0.22, 0.14))
-		_add_slot_pad(_stage_slot(seat), 0.9, Color(0.20, 0.18, 0.24))
+			_add_slot_pad(_banner_slot(seat, i), 0.92, Color(0.30, 0.33, 0.40))
+		_add_slot_pad(_vanguard_slot(seat), 1.0, Color(0.46, 0.37, 0.22))
+		_add_slot_pad(_stage_slot(seat), 0.9, Color(0.34, 0.30, 0.42))
 
 	_build_vignette()
+	set_brightness(_brightness)
 
 
 ## A carved-looking inlay: a recessed dark plate with a bright rim so slots read
@@ -172,9 +182,24 @@ func _vignette_texture() -> Texture2D:
 	for y in range(n):
 		for x in range(n):
 			var d := sqrt(pow(x - c, 2) + pow(y - c, 2)) / maxd
-			var a := clampf((d - 0.55) / 0.45, 0.0, 1.0)
-			img.set_pixel(x, y, Color(0, 0, 0, a * 0.55))
+			# Eased off (Brief 12.1): starts further out, much lighter, so it
+			# frames the board without darkening the play area.
+			var a := clampf((d - 0.72) / 0.28, 0.0, 1.0)
+			img.set_pixel(x, y, Color(0, 0, 0, a * 0.28))
 	return ImageTexture.create_from_image(img)
+
+
+## In-game brightness (Environment exposure multiplier), driven by the menu/HUD
+## slider so per-monitor variance is user-fixable. 1.0 = default.
+func set_brightness(value: float) -> void:
+	_brightness = clampf(value, 0.4, 2.5)
+	if _env != null:
+		_env.tonemap_exposure = _brightness
+		_env.ambient_light_energy = _AMBIENT_BASE * _brightness
+
+
+func brightness() -> float:
+	return _brightness
 
 
 # =========================================================================

@@ -64,6 +64,7 @@ godot                      # main scene is client/main.tscn
 | Attach Aura to an attack | `Aura +` / `Aura -` while an attacker is selected |
 | Activate an ability | `Activate VG` / `Activate Stage` |
 | Speed / skip animations | `Speed 1x↔2x`, `Skip` |
+| Brightness (per-monitor) | menu slider, or `Dim` / `Bright` in-match |
 | End your turn | `End Turn` |
 
 The **Card Inspector** shows the full card: name, cost, colours, tribe,
@@ -136,8 +137,14 @@ They verify, headless:
   colour B, never a blend); mono cards stay solid; the split is deterministic and
   applies to the frame, the creature sprite, and the inspector band.
 
+**Brief 12.1 layout smoke** (`test_layout_smoke.gd`) checks the window-scaling
+hotfix headless: the project uses `canvas_items` / `expand` stretch (viewport +
+UI fill the window), and the **menu controls stay inside the frame at 1152×648,
+1280×720, 1920×1080 and 1600×900** with the win/loss screen centred — no absolute
+pixel positions anywhere in the menu/win-loss code.
+
 **Engine untouched:** all pre-existing engine tests still pass — the full suite
-is **160/160 green** (141 engine + 19 client).
+is **167/167 green** (144 engine + 23 client).
 
 ---
 
@@ -161,12 +168,15 @@ and report **pass/fail per item**. Suggested opponent: **Neza (lockdown)** or
 | 9 | Confirm the board **reads as a lit place**: warm/cool lighting, soft shadows under creatures, carved slot inlays, dark-wood table, gentle vignette — legible first, moody second. | ☐ |
 | 10 | Confirm each **creature billboard sits centred ABOVE its slot** (not offset to the side), and that **Stormfoal Hatchling / Cull-Beast 01 show their real art** while everything else shows its placeholder sigil. | ☐ |
 | 11 | **Identify a dual-colour card's BOTH colours at hand scale without the inspector** — dual cards render a **50/50 vertical split** (left = colour A, right = colour B, never a blend); a mono card stays solid. Try a red/green Kaya/Bram card next to a mono card. | ☐ |
+| 12 | **Resize the window mid-menu AND mid-match** (incl. 1152×648, 1280×720, 1920×1080, maximized 1600×900) — nothing clipped or overlapping, the menu stays centred and fully visible, the inspector stays right-anchored, and the board fills the window with no large empty margins. | ☐ |
+| 13 | **Every board zone is identifiable at default brightness in a normally lit room** — slots, inlays, aura racks and plaques read without leaning in; the brightness slider (menu) and Dim/Bright buttons (in-match) adjust exposure if your monitor needs it. | ☐ |
 
 Bonus perf check: with a full board + several animations, does it stay smooth at
 1080p on the 3050? Note any hitches (card-frame build, glow, shadows) so they can
 be tuned.
 
-> Reminder: items 1–2 and 5–9 (and the split in 11) are **only fully judged on a
-> real GPU** — the headless CI proves the data and wiring are correct (160/160
-> tests, incl. the dual-split determinism) but not that the pixels look right.
-> That's this checklist's job.
+> Reminder: items 1–2, 5–9, the split in 11, and the look in 12–13 are **only
+> fully judged on a real GPU** — the headless CI proves the data, wiring and
+> layout math are correct (167/167 tests, incl. the dual-split determinism and the
+> menu-fits-the-frame layout smoke) but not that the pixels look right. That's
+> this checklist's job.
