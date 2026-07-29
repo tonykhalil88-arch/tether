@@ -55,16 +55,43 @@ func test_mono_card_is_legal_in_a_dual_deck():
 		"a mono-red card is legal under red/green")
 	assert_true(DeckValidator.is_colour_legal(DeckFactory.card("wm01-035"), kaya),
 		"a mono-green card is legal under red/green")
-	assert_true(DeckValidator.is_colour_legal(DeckFactory.card("wm01-013"), kaya),
-		"a red/green card is legal under red/green")
 	assert_false(DeckValidator.is_colour_legal(DeckFactory.card("wm01-046"), kaya),
 		"a mono-blue card is illegal under red/green")
 
 func test_is_colour_legal_helper_matches_subset_semantics():
 	var sora := DeckFactory.card("wm01-001")   # red
 	assert_true(DeckValidator.is_colour_legal(DeckFactory.card("wm01-002"), sora), "mono-red under red")
-	assert_false(DeckValidator.is_colour_legal(DeckFactory.card("wm01-013"), sora), "red/green NOT subset of red")
+	assert_false(DeckValidator.is_colour_legal(DeckFactory.card("wm01-024"), sora), "mono-green NOT subset of red")
 	assert_false(DeckValidator.is_colour_legal(DeckFactory.card("wm01-085"), sora), "purple NOT subset of red")
+
+# --- patch 1.2 cross-kit legality (mono recolour) ------------------------
+
+func test_mono_recolour_opens_cross_kit_tech():
+	# Sora (mono red) may now run Wagon Drake — a Morrow Runner recoloured to red.
+	var sora := DeckFactory.card("wm01-001")
+	var wagon := DeckFactory.card("wm01-019")
+	assert_eq(wagon.colors, ["red"] as Array, "Wagon Drake is mono red in 1.2")
+	assert_true(DeckValidator.is_colour_legal(wagon, sora), "Sora may run Wagon Drake")
+	# ...and it actually lands in the built deck (filler from the wider red pool).
+	var in_deck := false
+	for c in DeckFactory.deck_for(sora):
+		if c.id == "wm01-019":
+			in_deck = true
+	assert_true(in_deck, "Wagon Drake appears in Sora's rebuilt deck")
+
+	# Neza (mono green) may now run Korgan — an Old Pact body recoloured to green.
+	var neza := DeckFactory.card("wm01-034")
+	var korgan := DeckFactory.card("wm01-024")
+	assert_eq(korgan.colors, ["green"] as Array, "Korgan is mono green in 1.2")
+	assert_true(DeckValidator.is_colour_legal(korgan, neza), "Neza may run Korgan")
+
+func test_dual_vanguard_may_run_either_mono_pool():
+	# Kaya (red/green) shops both her mono pools; her colour pair excludes blue/purple.
+	var kaya := DeckFactory.card("wm01-012")
+	assert_true(DeckValidator.is_colour_legal(DeckFactory.card("wm01-019"), kaya), "mono-red Wagon Drake legal under Kaya")
+	assert_true(DeckValidator.is_colour_legal(DeckFactory.card("wm01-024"), kaya), "mono-green Korgan legal under Kaya")
+	assert_false(DeckValidator.is_colour_legal(DeckFactory.card("wm01-046"), kaya), "mono-blue illegal under Kaya")
+	assert_false(DeckValidator.is_colour_legal(DeckFactory.card("wm01-085"), kaya), "mono-purple illegal under Kaya")
 
 func test_vanguard_must_be_a_vanguard():
 	var r: Dictionary = DeckValidator.validate(_legal_deck(), DeckFactory.card("wm01-005"))

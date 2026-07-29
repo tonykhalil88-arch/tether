@@ -72,28 +72,39 @@ func test_placeholder_art_differs_between_ids():
 	assert_ne(a.get_data(), b.get_data(), "different ids -> different art")
 
 
-func test_dual_colour_card_renders_a_5050_vertical_split_not_a_blend():
-	# Verdigris is red/green. The art field left half must be the RED tone and the
-	# right half the GREEN tone — and NEITHER may be the averaged/blended colour.
-	var verdigris := DeckFactory.card("wm01-013")   # colors = [red, green]
-	var img := PlaceholderArt.card_art(verdigris, 168, 240)
+func test_dual_vanguard_renders_a_5050_vertical_split_not_a_blend():
+	# Under patch 1.2 ONLY Vanguards are multi-coloured. Kaya is red/green — the
+	# art field left half must be RED, right half GREEN, and NEITHER the blend.
+	var kaya := DeckFactory.card("wm01-012")   # dual Vanguard, colors = [red, green]
+	var img := PlaceholderArt.card_art(kaya, 168, 240)
 	var left := img.get_pixel(20, 90)
 	var right := img.get_pixel(148, 90)
-	var ids: Array = PlaceholderArt.identity_colors(verdigris.colors)
-	assert_ne(left, right, "dual card has a left/right split, not one colour")
+	var ids: Array = PlaceholderArt.identity_colors(kaya.colors)
+	assert_ne(left, right, "dual Vanguard has a left/right split, not one colour")
 	assert_true(_col_close(left, ids[0]), "left half is colour A (red)")
 	assert_true(_col_close(right, ids[1]), "right half is colour B (green)")
 	var blended: Color = ids[0].lerp(ids[1], 0.5)
 	assert_false(_col_close(left, blended), "left half is never the blended colour")
 	assert_false(_col_close(right, blended), "right half is never the blended colour")
 	# Determinism: same id -> same split.
-	var img2 := PlaceholderArt.card_art(verdigris, 168, 240)
+	var img2 := PlaceholderArt.card_art(kaya, 168, 240)
 	assert_eq(img.get_data(), img2.get_data(), "same id -> identical split art")
 
 
 ## Colours compared with an 8-bit tolerance (RGBA8 quantises float channels).
 func _col_close(a: Color, b: Color) -> bool:
 	return absf(a.r - b.r) < 0.02 and absf(a.g - b.g) < 0.02 and absf(a.b - b.b) < 0.02
+
+
+func test_recoloured_ex_dual_banner_renders_solid_not_split():
+	# Verdigris was red/green in 1.1; recoloured mono green in 1.2. Because the
+	# split is data-driven, it now renders SOLID — the split only ever appears on
+	# multi-coloured Vanguards.
+	var verdigris := DeckFactory.card("wm01-013")   # now mono green
+	assert_eq(verdigris.colors.size(), 1, "ex-dual Banner is now mono")
+	var img := PlaceholderArt.card_art(verdigris, 168, 240)
+	assert_eq(img.get_pixel(20, 90), img.get_pixel(148, 90),
+		"recoloured mono Banner art field is one colour on both halves")
 
 
 func test_mono_colour_card_is_solid_not_split():
@@ -103,13 +114,13 @@ func test_mono_colour_card_is_solid_not_split():
 		"mono card art field is one colour on both halves")
 
 
-func test_dual_sprite_splits_too():
+func test_dual_vanguard_sprite_splits_too():
 	PlaceholderArt.clear_cache()
-	var idris := DeckFactory.card("wm01-058")   # blue/purple banner
-	var img := PlaceholderArt.sprite_for(idris, 96).get_image()
+	var rue := DeckFactory.card("wm01-067")   # blue/purple Vanguard
+	var img := PlaceholderArt.sprite_for(rue, 96).get_image()
 	# Opaque body pixels either side of the vertical centre differ by colour.
 	assert_ne(img.get_pixel(30, 54), img.get_pixel(66, 54),
-		"dual creature sprite is split, not one colour")
+		"dual Vanguard creature sprite is split, not one colour")
 
 
 func test_creature_sprite_fallback_is_per_id_not_the_shared_diamond():

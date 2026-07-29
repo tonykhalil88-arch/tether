@@ -53,6 +53,17 @@ func test_clean_set_reports_no_issues_and_respects_ceiling():
 	for c in cards:
 		assert_true(c.power <= CardEnums.POWER_CEILING, "%s within power ceiling" % c.id)
 
+## Set invariant (patch 1.2, guards Set 2 too): only Vanguards may be
+## multi-coloured — every Banner / Technique / Stage is mono-colour.
+func test_only_vanguards_are_multicolour():
+	var cards: Array = CardImporter.import_file(DeckFactory.KIT_PATH)
+	for c in cards:
+		if c.type == CardEnums.TYPE_VANGUARD:
+			assert_between(c.colors.size(), 1, 2, "%s Vanguard has 1–2 colours" % c.id)
+		else:
+			assert_eq(c.colors.size(), 1,
+				"%s (%s) is mono-colour — only Vanguards may be multi-coloured" % [c.id, c.type])
+
 func test_power_ceiling_violation_is_flagged():
 	var over := '[{"id":"big","name":"Too Big","type":"banner","power":10000}]'
 	var cards: Array = CardImporter.import_string(over, "<test>")

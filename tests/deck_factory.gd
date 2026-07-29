@@ -47,13 +47,14 @@ static func kit_ids(vg: CardData) -> Array:
 	return out
 
 
-## A legal 50-card deck under STRICT PURITY (patch 1.1). Deterministic.
-##   * Mono Vanguards have exactly 13 subset-legal uniques (own kit of 10 + the
-##     3 mono staples). 13×4 = 52, so we trim 2 copies — one each off the two
-##     lowest archetype-ranked uniques (documented per deck in the report).
-##   * Dual Vanguards keep their 10-card kit at 4 copies (40) plus 10 filler
-##     drawn from their now-larger subset-legal pool (both mono pools + both
-##     dual kits), ranked by the existing archetype heuristic.
+## A legal 50-card deck under STRICT PURITY (patch 1.2). Deterministic.
+##
+## With the mono recolour every colour pool is now large (Red 18 / Green 28 /
+## Blue 21 / Purple 25 uniques; dual Vanguards see both their mono pools, 40+),
+## so ALL eight Vanguards build the same way: the Vanguard's own 10-card kit at
+## 4 copies each (40) plus 10 filler drawn from the ranked subset-legal pool
+## (best archetype pick first, taken as 4 + 4 + 2). This surfaces real cross-kit
+## tech — e.g. rush picks up Ashvane / Ola / Outriders; lockdown picks up Korgan.
 ## `size` is kept for signature compatibility but a legal deck is always 50.
 static func deck_for(vg: CardData, _size: int = 50) -> Array:
 	var kit := load_kit()
@@ -65,28 +66,8 @@ static func deck_for(vg: CardData, _size: int = 50) -> Array:
 	return deck
 
 
-## The deck as an ordered {id: count} map (best archetype pick first). This is
-## the canonical source the report prints and deck_for expands.
+## The deck as an ordered {id: count} map: own kit ×4 (40) + 10 ranked filler.
 static func decklist(vg: CardData) -> Dictionary:
-	if vg.colors.size() <= 1:
-		return _mono_decklist(vg)
-	return _dual_decklist(vg)
-
-
-## Mono: all 13 subset-legal uniques at 4 copies, minus one copy each off the
-## two lowest-ranked (mono_trims).
-static func _mono_decklist(vg: CardData) -> Dictionary:
-	var ranked := _ranked_legal_uniques(vg)     # best first
-	var counts: Dictionary = {}
-	for c in ranked:
-		counts[c.id] = DeckValidator.MAX_COPIES
-	for id in mono_trims(vg):
-		counts[id] -= 1
-	return counts
-
-
-## Dual: own kit ×4 (40) + 10 filler from the ranked non-kit legal pool.
-static func _dual_decklist(vg: CardData) -> Dictionary:
 	var counts: Dictionary = {}
 	for id in kit_ids(vg):
 		counts[id] = DeckValidator.MAX_COPIES
@@ -100,36 +81,15 @@ static func _dual_decklist(vg: CardData) -> Dictionary:
 	return counts
 
 
-## The two id(s) trimmed from a mono deck (the two lowest archetype-ranked of the
-## 13 uniques), so 13×4−2 = 50. Empty for dual Vanguards.
-static func mono_trims(vg: CardData) -> Array:
-	if vg.colors.size() > 1:
-		return []
-	var ranked := _ranked_legal_uniques(vg)
-	var out: Array = []
-	# The last two entries are the lowest-ranked.
-	for c in ranked.slice(ranked.size() - 2, ranked.size()):
-		out.append(c.id)
-	return out
-
-
-## All non-Vanguard cards subset-legal for `vg`, ranked best-first by the
-## Vanguard's archetype heuristic (deterministic id tie-break).
-static func _ranked_legal_uniques(vg: CardData) -> Array:
-	var kit := load_kit()
-	var pool: Array = []
-	for c in kit.values():
-		if c.type == CardEnums.TYPE_VANGUARD:
-			continue
-		if not DeckValidator.is_colour_legal(c, vg):
-			continue
-		pool.append(c)
-	_rank_pool(pool, vg)
-	return pool
+## Back-compat stub: patch 1.1 mono decks trimmed 2 copies off a 13-unique pool;
+## patch 1.2's larger pools use kit ×4 + filler for every Vanguard, so no deck is
+## trimmed. Kept so the 1.1 revalidation script still resolves.
+static func mono_trims(_vg: CardData) -> Array:
+	return []
 
 
 ## The filler card ids for a Vanguard, ranked by archetype heuristic. Excludes
-## the Vanguard's own kit and any card that is not subset-legal. (Dual decks.)
+## the Vanguard's own kit and any card that is not subset-legal.
 static func filler_ids_for(vg: CardData) -> Array:
 	var kit := load_kit()
 	var own := kit_ids(vg)
