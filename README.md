@@ -230,7 +230,7 @@ changes *which decks exist*, so the v1.1 baseline is **VOID** — not comparable
 only historical. A fresh full 8×8 matrix + C0 control was re-run on the same seed
 protocol → [`revalidation_v12_report.md`](revalidation_v12_report.md).
 
-**Baseline commit:** the v1.2 mono-recolour baseline is commit `__BASELINE_SHA__`
+**Baseline commit:** the v1.2 mono-recolour baseline is commit `0ddbbc3`
 (the "re-freeze at v1.2" commit that records this section). Check it out directly
 to reproduce; the environment's git proxy blocks tag pushes (feature-branch
 pushes only), so a `v1.2-mono-recolour-baseline` tag may need to be created on
