@@ -62,11 +62,12 @@ func _ensure_built() -> void:
 # =========================================================================
 
 func _build_static() -> void:
-	# Camera: tighter framing, slightly lower angle for depth.
+	# Camera: pulled back so the full board — both Vanguard zones AND the whole
+	# hand row — fits with a small margin (Brief 12.1 addendum v2).
 	camera = Camera3D.new()
-	camera.position = Vector3(0, 5.6, 7.4)
-	camera.look_at_from_position(camera.position, Vector3(0, 0.1, 0.2), Vector3.UP)
-	camera.fov = 50.0
+	camera.position = Vector3(0, 8.2, 11.0)
+	camera.look_at_from_position(camera.position, Vector3(0, 0.0, 0.6), Vector3.UP)
+	camera.fov = 52.0
 	add_child(camera)
 
 	# Warm key light with soft shadows.
@@ -223,9 +224,11 @@ func _stage_slot(seat: int) -> Vector3:
 
 
 func _hand_slot(i: int, n: int) -> Vector3:
-	var spread := 0.62
+	# Pulled in from the very front edge so the whole hand row stays on-screen at
+	# 1152x648 and up after the camera zoom-out (addendum v2, finding 3).
+	var spread := 0.6
 	var x := (i - (n - 1) * 0.5) * spread
-	return Vector3(x, 0.35, 4.3)
+	return Vector3(x, 0.32, 3.9)
 
 
 # =========================================================================

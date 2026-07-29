@@ -81,7 +81,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (167 tests: 144 engine + 23 client).
+All suites report **All tests passed!** (169 tests: 144 engine + 25 client).
 The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
 Phase 3 presentation layer and the Brief 10 readability pass (card-text
 synthesis, inspector data binding, deterministic placeholder art). Coverage:
@@ -290,10 +290,20 @@ untouched.
   slot inlays for separation from the background.
 - **Brightness control.** A brightness slider (menu) and Dim/Bright buttons
   (in-match) drive the Environment exposure multiplier, so per-monitor variance is
-  user-fixable.
+  user-fixable. (Per addendum v2, exposure is a verify-only item — v1.2's lighting
+  already reads well — and the slider is a nice-to-have.)
+- **Framing (addendum v2).** Camera pulled back so the full board + both Vanguard
+  zones + the entire hand row fit with a margin; the hand no longer clips off the
+  bottom. **Creature billboards are now scaled to a slot's footprint** (the sprite
+  pixel-size derives from the source frame height, so a 96px placeholder and a
+  32px sheet frame render the same ~1-unit-tall creature instead of one spanning
+  three slots). The **floating debug initial** ("S"/"K"/"D") was removed from the
+  billboards — identity is the frame nameplate + the (approved) colour/sigil.
+  Colours and the dual split are unchanged.
 - **Tests.** `test_layout_smoke.gd` asserts the stretch settings and that menu
-  controls stay inside the frame at 1152×648 / 1280×720 / 1920×1080 / 1600×900.
-  Suite now **167/167**.
+  controls stay inside the frame at 1152×648 / 1280×720 / 1920×1080 / 1600×900;
+  `test_readability_smoke.gd` gains the billboard size-normalisation and
+  no-debug-initial checks. Suite now **169/169**.
 
 ### Patch 1.2 — Mono recolour (baseline reset)
 

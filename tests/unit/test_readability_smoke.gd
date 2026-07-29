@@ -123,6 +123,28 @@ func test_dual_vanguard_sprite_splits_too():
 		"dual Vanguard creature sprite is split, not one colour")
 
 
+func test_billboard_has_no_debug_initial_watermark():
+	# The floating pixel-font initial (the "S"/"K"/"D" that read as debug text) is
+	# gone from the creature billboard — its top-left corner is now transparent.
+	PlaceholderArt.clear_cache()
+	var img := PlaceholderArt.sprite_for(DeckFactory.card("wm01-001"), 96).get_image()
+	assert_almost_eq(img.get_pixel(10, 10).a, 0.0, 0.01,
+		"no initial watermark in the billboard's top-left corner")
+
+
+func test_creature_billboard_scale_is_normalised_to_slot_footprint():
+	# A creature must sit within its slot (a little overhang is fine), regardless
+	# of the source art's pixel resolution — the 96px placeholder and a real
+	# 32px-frame sheet both render ~1 world unit tall, never ~3 slot widths.
+	for id in ["wm01-036", "wm01-008"]:   # placeholder (96px) and wired art (32px frame)
+		var sm := SummonStateMachine.new()
+		add_child_autofree(sm)
+		sm.setup(id)
+		var h := sm.sprite_world_height()
+		assert_between(h, 0.6, 1.15,
+			"%s billboard world height %.2f sits within a slot footprint" % [id, h])
+
+
 func test_creature_sprite_fallback_is_per_id_not_the_shared_diamond():
 	AssetManifest.clear_cache()
 	PlaceholderArt.clear_cache()

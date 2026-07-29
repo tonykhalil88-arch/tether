@@ -73,7 +73,6 @@ func setup(id: String) -> void:
 	_sprite = Sprite3D.new()
 	_sprite.texture = _bundle.get("sprite_idle")
 	_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	_sprite.pixel_size = 0.02
 	_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	_sprite.shaded = false
 	_hframes = maxi(1, int(_bundle.get("hframes", 1)))
@@ -81,6 +80,10 @@ func setup(id: String) -> void:
 	_sprite.hframes = _hframes
 	_sprite.vframes = maxi(1, int(_bundle.get("vframes", 1)))
 	_sprite.frame = 0
+	# Normalise size by SOURCE resolution so a creature sits within its slot's
+	# footprint regardless of the art's pixel dimensions (a 96px placeholder and
+	# a 32px sheet frame both render ~TARGET_HEIGHT tall, not 3 slots wide).
+	_sprite.pixel_size = _fit_pixel_size(_sprite)
 	add_child(_sprite)
 
 	_sfx = AudioStreamPlayer3D.new()
@@ -90,6 +93,28 @@ func setup(id: String) -> void:
 	add_child(_voice)
 
 	enter(IDLE)
+
+
+## World-space height a creature billboard should occupy, so it sits within its
+## slot (a little overhang is fine) instead of spanning several.
+const TARGET_HEIGHT := 0.95
+
+
+func _fit_pixel_size(sprite: Sprite3D) -> float:
+	var tex: Texture2D = sprite.texture
+	if tex == null:
+		return 0.01
+	var frame_h := float(tex.get_height()) / float(maxi(1, sprite.vframes))
+	if frame_h <= 0.0:
+		return 0.01
+	return TARGET_HEIGHT / frame_h
+
+
+## The billboard's rendered world height (for the size-normalisation test).
+func sprite_world_height() -> float:
+	if _sprite == null or _sprite.texture == null:
+		return 0.0
+	return _sprite.pixel_size * float(_sprite.texture.get_height()) / float(maxi(1, _sprite.vframes))
 
 
 func set_home(pos: Vector3) -> void:

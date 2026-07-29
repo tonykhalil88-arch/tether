@@ -121,7 +121,9 @@ static func sprite_for(card: CardData, size: int = 96) -> Texture2D:
 	img.fill(Color(0, 0, 0, 0))
 	_blob(img, size / 2, int(size * 0.56), int(size * 0.40), int(size * 0.34), A, B)
 	_sigil(img, size / 2, int(size * 0.50), int(size * 0.30), A, B, seed)
-	_initial(img, card.name, int(size * 0.06), int(size * 0.04), A)
+	# NOTE: no name-initial watermark on the billboard — the floating pixel-font
+	# letter read as debug text. Identity comes from the CardVisual nameplate
+	# (real-font name on the frame) + the colour/sigil (palette approved as-is).
 	var tex := ImageTexture.create_from_image(img)
 	_sprite_cache[card.id] = tex
 	return tex

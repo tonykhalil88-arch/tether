@@ -135,7 +135,10 @@ They verify, headless:
   the shared magenta diamond, while the two real-art cards keep their art;
 - **dual-colour cards render a 50/50 vertical split** (left = colour A, right =
   colour B, never a blend); mono cards stay solid; the split is deterministic and
-  applies to the frame, the creature sprite, and the inspector band.
+  applies to the frame, the creature sprite, and the inspector band;
+- *(addendum v2)* the **creature billboard scale is normalised to a slot's
+  footprint** regardless of source resolution (no ~3-slot sprites), and the
+  **floating debug initial is gone** from the billboard.
 
 **Brief 12.1 layout smoke** (`test_layout_smoke.gd`) checks the window-scaling
 hotfix headless: the project uses `canvas_items` / `expand` stretch (viewport +
@@ -144,7 +147,7 @@ UI fill the window), and the **menu controls stay inside the frame at 1152×648,
 pixel positions anywhere in the menu/win-loss code.
 
 **Engine untouched:** all pre-existing engine tests still pass — the full suite
-is **167/167 green** (144 engine + 23 client).
+is **169/169 green** (144 engine + 25 client).
 
 ---
 
@@ -169,14 +172,15 @@ and report **pass/fail per item**. Suggested opponent: **Neza (lockdown)** or
 | 10 | Confirm each **creature billboard sits centred ABOVE its slot** (not offset to the side), and that **Stormfoal Hatchling / Cull-Beast 01 show their real art** while everything else shows its placeholder sigil. | ☐ |
 | 11 | **Identify a dual-colour card's BOTH colours at hand scale without the inspector** — dual cards render a **50/50 vertical split** (left = colour A, right = colour B, never a blend); a mono card stays solid. Try a red/green Kaya/Bram card next to a mono card. | ☐ |
 | 12 | **Resize the window mid-menu AND mid-match** (incl. 1152×648, 1280×720, 1920×1080, maximized 1600×900) — nothing clipped or overlapping, the menu stays centred and fully visible, the inspector stays right-anchored, and the board fills the window with no large empty margins. | ☐ |
-| 13 | **Every board zone is identifiable at default brightness in a normally lit room** — slots, inlays, aura racks and plaques read without leaning in; the brightness slider (menu) and Dim/Bright buttons (in-match) adjust exposure if your monitor needs it. | ☐ |
+| 13 | *(verify-only)* **Every board zone is identifiable at default brightness in a normally lit room** — slots, inlays, aura racks and plaques read without leaning in. The brightness slider (menu) and Dim/Bright buttons (in-match) are a nice-to-have if your monitor needs it. | ☐ |
+| 14 | **Framing (addendum v2):** the **full board + both Vanguard zones + the entire hand row** are visible at once with a small margin; the hand doesn't clip off the bottom at 1152×648; each **creature billboard sits within its slot's footprint** (no sprite spanning ~3 slots / occluding neighbours); and there are **no floating debug letters** on units (identity comes from the frame nameplate + colour/sigil). | ☐ |
 
 Bonus perf check: with a full board + several animations, does it stay smooth at
 1080p on the 3050? Note any hitches (card-frame build, glow, shadows) so they can
 be tuned.
 
-> Reminder: items 1–2, 5–9, the split in 11, and the look in 12–13 are **only
+> Reminder: items 1–2, 5–9, the split in 11, and the look in 12–14 are **only
 > fully judged on a real GPU** — the headless CI proves the data, wiring and
-> layout math are correct (167/167 tests, incl. the dual-split determinism and the
+> layout math are correct (169/169 tests, incl. the dual-split determinism and the
 > menu-fits-the-frame layout smoke) but not that the pixels look right. That's
 > this checklist's job.

@@ -46,11 +46,12 @@ func setup(p_card_id: String, p_uid: int) -> void:
 	_frame.rotation_degrees = Vector3(-66, 0, 0)
 	_frame.position = Vector3(0, 0.02, 0.10)
 
-	# Creature billboard: CENTRED ABOVE the slot (the anchor fix).
+	# Creature billboard: centred just ABOVE the slot, sized to sit within its
+	# footprint (SummonStateMachine normalises the sprite scale).
 	sm = SummonStateMachine.new()
 	add_child(sm)
 	sm.setup(card_id)
-	sm.set_home(Vector3(0, 0.85, -0.05))
+	sm.set_home(Vector3(0, 0.58, -0.05))
 
 	var area := Area3D.new()
 	area.input_ray_pickable = true
