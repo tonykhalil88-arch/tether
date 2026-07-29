@@ -8,7 +8,7 @@ Two players duel with a 50-card deck plus a single Vanguard. Card types are
 **Vanguard**, **Banner** (creature), **Technique** (one-shot) and **Stage**
 (persistent field). The engine runs the real **WM01 "The First Stampede"** set
 — 100 cards across five tribes (Redgale, Runner, Pact, Consortium, Bulwark),
-at patch 1.1 (Strict Purity).
+at patch 1.2 (mono recolour — only Vanguards are multi-coloured).
 
 **Phase 3 adds a playable human-vs-AI 3D client** on top of this frozen engine
 (`client/`, main scene `client/main.tscn`). The client is a pure consumer: it
@@ -53,7 +53,7 @@ wildmigration/
 │       ├── effect_engine.gd      # data-driven effect resolver (WM01 schema)
 │       └── hooks.gd              # GDScript hook escape hatch for bespoke effects
 ├── data/cards/
-│   └── wildmigration_set1.json   # WM01 — 100 cards (patch 1.1)
+│   └── wildmigration_set1.json   # WM01 — 100 cards (patch 1.2)
 ├── tools/importer.gd             # JSON <-> CardData importer (lossless)
 ├── sim/
 │   ├── ai_policy.gd              # two AI policies (aggro / guard), Rush + Freeze aware
