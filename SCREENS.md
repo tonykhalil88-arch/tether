@@ -146,10 +146,14 @@ They verify, headless:
 hotfix headless: the project uses `canvas_items` / `expand` stretch (viewport +
 UI fill the window), and the **menu controls stay inside the frame at 1152×648,
 1280×720, 1920×1080 and 1600×900** with the win/loss screen centred — no absolute
-pixel positions anywhere in the menu/win-loss code.
+pixel positions anywhere in the menu/win-loss code. *(finding 8)* It also projects
+the **local player's aura rack** and each **hand card** to screen through the live
+camera and asserts the rack's screen rect **intersects neither any hand card nor
+the bottom HUD bar** at every one of those sizes — the rack now stands as a clear
+column on the far right instead of rendering on top of the hand row.
 
 **Engine untouched:** all pre-existing engine tests still pass — the full suite
-is **172/172 green** (144 engine + 28 client).
+is **173/173 green** (144 engine + 29 client).
 
 ---
 
@@ -165,7 +169,7 @@ and report **pass/fail per item**. Suggested opponent: **Neza (lockdown)** or
 | 1 | From your hand, hover **Ragnir, Thunder-Maned** and read its full effect text in the inspector without squinting ("On Play (2 Aura): KO an enemy Banner with 5000 power or less"). | ☐ |
 | 2 | Read a **long card name** in full on the frame (it wraps / shrinks — nothing is cut off with "…"). | ☐ |
 | 3 | **Identify every creature on the board without clicking** — colour + sigil + name make each one distinct (no field of identical diamonds). | ☐ |
-| 4 | **Find both players' Aura totals in under a second** — the two racks (bright = refreshed, dim = exhausted, ice-blue = frozen) each show `AURA n/total`. | ☐ |
+| 4 | **Find both players' Aura totals in under a second** — the two racks (bright = refreshed, dim = exhausted, ice-blue = frozen) each show `AURA n/total`. Your own rack now stands as a **clear column on the far right** (finding 8) — it never covers your hand cards. | ☐ |
 | 5 | Hover an enemy Banner **during a defence prompt** and read it while the prompt is still open (deciding counters). | ☐ |
 | 6 | **Click a card to pin** the inspector, move the mouse away, confirm it stays; press **Esc** to close. | ☐ |
 | 7 | Try to attack with a **rested/summoning-sick** unit and see the reason (*"can't attack: exhausted / summoning sick"*) float **at that unit**. | ☐ |
@@ -178,6 +182,7 @@ and report **pass/fail per item**. Suggested opponent: **Neza (lockdown)** or
 | 14 | **Framing (addendum v2):** the **full board + both Vanguard zones + the entire hand row** are visible at once with a small margin; the hand doesn't clip off the bottom at 1152×648; each **creature billboard sits within its slot's footprint** (no sprite spanning ~3 slots / occluding neighbours); and there are **no floating debug letters** on units (identity comes from the frame nameplate + colour/sigil). | ☐ |
 | 15 | **CRITICAL — the four channels fire on hardware.** Summon **Stormfoal Hatchling** and **Cull-Beast 01**: you should **hear the summon SFX and voice line**, **see a VFX flash** over the creature, and the summon should **read as an event** (sprite scale-in + flash + sound over ~0.7s), not just a sprite popping in. Every other creature should at least flash + whoosh on summon. | ☐ |
 | 16 | **Sprite scale consistency (finding 6):** the real-art creatures (Cull-Beast) render at the **same slot-relative size** as the placeholder-sigil creatures — neither noticeably smaller. | ☐ |
+| 17 | **Aura rack clearance (finding 8):** your own Aura rack (bottom-right column) **never overlaps your hand cards, board slots, plaques, or the bottom HUD bar** at any size (1152×648 → 1920×1080). Both racks' `AURA n/total` are still findable in under a second. | ☐ |
 
 Bonus perf check: with a full board + several animations, does it stay smooth at
 1080p on the 3050? Note any hitches (card-frame build, glow, shadows) so they can

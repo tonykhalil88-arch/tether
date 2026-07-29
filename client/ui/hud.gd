@@ -19,6 +19,7 @@ var _banner_label: Label
 var _banner_style: StyleBoxFlat
 var _attach_label: Label
 var _speed_btn: Button
+var _action_bar: HBoxContainer
 var _prompt_panel: PanelContainer
 var _prompt_box: VBoxContainer
 
@@ -69,6 +70,7 @@ func _build() -> void:
 	bar.position = Vector2(16, -52)
 	bar.set_anchor_and_offset(SIDE_TOP, 1.0, -52)
 	root.add_child(bar)
+	_action_bar = bar
 
 	bar.add_child(_mk_button("End Turn", _on_end_turn))
 	bar.add_child(_mk_button("Activate VG", func(): _activate(true)))
@@ -259,6 +261,17 @@ func _on_prompt_life_trigger(card: CardInstance) -> void:
 # =========================================================================
 # Widgets
 # =========================================================================
+
+## The bottom action-bar's screen rect (for the layout smoke test). Spans the full
+## width of the strip the bar occupies so an overlap check treats the whole bottom
+## HUD zone as off-limits, not just the buttons' current extent.
+func action_bar_rect() -> Rect2:
+	if _action_bar == null or _root == null:
+		return Rect2()
+	var r: Rect2 = _action_bar.get_global_rect()
+	var w: float = _root.size.x
+	return Rect2(0.0, r.position.y, w, maxf(r.size.y, 52.0))
+
 
 func _mk_label(pos: Vector2, size: int, color: Color) -> Label:
 	var l := Label.new()

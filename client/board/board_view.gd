@@ -32,6 +32,7 @@ var _markers: Node3D
 var _selected_attacker: int = -1
 var _pending_attach: int = 0
 var _legal_targets: Array = []    # uids currently highlighted as attack targets
+var _human_rack_aabb: AABB = AABB()   # world bounds of the local player's aura rack
 
 
 func bind(controller: MatchController) -> void:
@@ -330,27 +331,46 @@ func _rebuild_markers() -> void:
 ## Aura rack v2: a fixed rack of large chips — bright when refreshed, dim when
 ## exhausted, ice-blue when frozen — with a numeric counter, readable for both
 ## players at all times.
+##
+## The OPPONENT rack sits at their far edge (top of screen — clear). The LOCAL
+## player's rack used to sit at the near edge and rendered OVER the hand row
+## (finding 8); it now stands as a vertical column on the far right at mid-depth,
+## clear of the hand, board slots, plaques and the bottom HUD bar at any size.
+const _HUMAN_RACK_CENTER := Vector3(4.9, 0.03, 2.75)
+const _HUMAN_RACK_STEP := Vector3(0, 0, 0.22)
+const _HUMAN_RACK_PLATE := Vector3(0.42, 0.05, 2.5)
+
 func _aura_rack(ps: PlayerState, seat: int) -> void:
-	var s := _seat_sign(seat)
-	var z := 4.15 * s
+	if seat == SEAT_HUMAN:
+		_draw_aura_rack(ps, _HUMAN_RACK_CENTER, _HUMAN_RACK_STEP, _HUMAN_RACK_PLATE,
+			_HUMAN_RACK_CENTER + Vector3(0.0, 0.31, -1.5), HORIZONTAL_ALIGNMENT_CENTER)
+		_human_rack_aabb = AABB(
+			Vector3(_HUMAN_RACK_CENTER.x - 0.35, 0.0, _HUMAN_RACK_CENTER.z - _HUMAN_RACK_PLATE.z * 0.5 - 0.35),
+			Vector3(0.7, 0.7, _HUMAN_RACK_PLATE.z + 0.7))
+	else:
+		_draw_aura_rack(ps, Vector3(-0.1, 0.03, -4.15), Vector3(0.24, 0, 0),
+			Vector3(2.5, 0.05, 0.4), Vector3(-1.35, 0.34, -4.15), HORIZONTAL_ALIGNMENT_LEFT)
+
+
+func _draw_aura_rack(ps: PlayerState, center: Vector3, step: Vector3,
+		plate_size: Vector3, label_pos: Vector3, label_align: int) -> void:
 	var avail := ps.aura_available()
 	var frozen := ps.aura_frozen_pending
 	var total := ps.aura_total
+	var shown: int = mini(maxi(total, 1), 10)
 
-	# Rack base plate.
 	var base := MeshInstance3D.new()
 	var bm := BoxMesh.new()
-	bm.size = Vector3(2.5, 0.05, 0.4)
+	bm.size = plate_size
 	base.mesh = bm
 	var basemat := StandardMaterial3D.new()
 	basemat.albedo_color = Color(0.08, 0.08, 0.1)
 	base.material_override = basemat
-	base.position = Vector3(-0.1, 0.03, z)
+	base.position = Vector3(center.x, center.y, center.z)
 	_markers.add_child(base)
 
-	for i in range(maxi(total, 1)):
-		if i >= total:
-			break
+	var start := center - step * (float(shown - 1) * 0.5)
+	for i in range(mini(total, 10)):
 		var chip := MeshInstance3D.new()
 		var cm := CylinderMesh.new()
 		cm.top_radius = 0.11
@@ -371,14 +391,13 @@ func _aura_rack(ps: PlayerState, seat: int) -> void:
 		m.emission = color
 		m.emission_energy_multiplier = energy
 		chip.material_override = m
-		chip.position = Vector3(-1.2 + i * 0.24, 0.11, z)
+		chip.position = Vector3(start.x + step.x * i, 0.11, start.z + step.z * i)
 		_markers.add_child(chip)
 
 	var counter := "AURA %d/%d" % [avail, total]
 	if frozen > 0:
 		counter += " (%d frozen)" % frozen
-	_label3d(counter, Vector3(-1.35, 0.34, z), 30, Color(0.75, 0.95, 0.85),
-		HORIZONTAL_ALIGNMENT_LEFT)
+	_label3d(counter, label_pos, 30, Color(0.75, 0.95, 0.85), label_align)
 
 
 ## A small billboarded plaque (real font) anchored at a zone.
@@ -608,6 +627,28 @@ func camera_unproject(world: Vector3) -> Vector2:
 	if camera != null:
 		return camera.unproject_position(world)
 	return Vector2.ZERO
+
+
+# --- layout probes (headless overlap tests) -------------------------------
+
+## World AABB enclosing the LOCAL player's aura rack (base plate + chips +
+## counter). Used by the layout smoke test to prove the rack never overlaps the
+## hand row or the HUD bar on screen (finding 8).
+func human_aura_rack_world_aabb() -> AABB:
+	return _human_rack_aabb
+
+
+## A world AABB around every local hand card currently on the table. Each card
+## is a billboard ~0.8 wide; the box is padded generously so a "no intersection"
+## assertion is conservative.
+func hand_card_world_aabbs() -> Array:
+	var boxes: Array = []
+	for uid in _hand.keys():
+		var node: Node3D = _hand[uid]
+		if is_instance_valid(node):
+			var p := node.position
+			boxes.append(AABB(p - Vector3(0.45, 0.55, 0.55), Vector3(0.9, 1.1, 1.1)))
+	return boxes
 
 
 # --- lookups --------------------------------------------------------------

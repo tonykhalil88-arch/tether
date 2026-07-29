@@ -81,7 +81,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (172 tests: 144 engine + 28 client).
+All suites report **All tests passed!** (173 tests: 144 engine + 29 client).
 The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
 Phase 3 presentation layer and the Brief 10 readability pass (card-text
 synthesis, inspector data binding, deterministic placeholder art). Coverage:
@@ -312,11 +312,18 @@ untouched.
 - **Sprite scale consistency (addendum v2, finding 6).** The example creature
   art was enlarged to fill its frame, so real-art creatures render at the same
   slot-relative size as placeholder sigils (not smaller).
+- **Aura rack no longer overlaps the hand (addendum v2, finding 8).** The local
+  player's Aura rack used to render on top of the hand row, obscuring the cards.
+  It now stands as a **vertical column on the far right at mid-depth**, clear of
+  the hand, board slots, plaques and the bottom HUD bar at every supported size;
+  the opponent rack (already clear at their far edge) is unchanged.
 - **Tests.** `test_layout_smoke.gd` asserts the stretch settings and that menu
-  controls stay inside the frame at 1152×648 / 1280×720 / 1920×1080 / 1600×900;
-  `test_readability_smoke.gd` gains billboard size-normalisation, real-vs-
-  placeholder equal-size, no-debug-initial, non-positional-audio and
-  summon-VFX-flash checks. Suite now **172/172**.
+  controls stay inside the frame at 1152×648 / 1280×720 / 1920×1080 / 1600×900,
+  and (finding 8) projects the aura rack + each hand card to screen through the
+  live camera and asserts the rack's screen rect intersects neither the hand
+  cards nor the HUD bar at every size; `test_readability_smoke.gd` gains
+  billboard size-normalisation, real-vs-placeholder equal-size, no-debug-initial,
+  non-positional-audio and summon-VFX-flash checks. Suite now **173/173**.
 
 ### Patch 1.2 — Mono recolour (baseline reset)
 
