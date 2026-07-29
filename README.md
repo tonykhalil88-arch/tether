@@ -81,7 +81,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (169 tests: 144 engine + 25 client).
+All suites report **All tests passed!** (172 tests: 144 engine + 28 client).
 The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
 Phase 3 presentation layer and the Brief 10 readability pass (card-text
 synthesis, inspector data binding, deterministic placeholder art). Coverage:
@@ -300,10 +300,23 @@ untouched.
   three slots). The **floating debug initial** ("S"/"K"/"D") was removed from the
   billboards — identity is the frame nameplate + the (approved) colour/sigil.
   Colours and the dual split are unchanged.
+- **The four channels fire on hardware (addendum v2, CRITICAL).** On GPU the
+  summon produced only a sprite — no SFX, no voice, no VFX. Root causes fixed:
+  the SFX/voice were `AudioStreamPlayer3D`s that distance-attenuated to silence
+  at the pulled-back camera → switched to non-positional `AudioStreamPlayer`
+  (Master bus); the VFX only fired on *strike* → now spawns on **summon** too,
+  and falls back to a built-in `VfxBurst` so **every** creature flashes; the
+  burst is bigger/longer; the generated WAVs are louder and longer; and the
+  summon dwell time was raised (state 0.7s, beat 0.8s) so scale-in + flash +
+  sound read as an event.
+- **Sprite scale consistency (addendum v2, finding 6).** The example creature
+  art was enlarged to fill its frame, so real-art creatures render at the same
+  slot-relative size as placeholder sigils (not smaller).
 - **Tests.** `test_layout_smoke.gd` asserts the stretch settings and that menu
   controls stay inside the frame at 1152×648 / 1280×720 / 1920×1080 / 1600×900;
-  `test_readability_smoke.gd` gains the billboard size-normalisation and
-  no-debug-initial checks. Suite now **169/169**.
+  `test_readability_smoke.gd` gains billboard size-normalisation, real-vs-
+  placeholder equal-size, no-debug-initial, non-positional-audio and
+  summon-VFX-flash checks. Suite now **172/172**.
 
 ### Patch 1.2 — Mono recolour (baseline reset)
 

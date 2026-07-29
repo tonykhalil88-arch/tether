@@ -32,8 +32,8 @@ const AI := 1
 
 const _DURATION := {
 	"turn_start": 0.35,
-	"play_banner": 0.55,
-	"play_self": 0.55,
+	"play_banner": 0.8,     # dwell so the summon (scale-in + flash + sound) registers
+	"play_self": 0.8,
 	"play_technique": 0.40,
 	"play_stage": 0.40,
 	"activate_main": 0.30,

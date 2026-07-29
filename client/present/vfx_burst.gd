@@ -9,8 +9,8 @@ extends Node3D
 ## Tint it before/after instancing via `tint`; the SummonStateMachine sets it
 ## to the card's accent colour so each strike reads a little differently.
 
-@export var tint: Color = Color(1.0, 0.85, 0.35)
-@export var lifetime: float = 0.35
+@export var tint: Color = Color(1.0, 0.9, 0.5)
+@export var lifetime: float = 0.55       # long enough to perceive as a flash
 
 var _t := 0.0
 var _mesh: MeshInstance3D
@@ -19,7 +19,7 @@ var _mesh: MeshInstance3D
 func _ready() -> void:
 	_mesh = MeshInstance3D.new()
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.6, 0.6)
+	quad.size = Vector2(1.1, 1.1)         # covers the creature, clearly visible
 	_mesh.mesh = quad
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = tint
@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 	_t += delta
 	var k := clampf(_t / maxf(0.001, lifetime), 0.0, 1.0)
 	if _mesh != null:
-		var s := 0.3 + k * 1.8
+		var s := 0.4 + k * 2.0
 		_mesh.scale = Vector3(s, s, s)
 		var mat := _mesh.material_override as StandardMaterial3D
 		if mat != null:

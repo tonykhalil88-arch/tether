@@ -145,6 +145,55 @@ func test_creature_billboard_scale_is_normalised_to_slot_footprint():
 			"%s billboard world height %.2f sits within a slot footprint" % [id, h])
 
 
+func test_real_art_and_placeholder_billboards_render_the_same_size():
+	# Finding 6: real art (Cull-Beast, 32px frame) must NOT render far smaller than
+	# a placeholder sigil (96px) — both are normalised to the same slot-relative
+	# height.
+	var ph := SummonStateMachine.new()
+	add_child_autofree(ph)
+	ph.setup("wm01-036")
+	var art := SummonStateMachine.new()
+	add_child_autofree(art)
+	art.setup("wm01-046")   # Cull-Beast 01, real art
+	assert_almost_eq(art.sprite_world_height(), ph.sprite_world_height(), 0.15,
+		"real-art and placeholder billboards are the same slot-relative size")
+
+
+func test_summon_uses_non_positional_audio_and_spawns_a_vfx_flash():
+	# Finding 5: the four channels were silent/invisible on hardware. SFX + voice
+	# must be non-positional (audible regardless of the pulled-back camera), and a
+	# summon must spawn a visible VFX flash.
+	var sm := SummonStateMachine.new()
+	add_child_autofree(sm)
+	sm.setup("wm01-008")   # fully-wired example card
+	var non_positional := 0
+	for c in sm.get_children():
+		if c is AudioStreamPlayer and not (c is AudioStreamPlayer3D):
+			non_positional += 1
+	assert_gte(non_positional, 2, "summon SFX + voice use non-positional AudioStreamPlayers")
+
+	sm.enter(SummonStateMachine.SUMMON)
+	var has_vfx := false
+	for c in sm.get_children():
+		if c is VfxBurst:
+			has_vfx = true
+	assert_true(has_vfx, "a VFX burst spawns on summon (not only on strike)")
+
+
+func test_placeholder_creatures_also_flash_on_summon():
+	# Even a card with no manifest VFX gets the built-in burst, so every summon
+	# reads as an event.
+	var sm := SummonStateMachine.new()
+	add_child_autofree(sm)
+	sm.setup("wm01-036")   # placeholder, no manifest vfx
+	sm.enter(SummonStateMachine.SUMMON)
+	var has_vfx := false
+	for c in sm.get_children():
+		if c is VfxBurst:
+			has_vfx = true
+	assert_true(has_vfx, "placeholder creature still flashes on summon via the built-in burst")
+
+
 func test_creature_sprite_fallback_is_per_id_not_the_shared_diamond():
 	AssetManifest.clear_cache()
 	PlaceholderArt.clear_cache()

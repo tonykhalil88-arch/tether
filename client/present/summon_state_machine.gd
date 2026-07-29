@@ -33,7 +33,7 @@ const LIFE_TRIGGER_REVEAL := "life_trigger_reveal"
 
 # Persistent states hold until told otherwise; transient ones auto-advance.
 const _DURATION := {
-	SUMMON: 0.45,
+	SUMMON: 0.7,      # long enough that the scale-in + flash + sound reads as an event
 	ATTACK_WINDUP: 0.25,
 	STRIKE: 0.30,
 	RETURN: 0.25,
@@ -56,8 +56,11 @@ var state: String = IDLE
 
 var _bundle: Dictionary = {}
 var _sprite: Sprite3D
-var _sfx: AudioStreamPlayer3D
-var _voice: AudioStreamPlayer3D
+# Non-positional players (Master bus, full volume): AudioStreamPlayer3D was
+# distance-attenuated to silence at the pulled-back camera (~11 units). Summon
+# SFX / voice are UI feedback, not spatial, so they must always be audible.
+var _sfx: AudioStreamPlayer
+var _voice: AudioStreamPlayer
 var _rest_state: String = IDLE          # persistent state to fall back to
 var _t: float = 0.0
 var _frame_t: float = 0.0
@@ -86,10 +89,12 @@ func setup(id: String) -> void:
 	_sprite.pixel_size = _fit_pixel_size(_sprite)
 	add_child(_sprite)
 
-	_sfx = AudioStreamPlayer3D.new()
+	_sfx = AudioStreamPlayer.new()
+	_sfx.bus = "Master"
 	add_child(_sfx)
-	_voice = AudioStreamPlayer3D.new()
-	_voice.unit_size = 6.0
+	_voice = AudioStreamPlayer.new()
+	_voice.bus = "Master"
+	_voice.volume_db = -2.0
 	add_child(_voice)
 
 	enter(IDLE)
@@ -138,6 +143,7 @@ func enter(new_state: String) -> void:
 			_sprite.modulate = Color.WHITE
 			_play_sfx(_bundle.get("sfx_summon"))
 			_play_voice(_bundle.get("voice_summon"))
+			_spawn_vfx()   # a summon should FEEL like an event: scale-in + flash + sound
 		IDLE:
 			_use_sheet(false)
 			_sprite.scale = Vector3.ONE
@@ -253,9 +259,15 @@ func _play_voice(stream) -> void:
 
 
 func _spawn_vfx() -> void:
+	# Prefer the card's manifest VFX; otherwise use the built-in burst so EVERY
+	# creature flashes (a summon must read as an event, not just a sprite pop).
+	var inst: Node3D = null
 	var scene = _bundle.get("vfx_strike")
 	if scene is PackedScene:
-		var inst = scene.instantiate()
-		if inst is Node3D:
-			add_child(inst)
-			(inst as Node3D).position = Vector3(0, 0, 0.4)
+		var n = scene.instantiate()
+		if n is Node3D:
+			inst = n
+	if inst == null:
+		inst = VfxBurst.new()
+	add_child(inst)
+	inst.position = Vector3(0, 0.05, 0.05)   # right on the creature, above the slot

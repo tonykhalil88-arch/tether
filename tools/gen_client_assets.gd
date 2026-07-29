@@ -26,9 +26,10 @@ func _make_card(id: String, body: Color, accent: Color, shape: String,
 	# Idle sheet: 4 frames of gentle bob. Attack sheet: 2 frames of lunge.
 	_save_sheet("%s/sprite.png" % dir, 4, body, accent, shape, false)
 	_save_sheet("%s/attack.png" % dir, 2, body, accent, shape, true)
-	_save_wav("%s/summon.wav" % dir, summon_hz, 0.22, 0.5, false)
-	_save_wav("%s/hit.wav" % dir, hit_hz, 0.14, 0.9, true)
-	_save_wav("%s/voice.wav" % dir, voice_hz, 0.30, 0.3, false)
+	# Longer + louder so the cues are clearly audible over the summon dwell.
+	_save_wav("%s/summon.wav" % dir, summon_hz, 0.5, 0.5, false)
+	_save_wav("%s/hit.wav" % dir, hit_hz, 0.22, 0.9, true)
+	_save_wav("%s/voice.wav" % dir, voice_hz, 0.5, 0.3, false)
 
 
 func _save_sheet(path: String, frames: int, body: Color, accent: Color,
@@ -46,24 +47,25 @@ func _save_sheet(path: String, frames: int, body: Color, accent: Color,
 func _draw_creature(img: Image, ox: int, bob: int, lunge: int, body: Color,
 		accent: Color, shape: String) -> void:
 	var cx := 16 + lunge
-	var cy := 18 + bob
-	# Body blob.
+	var cy := 15 + bob
+	# Body blob — sized to FILL the frame (~70%) so the real-art creature reads at
+	# the same on-screen size as a placeholder sigil (finding 6), not smaller.
 	for y in range(32):
 		for x in range(32):
 			var dx := float(x - cx)
 			var dy := float(y - cy)
-			var rx := 9.0 if shape == "beast" else 7.0
-			var ry := 7.0 if shape == "beast" else 8.0
+			var rx := 13.0 if shape == "beast" else 11.0
+			var ry := 12.0 if shape == "beast" else 13.0
 			if (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) <= 1.0:
 				img.set_pixelv(Vector2i(ox + x, y), body)
 	# Accent stripe / eye.
-	for x in range(cx - 4, cx + 5):
+	for x in range(cx - 6, cx + 7):
 		if x >= 0 and x < 32:
-			img.set_pixelv(Vector2i(ox + x, cy - 2), accent)
-	img.set_pixelv(Vector2i(ox + clampi(cx + 3, 0, 31), cy - 3), Color.WHITE)
+			img.set_pixelv(Vector2i(ox + x, cy - 3), accent)
+	img.set_pixelv(Vector2i(ox + clampi(cx + 4, 0, 31), cy - 4), Color.WHITE)
 	# Legs.
-	for lx in [cx - 4, cx + 3]:
-		for y in range(cy + 5, cy + 9):
+	for lx in [cx - 6, cx + 5]:
+		for y in range(cy + 9, cy + 13):
 			if lx >= 0 and lx < 32 and y < 32:
 				img.set_pixelv(Vector2i(ox + lx, y), body.darkened(0.2))
 
@@ -81,7 +83,7 @@ func _save_wav(path: String, freq: float, seconds: float, decay: float, gritty: 
 		if gritty:
 			noise_state = (noise_state * 1103515245 + 12345) & 0x7fffffff
 			s = s * 0.7 + (float(noise_state % 1000) / 1000.0 - 0.5) * 0.5
-		var v := int(clamp(s * env * 0.6, -1.0, 1.0) * 32767.0)
+		var v := int(clamp(s * env * 0.9, -1.0, 1.0) * 32767.0)
 		bytes.encode_s16(i * 2, v)
 	var wav := AudioStreamWAV.new()
 	wav.format = AudioStreamWAV.FORMAT_16_BITS

@@ -139,7 +139,7 @@ static func placeholder_sprite() -> Texture2D:
 static func default_whoosh() -> AudioStream:
 	if _default_whoosh != null:
 		return _default_whoosh
-	_default_whoosh = _make_tone(220.0, 0.12, 0.4)
+	_default_whoosh = _make_tone(220.0, 0.22, 0.4)
 	return _default_whoosh
 
 
@@ -153,7 +153,7 @@ static func _make_tone(freq: float, seconds: float, decay: float) -> AudioStream
 	for i in range(n):
 		var t := float(i) / float(rate)
 		var env := pow(1.0 - float(i) / float(n), 1.0 + decay * 4.0)
-		var s := sin(TAU * freq * t) * env * 0.6
+		var s := sin(TAU * freq * t) * env * 0.9
 		var v := int(clamp(s, -1.0, 1.0) * 32767.0)
 		bytes.encode_s16(i * 2, v)
 	var wav := AudioStreamWAV.new()
