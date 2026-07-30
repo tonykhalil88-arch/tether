@@ -2,9 +2,13 @@
   "card_id": "wm01-004",
   "name": "Mika Tetsu, Redgale Quartermaster",
   "sprite": {
-    "fps": 8,
-    "frames": 1,
-    "hframes": 1,
+    "attack": "attack.png",
+    "attack_frames": 8,
+    "attack_hframes": 8,
+    "attack_vframes": 1,
+    "fps": 12,
+    "frames": 8,
+    "hframes": 8,
     "idle": "sprite.png",
     "vframes": 1
   },

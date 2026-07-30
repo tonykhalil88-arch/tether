@@ -7,12 +7,12 @@
   },
   "sprite": {
     "attack": "attack.png",
-    "attack_frames": 2,
-    "attack_hframes": 2,
+    "attack_frames": 8,
+    "attack_hframes": 8,
     "attack_vframes": 1,
-    "fps": 8,
-    "frames": 1,
-    "hframes": 1,
+    "fps": 12,
+    "frames": 8,
+    "hframes": 8,
     "idle": "sprite.png",
     "vframes": 1
   },

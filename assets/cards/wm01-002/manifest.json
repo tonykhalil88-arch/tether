@@ -2,6 +2,10 @@
   "card_id": "wm01-002",
   "name": "Ragnir, Thunder-Maned",
   "sprite": {
+    "attack": "attack.png",
+    "attack_frames": 8,
+    "attack_hframes": 8,
+    "attack_vframes": 1,
     "fps": 12,
     "frames": 8,
     "hframes": 8,
