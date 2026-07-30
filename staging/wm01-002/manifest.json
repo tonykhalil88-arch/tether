@@ -2,11 +2,11 @@
   "card_id": "wm01-002",
   "name": "Ragnir, Thunder-Maned",
   "sprite": {
-    "fps": 12,
+    "idle": "sprite.png",
     "frames": 8,
     "hframes": 8,
-    "idle": "sprite.png",
-    "vframes": 1
+    "vframes": 1,
+    "fps": 12
   },
   "vfx": {
     "strike": "res://client/present/vfx_burst.tscn"

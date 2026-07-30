@@ -1,0 +1,10 @@
+{
+  "art": {
+    "card": "card_art.png"
+  },
+  "card_id": "wm01-045",
+  "name": "Director Averil Cros, the Kind Face",
+  "vfx": {
+    "strike": "res://client/present/vfx_burst.tscn"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "art": {
+    "card": "card_art.png"
+  },
+  "card_id": "wm01-023",
+  "name": "Bram Oxhart, Warband Chief",
+  "vfx": {
+    "strike": "res://client/present/vfx_burst.tscn"
+  }
+}

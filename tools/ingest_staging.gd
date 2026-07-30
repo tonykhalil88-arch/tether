@@ -210,7 +210,7 @@ func _ingest(id: String, targets: Dictionary, names: Dictionary) -> void:
 	else:
 		row["card_art"] = "placeholder"
 
-	_write_manifest(id, dst, sheet, attack, ingested,
+	_write_manifest(id, dst, sheet, attack, ingested, row["sprite"] != "placeholder",
 		row["card_art"] != "placeholder", names.get(id, ""))
 	_rows.append(row)
 
@@ -304,26 +304,32 @@ func _staged_sprite_block(src: String) -> Dictionary:
 ## with channels omitted when the card ships nothing for them so AssetManifest
 ## falls back cleanly.
 func _write_manifest(id: String, dst: String, sheet: Dictionary, attack: Dictionary,
-		audio: Dictionary, has_card_art: bool, name: String) -> void:
-	var sprite := {
-		"idle": "sprite.png",
-		"frames": int(sheet.get("frames", 1)),
-		"hframes": int(sheet.get("hframes", 1)),
-		"vframes": int(sheet.get("vframes", 1)),
-		"fps": int(sheet.get("fps", 8)),
-	}
-	# The attack sheet is a separate strip with its own frame count; declaring it
-	# keeps the state machine from assuming the legacy 2-frame placeholder shape.
-	if not attack.is_empty():
-		sprite["attack"] = "attack.png"
-		sprite["attack_frames"] = int(attack.get("frames", 2))
-		sprite["attack_hframes"] = int(attack.get("hframes", 2))
-		sprite["attack_vframes"] = int(attack.get("vframes", 1))
+		audio: Dictionary, has_sprite: bool, has_card_art: bool, name: String) -> void:
+	var sprite := {}
+	# A card-art-only drop ships no sprite at all. Naming a sprite.png that does
+	# not exist would make the manifest lie; omit the block and let AssetManifest
+	# fall back to the generated placeholder billboard.
+	if has_sprite:
+		sprite = {
+			"idle": "sprite.png",
+			"frames": int(sheet.get("frames", 1)),
+			"hframes": int(sheet.get("hframes", 1)),
+			"vframes": int(sheet.get("vframes", 1)),
+			"fps": int(sheet.get("fps", 8)),
+		}
+		# The attack sheet is a separate strip with its own frame count; declaring
+		# it keeps the state machine off the legacy 2-frame placeholder shape.
+		if not attack.is_empty():
+			sprite["attack"] = "attack.png"
+			sprite["attack_frames"] = int(attack.get("frames", 2))
+			sprite["attack_hframes"] = int(attack.get("hframes", 2))
+			sprite["attack_vframes"] = int(attack.get("vframes", 1))
 
 	var m := {"card_id": id}
 	if not name.is_empty():
 		m["name"] = name
-	m["sprite"] = sprite
+	if not sprite.is_empty():
+		m["sprite"] = sprite
 
 	var sfx: Dictionary = {}
 	if audio.get("summon.wav", "placeholder") != "placeholder":
