@@ -1,5 +1,10 @@
-; Engine configuration file for WILDMIGRATION.
-; Headless rules engine — no visuals, no autoloads that touch rendering.
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 
@@ -7,15 +12,11 @@ config_version=5
 
 config/name="wildmigration"
 config/description="WILDMIGRATION — TCG rules engine (Phase 2) + human-vs-AI client (Phase 3)."
-config/features=PackedStringArray("4.5")
 run/main_scene="res://client/main.tscn"
-run/disable_stdout=false
+config/features=PackedStringArray("4.5")
 
 [display]
 
-; Design resolution; the canvas_items stretch + expand aspect makes both the 3D
-; viewport and the anchored 2D UI fill the window at any size (no letterbox
-; margins, no clipped menu). All UI is anchored, so expand is safe.
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"

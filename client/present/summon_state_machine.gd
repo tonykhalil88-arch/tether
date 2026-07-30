@@ -65,6 +65,9 @@ var _rest_state: String = IDLE          # persistent state to fall back to
 var _t: float = 0.0
 var _frame_t: float = 0.0
 var _hframes: int = 1
+var _vframes: int = 1
+var _attack_hframes: int = 2
+var _attack_vframes: int = 1
 var _fps: int = 8
 var _home := Vector3.ZERO
 
@@ -79,9 +82,12 @@ func setup(id: String) -> void:
 	_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	_sprite.shaded = false
 	_hframes = maxi(1, int(_bundle.get("hframes", 1)))
+	_vframes = maxi(1, int(_bundle.get("vframes", 1)))
+	_attack_hframes = maxi(1, int(_bundle.get("attack_hframes", 2)))
+	_attack_vframes = maxi(1, int(_bundle.get("attack_vframes", 1)))
 	_fps = maxi(1, int(_bundle.get("fps", 8)))
 	_sprite.hframes = _hframes
-	_sprite.vframes = maxi(1, int(_bundle.get("vframes", 1)))
+	_sprite.vframes = _vframes
 	_sprite.frame = 0
 	# Normalise size by SOURCE resolution so a creature sits within its slot's
 	# footprint regardless of the art's pixel dimensions (a 96px placeholder and
@@ -238,12 +244,17 @@ func _use_sheet(attacking: bool) -> void:
 	if tex == null:
 		tex = _bundle.get("sprite_idle")
 	_sprite.texture = tex
-	if attacking:
-		# Attack sheet is 2-frame in the placeholder set; fall back gracefully.
-		_sprite.hframes = 2 if tex == _bundle.get("sprite_attack") else _hframes
+	if attacking and tex == _bundle.get("sprite_attack"):
+		# The attack sheet carries its own geometry (real art is not 2-frame).
+		_sprite.hframes = _attack_hframes
+		_sprite.vframes = _attack_vframes
 	else:
 		_sprite.hframes = _hframes
+		_sprite.vframes = _vframes
 	_sprite.frame = 0
+	# Frame height can differ between the idle and attack sheets, so re-fit or
+	# the creature changes size mid-swing.
+	_sprite.pixel_size = _fit_pixel_size(_sprite)
 
 
 func _play_sfx(stream) -> void:

@@ -59,9 +59,11 @@ static func render(card) -> Image:
 	PixelFont.draw_text(img, _clip(str(d.get("name", "")).to_upper(), 10),
 		30, 12, Color(0.98, 0.96, 0.92), 2)
 
-	# Art well (tinted by accent) — the Sprite3D shows the real creature; here
-	# it's just a coloured plate so the frame reads at a glance.
+	# Art well: a coloured plate, with the card's real art composited over it when
+	# the card ships some. The plate stays as the backing so art with transparency
+	# (or no art at all) still reads at a glance.
 	_fill(img, 12, 40, W - 24, 120, accent.lerp(Color(0.90, 0.87, 0.80), 0.55))
+	_blend_card_art(img, str(d.get("id", "")), 12, 40, W - 24, 120)
 	_rect(img, 12, 40, W - 24, 120, accent)
 
 	# Type + tribe line.
@@ -101,6 +103,30 @@ static func clear_cache() -> void:
 
 
 # --- helpers --------------------------------------------------------------
+
+## Composite a card's real art into the art well, cover-fitted (scaled to fill,
+## centre-cropped) so it never stretches. No-op when the card ships no art.
+static func _blend_card_art(img: Image, card_id: String, x: int, y: int,
+		w: int, h: int) -> bool:
+	if card_id.is_empty() or w <= 0 or h <= 0:
+		return false
+	var art := AssetManifest.card_art_image(card_id)
+	if art == null or art.get_width() <= 0 or art.get_height() <= 0:
+		return false
+	art = art.duplicate()   # never mutate the cached texture's own image
+	# Godot's "detect 3D" can re-import card art VRAM-compressed once CardVisual
+	# uses it on a material; a compressed Image cannot be resized or blended.
+	if art.is_compressed() and art.decompress() != OK:
+		return false
+	var scale: float = max(float(w) / art.get_width(), float(h) / art.get_height())
+	var sw := maxi(w, int(ceil(art.get_width() * scale)))
+	var sh := maxi(h, int(ceil(art.get_height() * scale)))
+	art.resize(sw, sh, Image.INTERPOLATE_LANCZOS)
+	var region := art.get_region(Rect2i((sw - w) / 2, (sh - h) / 2, w, h))
+	if region.get_format() != img.get_format():
+		region.convert(img.get_format())
+	img.blend_rect(region, Rect2i(0, 0, w, h), Vector2i(x, y))
+	return true
 
 static func _as_dict(card) -> Dictionary:
 	if card is CardData:

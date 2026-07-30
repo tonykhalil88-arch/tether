@@ -1,0 +1,14 @@
+{
+  "card_id": "wm01-003",
+  "name": "Sora Akaza, First to Ride",
+  "sprite": {
+    "fps": 8,
+    "frames": 1,
+    "hframes": 1,
+    "idle": "sprite.png",
+    "vframes": 1
+  },
+  "vfx": {
+    "strike": "res://client/present/vfx_burst.tscn"
+  }
+}

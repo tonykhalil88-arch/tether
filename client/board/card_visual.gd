@@ -32,7 +32,9 @@ func build(p_card: CardData, p_width: float = 1.0, show_rules: bool = true) -> v
 	quad.size = Vector2(w, h)
 	face.mesh = quad
 	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = ImageTexture.create_from_image(
+	# Real card art when the card ships some; procedural sigil otherwise.
+	var art := AssetManifest.card_art(card.id)
+	mat.albedo_texture = art if art != null else ImageTexture.create_from_image(
 		PlaceholderArt.card_art(card, 336, 480))
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED   # readable first

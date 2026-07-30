@@ -21,6 +21,48 @@ func test_asset_manifest_resolves_four_channels_for_wired_card():
 	assert_true(b["vfx_strike"] is PackedScene, "strike VFX resolves")
 
 
+func test_asset_manifest_resolves_card_art_only_when_shipped():
+	AssetManifest.clear_cache()
+	assert_true(AssetManifest.card_art("wm01-001") is Texture2D,
+		"an ingested card_art.png resolves")
+	assert_null(AssetManifest.card_art("wm01-046"),
+		"a card with no card art gets none fabricated")
+
+
+## The attack strip has its own frame count. Before real art landed the client
+## assumed every attack sheet was the placeholder set's 2 frames.
+func test_asset_manifest_reads_attack_sheet_geometry():
+	AssetManifest.clear_cache()
+	assert_eq(AssetManifest.resolve("wm01-001")["attack_hframes"], 8,
+		"an ingested 8-frame attack sheet declares 8 frames")
+	assert_eq(AssetManifest.resolve("wm01-046")["attack_hframes"], 2,
+		"an undeclared attack sheet keeps the legacy 2-frame shape")
+
+
+## Ingestion contract: every manifest it writes must reference files that exist,
+## or the client silently falls back to placeholders.
+func test_every_card_manifest_points_at_files_that_exist():
+	var dir := DirAccess.open("res://assets/cards")
+	assert_not_null(dir, "assets/cards is readable")
+	for id in dir.get_directories():
+		var mpath := "res://assets/cards/%s/manifest.json" % id
+		assert_true(FileAccess.file_exists(mpath), "%s has a manifest.json" % id)
+		var m = JSON.parse_string(FileAccess.get_file_as_string(mpath))
+		assert_eq(typeof(m), TYPE_DICTIONARY, "%s manifest.json parses" % id)
+		if typeof(m) != TYPE_DICTIONARY:
+			continue
+		for section in ["sprite", "sfx", "voice", "art"]:
+			var block = m.get(section, {})
+			if typeof(block) != TYPE_DICTIONARY:
+				continue
+			for key in block.keys():
+				var v := str(block[key])
+				if not (v.ends_with(".png") or v.ends_with(".wav")):
+					continue   # frame counts, and the shared res:// VFX scene
+				assert_true(FileAccess.file_exists("res://assets/cards/%s/%s" % [id, v]),
+					"%s: %s.%s -> %s exists" % [id, section, key, v])
+
+
 func test_asset_manifest_falls_back_for_unknown_card():
 	AssetManifest.clear_cache()
 	var b := AssetManifest.resolve("wm01-does-not-exist")
@@ -38,6 +80,28 @@ func test_card_frame_renders_every_card_type():
 		var img: Image = CardFrame.render(DeckFactory.card(id))
 		assert_eq(img.get_width(), CardFrame.W, "frame width for %s" % id)
 		assert_eq(img.get_height(), CardFrame.H, "frame height for %s" % id)
+
+
+## The art window shows real art when the card ships some, and the flat accent
+## plate when it does not.
+func test_card_frame_art_window_uses_real_card_art():
+	CardFrame.clear_cache()
+	AssetManifest.clear_cache()
+	var with_art: Image = CardFrame.render(DeckFactory.card("wm01-001"))
+	var without: Image = CardFrame.render(DeckFactory.card("wm01-046"))
+	assert_gt(_art_well_colours(with_art), 8,
+		"real card art paints a varied art window")
+	assert_eq(_art_well_colours(without), 1,
+		"with no card art the window stays a flat accent plate")
+
+
+## Distinct colours sampled from inside the art well (clear of its 2px border).
+func _art_well_colours(img: Image) -> int:
+	var seen: Dictionary = {}
+	for y in range(48, 152, 4):
+		for x in range(20, 148, 4):
+			seen[img.get_pixel(x, y)] = true
+	return seen.size()
 
 
 # --- Presentation queue ---------------------------------------------------

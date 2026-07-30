@@ -175,7 +175,9 @@ func _populate(card: CardData) -> void:
 	_title.text = card.name
 	_meta.text = _meta_line(card)
 	_band.texture = _identity_band(card)
-	_art.texture = ImageTexture.create_from_image(
+	# Real card art when the card ships some; procedural sigil otherwise.
+	var art := AssetManifest.card_art(card.id)
+	_art.texture = art if art != null else ImageTexture.create_from_image(
 		PlaceholderArt.card_art(card, 336, 480))
 	_body.text = _body_bbcode(card)
 	_pin_hint.text = "click a card to pin · Esc to close" if not _pinned else "pinned · Esc to close"

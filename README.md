@@ -66,7 +66,9 @@ wildmigration/
 │   ├── match/match_controller.gd # drives the frozen engine via its public API
 │   ├── board/                    # 3D table + unit/hand card views + input
 │   └── ui/                       # HUD, main menu, win/loss
-├── assets/cards/<id>/            # per-card art drop (2 fully-wired examples)
+├── staging/<id>/                 # inbound art drop zone (never modified in place)
+├── assets/cards/<id>/            # per-card art drop, written by ingest_staging
+├── tools/ingest_staging.gd       # staging/ -> assets/cards/ ingestion + coverage
 ├── tools/gen_client_assets.gd    # procedural placeholder-asset generator
 ├── tools/gen_screens.gd          # board-schematic capture for SCREENS.md
 ├── tests/                        # GUT suites + helpers (engine + client smoke)
@@ -81,7 +83,7 @@ wildmigration/
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 ```
 
-All suites report **All tests passed!** (173 tests: 144 engine + 29 client).
+All suites report **All tests passed!** (177 tests: 144 engine + 33 client).
 The client suites (`test_client_smoke.gd`, `test_readability_smoke.gd`) cover the
 Phase 3 presentation layer and the Brief 10 readability pass (card-text
 synthesis, inspector data binding, deterministic placeholder art). Coverage:
@@ -112,6 +114,46 @@ synthesis, inspector data binding, deterministic placeholder art). Coverage:
 | `test_patch04.gd` | Patch 0.4 uncapped refresh (Bram/Stampede) + Kaya rest-5 |
 | `test_patch05.gd` | Patch 0.5 uncapped rest package + biggest-threat targeting |
 | `test_sim.gd` | simulator determinism + batch integrity |
+
+---
+
+## Ingesting card art
+
+Finished art lands in `staging/<card_id>/` and is pulled into the game by:
+
+```bash
+godot --headless --path . -s tools/ingest_staging.gd
+godot --headless --path . -s tools/ingest_staging.gd -- --dry-run
+godot --headless --path . -s tools/ingest_staging.gd -- --only wm01-001,wm01-004
+```
+
+Per card it validates the expected files, normalises WAV loudness to the
+reference measured from the original procedural example cards (cached in
+`tools/loudness_reference.json`), copies the assets into `assets/cards/<id>/`,
+writes a `manifest.json` whose frame counts and fps match the sheets actually
+ingested, and prints a coverage table:
+
+| state | meaning |
+| --- | --- |
+| `staged` | a real asset from this drop was ingested |
+| `staged*` | static art ingested — no animation sheet in this drop |
+| `present` | already in `assets/cards/`, kept (not part of this drop) |
+| `partial` | one of the two SFX channels is still missing |
+| `placeholder` | nothing on disk; `AssetManifest` generates a runtime fallback |
+
+The pass is **incremental and rerunnable**: staging folders are never modified
+or deleted, and a channel absent from the current drop leaves whatever is
+already in `assets/cards/` untouched — so art can arrive in waves.
+
+Expected files per staged card: `sprite.png` (animation sheet) or
+`sprite_raw.png` (static fallback), `attack.png`, `summon.wav`, `hit.wav`,
+`voice.wav`, `card_art.png`, and an optional `manifest.json` declaring the sheet
+geometry the generator produced. Anything a card ships `card_art.png` for shows
+that art in the CardFrame art window and the Card Inspector instead of the
+procedural `PlaceholderArt` sigil; the fallback is unchanged for cards without it.
+
+After ingesting, run `godot --headless --path . --import` to generate the
+`.import` sidecars for the new files.
 
 ---
 

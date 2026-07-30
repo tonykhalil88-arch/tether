@@ -1,0 +1,18 @@
+{
+  "card_id": "wm01-001",
+  "name": "Sora Akaza, Redgale Captain",
+  "sprite": {
+    "idle": "sprite.png",
+    "attack": "attack.png",
+    "frames": 8,
+    "hframes": 8,
+    "vframes": 1,
+    "fps": 12
+  },
+  "vfx": {
+    "strike": "res://client/present/vfx_burst.tscn"
+  },
+  "art": {
+    "card": "card_art.png"
+  }
+}

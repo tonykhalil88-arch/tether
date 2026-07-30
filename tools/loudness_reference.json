@@ -1,0 +1,8 @@
+{
+  "_comment": "Reference RMS measured from the original procedural example cards (wm01-008, wm01-046). Delete to re-measure.",
+  "targets": {
+    "hit.wav": 0.143675380076725,
+    "summon.wav": 0.24051409499358,
+    "voice.wav": 0.273841216712189
+  }
+}
