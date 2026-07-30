@@ -19,6 +19,11 @@ Godot_v*
 # ignore any local dumps a contributor points here.
 tests/**/*.tmp
 
+# Source art vault ----------------------------------------------------------
+# Raw/source renders kept locally for reference. Finished art reaches the game
+# through staging/ -> tools/ingest_staging.gd; the vault stays out of history.
+art-vault/
+
 # Simulator output ----------------------------------------------------------
 # Batch logs are generated; keep them out of version control.
 sim_logs/
