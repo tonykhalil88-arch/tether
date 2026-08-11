@@ -21,20 +21,43 @@ balance history, [`SCREENS.md`](SCREENS.md) for the client, and
 
 ---
 
-## ⚠️ Godot is not installed in this container
+## ⚠️ Godot is not preinstalled — install it first
 
-`godot` is **not on PATH** in the standard remote-execution container. You can
-read, reason about and edit code here, but **you cannot run the tests, the
-simulator or the client**. Consequences:
+`godot` is **not on PATH** in a fresh remote-execution container, and the
+container is ephemeral, so **every new session has to install it again**. It
+takes about a minute and everything headless works afterwards (verified: full
+suite 146/146 green, simulator and import scan both fine on
+`4.5.stable.official.876b29033`):
 
-- **Never claim tests pass.** Say exactly what you did and did not verify.
-- Prefer changes you can justify by reading the code and its tests.
-- When you change behaviour, also write/extend the GUT test that would prove it,
-  so whoever has Godot 4.5 can verify in one command.
-- If a task genuinely requires execution, say so plainly rather than guessing.
+```bash
+cd /tmp && curl -sSL -o godot45.zip \
+  https://github.com/godotengine/godot/releases/download/4.5-stable/Godot_v4.5-stable_linux.x86_64.zip
+# optional but cheap — verify against the official sums file
+curl -sSL -O https://github.com/godotengine/godot/releases/download/4.5-stable/SHA512-SUMS.txt
+grep 'linux.x86_64.zip' SHA512-SUMS.txt | sed 's/Godot_v4.5-stable_linux.x86_64.zip/godot45.zip/' | sha512sum -c -
+unzip -oq godot45.zip && install -m 0755 Godot_v4.5-stable_linux.x86_64 /usr/local/bin/godot
+godot --version   # -> 4.5.stable.official.876b29033
+```
 
-All commands below are the *correct* commands — they just need a machine with
-Godot 4.5.
+Notes:
+
+- Use the **4.5** build. The project targets Godot 4.5 (`config/features` in
+  `project.godot`) and GUT 9.5.0 is the release that targets 4.5.
+- The plain editor binary is the right one — `--headless --editor --quit` (the
+  required `class_name` import scan) needs the editor, not an export template.
+- `github.com` and its release-asset host are reachable through the agent proxy;
+  `api.github.com` returns 403, so fetch release assets by direct URL rather than
+  through the API.
+- No GPU here, so the **client itself (`godot`, `client/main.tscn`) still cannot
+  be run** — only the headless suite, simulator and tools. Client behaviour is
+  covered headlessly by `test_client_smoke.gd`.
+- The import scan writes `.godot/` (gitignored) and generates any missing `.uid`
+  / `.import` sidecars — those *are* tracked, so commit them if they appear.
+
+If installation is unavailable (egress blocked, no disk), fall back to
+read-only work: **never claim tests pass**, say exactly what you did and did not
+verify, prefer changes justifiable by reading the code, and still write the GUT
+test that would prove any behaviour change.
 
 ---
 
@@ -341,8 +364,9 @@ Intermediate partials (`iso_*.json`, `patch*_arch.json`, `patch*_c0.json`) and
 - **`class_name` needs an import scan.** After adding/renaming a script, run
   `godot --headless --editor --quit` or every suite fails on an unresolved
   identifier. This is the single most common cause of a "broken" test run.
-- **The README's test count (139) is stale** — the suite is **146** (139 engine +
-  7 client, per `SCREENS.md`), and the README coverage table omits
+- **The README's test count (139) is stale** — the suite is **146** across 26
+  suites (139 engine + 7 client, per `SCREENS.md`), confirmed by an actual run
+  on Godot 4.5 stable; the README coverage table also omits
   `test_client_smoke.gd`. Prefer `SCREENS.md`'s number; ideally fix the README
   when you touch that section.
 - **Banner freeze is capped at 1 per player per turn** (`banner_freezes_used`,
