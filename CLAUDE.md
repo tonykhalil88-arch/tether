@@ -24,10 +24,17 @@ balance history, [`SCREENS.md`](SCREENS.md) for the client, and
 ## ⚠️ Godot is not preinstalled — install it first
 
 `godot` is **not on PATH** in a fresh remote-execution container, and the
-container is ephemeral, so **every new session has to install it again**. It
-takes about a minute and everything headless works afterwards (verified: full
-suite 146/146 green, simulator and import scan both fine on
-`4.5.stable.official.876b29033`):
+container is ephemeral, so **every new session has to install it again**.
+
+**On the web this is automatic**: `.claude/hooks/session-start.sh` (registered as
+a `SessionStart` hook in `.claude/settings.json`) installs Godot 4.5 and warms
+the import scan before the session starts — ~13s cold, ~8s warm. Check with
+`godot --version` before assuming you need to do anything. The hook is
+remote-only and a no-op for local sessions.
+
+To install by hand (or if the hook did not run) — about a minute, after which
+everything headless works (verified: full suite 146/146 green, simulator and
+import scan both fine on `4.5.stable.official.876b29033`):
 
 ```bash
 cd /tmp && curl -sSL -o godot45.zip \
@@ -72,8 +79,14 @@ godot --headless --editor --quit
 # Full test suite (GUT 9.5.0, vendored in addons/gut/). 146 tests, 26 suites.
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs=true -gexit
 
-# A single suite
-godot --headless -s addons/gut/gut_cmdln.gd -gtest=res://tests/unit/test_freeze.gd -gexit
+# A single suite. Use -gselect (matches by script name) — -gtest= does NOT
+# isolate a suite, because .gutconfig.json's `dirs` still applies and the whole
+# suite runs anyway.
+godot --headless -s addons/gut/gut_cmdln.gd -gselect=test_freeze.gd -gexit
+
+# Parse-check one script (there is no configured linter; this is the closest
+# equivalent). Exits 1 on a parse error, 0 when clean.
+godot --headless --check-only --script engine/game_engine.gd
 
 # AI-vs-AI simulator (flags go after `--`)
 godot --headless -s sim/run.gd -- --games=100 --seed=1 --out=sim_logs
